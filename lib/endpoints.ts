@@ -2,9 +2,9 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
 // Auth endpoints
 export const authEndpoints = {
-  login: `${API_BASE_URL}/admin/login`,
+  login: `${API_BASE_URL}/user/login`,
   logout: `${API_BASE_URL}/admin/logout`,
-  me: `${API_BASE_URL}/admin/me`,
+  me: `${API_BASE_URL}/user/me`,
   refreshToken: `${API_BASE_URL}/admin/refresh`,
 }
 
