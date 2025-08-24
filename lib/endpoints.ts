@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
 // Auth endpoints
 export const authEndpoints = {
@@ -94,4 +94,21 @@ export const uploadEndpoints = {
   image: `${API_BASE_URL}/admin/upload/image`,
   banner: `${API_BASE_URL}/admin/upload/banner`,
   avatar: `${API_BASE_URL}/admin/upload/avatar`,
+}
+
+// Roles (User Types) endpoints
+export const roleEndpoints = {
+  getAll: `${API_BASE_URL}/admin/roles`,
+  getRequestables: `${API_BASE_URL}/admin/roles?onlyRequestables=true`,
+  getById: (id: string | number) => `${API_BASE_URL}/admin/roles/${id}`,
+  create: `${API_BASE_URL}/admin/roles`,
+  update: (id: string | number) => `${API_BASE_URL}/admin/roles/${id}`,
+  delete: (id: string | number) => `${API_BASE_URL}/admin/roles/${id}`,
+}
+
+export const systemSettingEndpoints = {
+  getAll: `${API_BASE_URL}/admin/settings`,
+  create: `${API_BASE_URL}/admin/settings`,
+  update: (id: string | number) => `${API_BASE_URL}/admin/settings/${id}`,
+  delete: (id: string | number) => `${API_BASE_URL}/admin/settings/${id}`,
 }

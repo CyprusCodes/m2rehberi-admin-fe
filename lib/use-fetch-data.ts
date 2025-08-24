@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { AxiosPromise } from "axios"
 
 const useFetchData = (
-  apiCallFn: () => AxiosPromise<any> | Promise<{ data: never[] }>,
+  apiCallFn: () => AxiosPromise<any> | Promise<{ data: any }>,
   deps: any = [],
   options: {
     enabled?: boolean

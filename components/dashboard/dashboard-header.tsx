@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -12,10 +13,28 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ModeToggle } from "@/components/mode-toggle"
 import { Bell, LogOut, User } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 
 export function DashboardHeader() {
   const router = useRouter()
+  const pathname = usePathname()
+
+  const segments = (pathname || "").split("/").filter(Boolean)
+  const baseIndex = segments.indexOf("dashboard")
+  const trail = baseIndex >= 0 ? segments.slice(baseIndex + 1) : []
+
+  const toTitleCase = (s: string) =>
+    decodeURIComponent(s)
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase())
 
   const handleLogout = () => {
     localStorage.removeItem("metinport_auth")
@@ -25,7 +44,30 @@ export function DashboardHeader() {
   return (
     <header className="flex h-16 items-center justify-between border-b bg-card px-6">
       <div className="flex items-center gap-4">
-        <h2 className="text-lg font-semibold">Admin Panel</h2>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            {trail.map((seg, idx) => {
+              const href = "/dashboard/" + trail.slice(0, idx + 1).join("/")
+              const label = toTitleCase(seg)
+              const isLast = idx === trail.length - 1
+              return (
+                <React.Fragment key={href}>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    {isLast ? (
+                      <BreadcrumbPage>{label}</BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink href={href}>{label}</BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                </React.Fragment>
+              )
+            })}
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
 
       <div className="flex items-center gap-4">

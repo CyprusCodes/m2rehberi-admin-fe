@@ -88,6 +88,7 @@ export type ServerOwnerRequestRow = {
   firstName: string;
   lastName: string;
   email: string;
+  selectedUserType: 'server_owner' | 'streamer';
   message: string | null;
   status: 'pending' | 'approved' | 'rejected';
   rejectReason: string | null;
@@ -100,8 +101,8 @@ export const fetchServerOwnerRequests = async (): Promise<{ data: ServerOwnerReq
   return res.data as { data: ServerOwnerRequestRow[] };
 };
 
-export const createServerOwnerRequest = async (userId: number, message: string) => {
-  const res = await apiClient.post(serverOwnerRequestEndpoints.create, { userId, message });
+export const createServerOwnerRequest = async (userId: number, message: string, selectedUserType: number) => {
+  const res = await apiClient.post(serverOwnerRequestEndpoints.create, { userId, message, selectedUserType });
   return res.data as { requestId: number };
 };
 
