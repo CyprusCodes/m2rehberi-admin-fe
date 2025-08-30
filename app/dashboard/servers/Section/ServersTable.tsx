@@ -26,12 +26,12 @@ type ApiServer = {
   approval_status: "pending" | "approved" | "rejected"
   approved_by: number | null
   created_at: string | null
-  server_ip_address: string | null
-  server_port: number | null
-  server_password: string | null
+  discord_link?: string | null
+  website_link?: string | null
+  youtube_links?: any | null
   max_players: number | null
   location: string | null
-  version: string | null
+  tag_id?: number | null
   reject_note?: string | null
   owner_first_name?: string | null
   owner_last_name?: string | null
@@ -53,13 +53,11 @@ type TableServer = {
   maxPlayers: number
   uptime: string
   location: string
-  version: string
+  tagId?: number | null
   banner?: string
   rules?: string[]
   description?: string
-  ip: string
-  port: string
-  password: string
+  links?: { discord?: string | null; website?: string | null; youtube?: string[] }
   rating: number
   reviews: number
   rejectionReason?: string
@@ -78,13 +76,15 @@ const mapToTable = (s: ApiServer): TableServer => ({
   maxPlayers: Number(s.max_players || 0),
   uptime: "-",
   location: s.location || "-",
-  version: s.version || "-",
+  tagId: s.tag_id ?? null,
   banner: undefined,
   rules: undefined,
   description: undefined,
-  ip: s.server_ip_address || "-",
-  port: s.server_port ? String(s.server_port) : "-",
-  password: s.server_password || "",
+  links: {
+    discord: s.discord_link || undefined,
+    website: s.website_link || undefined,
+    youtube: Array.isArray(s.youtube_links) ? s.youtube_links : undefined,
+  },
   rating: 0,
   reviews: 0,
   rejectionReason: s.reject_note || undefined,
@@ -166,7 +166,7 @@ export function ServersTable() {
             <TableHead>Gönderen</TableHead>
             <TableHead>Oyuncular</TableHead>
             <TableHead>Konum</TableHead>
-            <TableHead>IP:Port</TableHead>
+            <TableHead>Bağlantılar</TableHead>
             <TableHead>Uptime</TableHead>
             <TableHead>Değerlendirme</TableHead>
             <TableHead className="text-right">İşlemler</TableHead>
@@ -183,7 +183,9 @@ export function ServersTable() {
                   </Avatar>
                   <div>
                     <div className="font-medium">{server.name}</div>
-                    <div className="text-sm text-muted-foreground">v{server.version}</div>
+                    {server.tagId != null && (
+                      <div className="text-xs text-muted-foreground">Tag ID: {server.tagId}</div>
+                    )}
                   </div>
                 </div>
               </TableCell>
@@ -205,11 +207,16 @@ export function ServersTable() {
               </TableCell>
               <TableCell>{server.location}</TableCell>
               <TableCell>
-                <div className="text-sm">
-                  <div className="font-mono">
-                    {server.ip}:{server.port}
-                  </div>
-                  {server.password && <div className="text-xs text-muted-foreground">Şifre: {server.password}</div>}
+                <div className="flex flex-col gap-1 text-xs">
+                  {server.links?.discord && (
+                    <a className="text-blue-600 hover:underline" href={server.links.discord} target="_blank" rel="noreferrer">Discord</a>
+                  )}
+                  {server.links?.website && (
+                    <a className="text-blue-600 hover:underline" href={server.links.website} target="_blank" rel="noreferrer">Website</a>
+                  )}
+                  {server.links?.youtube && server.links.youtube.length > 0 && (
+                    <span className="text-muted-foreground">YouTube: {server.links.youtube.length} link</span>
+                  )}
                 </div>
               </TableCell>
               <TableCell>

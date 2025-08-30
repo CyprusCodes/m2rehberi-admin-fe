@@ -20,10 +20,10 @@ export interface CreateServerPayload {
   serverType?: string;
   location?: string;
   maxPlayers: number;
-  version?: string;
-  serverIpAddress: string;
-  serverPort: number;
-  serverPassword?: string | null;
+  tagId?: number;
+  discordLink?: string | null;
+  websiteLink?: string | null;
+  youtubeLinks?: string[] | null;
   serverRules?: string;
   systems?: any;
   features?: any;

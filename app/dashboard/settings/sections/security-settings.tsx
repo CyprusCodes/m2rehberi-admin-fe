@@ -1,12 +1,16 @@
+'use client'
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Separator } from "@/components/ui/separator"
 import { Shield, Key, AlertTriangle, Users } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function SecuritySettings() {
+  const router = useRouter()
+  
   return (
     <div className="space-y-6">
       <Card>
@@ -21,39 +25,10 @@ export function SecuritySettings() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>İki Faktörlü Doğrulama</Label>
-                <div className="text-sm text-muted-foreground">Admin hesapları için 2FA zorunlu</div>
+                <Label>Email Doğrulama</Label>
+                <div className="text-sm text-muted-foreground">Tüm hesaplar için email doğrulama zorunlu</div>
               </div>
               <Switch />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>IP Kısıtlaması</Label>
-                <div className="text-sm text-muted-foreground">Belirli IP adreslerinden erişim</div>
-              </div>
-              <Switch />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Oturum Zaman Aşımı</Label>
-                <div className="text-sm text-muted-foreground">Otomatik oturum kapatma</div>
-              </div>
-              <Switch defaultChecked />
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="sessionTimeout">Oturum Süresi (dakika)</Label>
-              <Input id="sessionTimeout" type="number" defaultValue="30" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="maxAttempts">Maksimum Giriş Denemesi</Label>
-              <Input id="maxAttempts" type="number" defaultValue="5" />
             </div>
           </div>
         </CardContent>
@@ -108,26 +83,14 @@ export function SecuritySettings() {
           <CardDescription>Kullanıcı rolleri ve izinleri</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Admin Onayı</Label>
-                <div className="text-sm text-muted-foreground">Yeni admin hesapları manuel onay gerektirir</div>
-              </div>
-              <Switch defaultChecked />
-            </div>
 
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Rol Tabanlı Erişim</Label>
-                <div className="text-sm text-muted-foreground">Kullanıcı rollerine göre sayfa erişimi</div>
-              </div>
-              <Switch defaultChecked />
-            </div>
-          </div>
 
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm"
+            onClick={() => {
+              router.push("/dashboard/roles")
+            }}
+            >
               Rolleri Yönet
             </Button>
             <Button variant="outline" size="sm">

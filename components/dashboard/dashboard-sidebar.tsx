@@ -57,12 +57,12 @@ const navigation = [
     icon: Package,
   },
   {
-    name: "Server Owner Requests",
+    name: "User Role Requests",
     href: "/dashboard/server-owner-requests",
     icon: ShieldCheck,
   },
   {
-    name: "Server Settings",
+    name: "System Settings",
     href: "/dashboard/settings",
     icon: Settings,
   },

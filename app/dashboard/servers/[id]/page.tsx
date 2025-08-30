@@ -5,20 +5,22 @@ import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-// import { Progress } from "@/components/ui/progress"
-// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-// import { Label } from "@/components/ui/label"
 import {
   ArrowLeft,
-  Globe,
   Shield,
   Clock,
   Server,
-  Key,
   Star,
   Reply,
   Send,
   X,
+  ExternalLink,
+  Calendar,
+  User,
+  Tag,
+  Users,
+  Gamepad2,
+  Settings,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -163,13 +165,38 @@ export default function ServerDetailPage() {
     switch (status) {
       case "online":
         return (
-          <Badge className="bg-green-500 hover:bg-green-600">Çevrimiçi</Badge>
+          <Badge className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700">
+            Çevrimiçi
+          </Badge>
         );
       case "offline":
         return <Badge variant="destructive">Çevrimdışı</Badge>;
       case "maintenance":
         return (
-          <Badge className="bg-yellow-500 hover:bg-yellow-600">Bakım</Badge>
+          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700">
+            Bakım
+          </Badge>
+        );
+      default:
+        return <Badge variant="secondary">Bilinmiyor</Badge>;
+    }
+  };
+
+  const getApprovalBadge = (status: string) => {
+    switch (status) {
+      case "approved":
+        return (
+          <Badge className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700">
+            Onaylandı
+          </Badge>
+        );
+      case "rejected":
+        return <Badge variant="destructive">Reddedildi</Badge>;
+      case "pending":
+        return (
+          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700">
+            Beklemede
+          </Badge>
         );
       default:
         return <Badge variant="secondary">Bilinmiyor</Badge>;
@@ -196,13 +223,13 @@ export default function ServerDetailPage() {
       ? items.split("\n")
       : [];
     if (!arr.length)
-      return <span className="text-sm text-muted-foreground">-</span>;
+      return <span className="text-sm text-muted-foreground">Belirtilmemiş</span>;
     return (
       <div className="flex flex-wrap gap-2">
         {arr.map((it: any, idx: number) => (
-          <span key={idx} className="px-2 py-1 text-xs rounded-full bg-muted">
+          <Badge key={idx} variant="secondary" className="text-xs">
             {String(it)}
-          </span>
+          </Badge>
         ))}
       </div>
     );
@@ -251,176 +278,249 @@ export default function ServerDetailPage() {
 
       {segment === "overview" && (
         <>
-          {/* Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Özet</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <div>
-                  <div className="text-sm text-muted-foreground">Sahip</div>
-                  <div className="text-base font-medium">{ownerName}</div>
-                  <div className="text-xs text-muted-foreground">
-                    Eklenme: {createdAtStr}
+          {/* Server Overview */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* Basic Info */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Server className="h-5 w-5" />
+                  Temel Bilgiler
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-sm text-muted-foreground">Sunucu ID</div>
+                    <div className="font-medium">#{server.server_id}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Oyun Türü</div>
+                    <div className="font-medium capitalize">{server.game_type}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Durum</div>
+                    <div className="mt-1">{getStatusBadge(server.status)}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Maksimum Oyuncu</div>
+                    <div className="font-medium flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      {server.max_players}
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">
-                    Onay Durumu
-                  </div>
-                  <div className="text-base font-medium flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />{" "}
-                    {server.approval_status}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    Onay Tarihi: {approvedAtStr}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">Konum</div>
-                  <div className="text-base font-medium flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-muted-foreground" />{" "}
-                    {server.location || "-"}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">Versiyon</div>
-                  <div className="text-base font-medium flex items-center gap-2">
-                    <Server className="h-4 w-4 text-muted-foreground" />{" "}
-                    {server.version || "-"}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Meta Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Detaylar</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Detail label="Sunucu ID" value={server.server_id} />
-                <Detail label="Oyun Tipi" value={server.game_type} />
-                <Detail label="Sunucu Tipi" value={server.server_type} />
-                <Detail label="Zorluk" value={server.server_difficulty} />
-                <Detail
-                  label="Seviye Aralığı"
-                  value={server.server_level_range}
-                />
-                <Detail label="Maks. Oyuncu" value={server.max_players} />
-                <Detail label="Durum" value={server.status} />
-              </div>
-            </CardContent>
-          </Card>
+            {/* Owner & Dates */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Sahip & Tarihler
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-sm text-muted-foreground">Sunucu Sahibi</div>
+                    <div className="font-medium">{ownerName}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Oluşturulma</div>
+                    <div className="text-sm flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      {createdAtStr}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Son Güncelleme</div>
+                    <div className="text-sm flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      {server.updated_at ? moment(server.updated_at).locale("tr").format("lll") : "-"}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Connection */}
+            {/* Approval Status */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Onay Durumu
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-sm text-muted-foreground">Durum</div>
+                    <div className="mt-1">{getApprovalBadge(server.approval_status)}</div>
+                  </div>
+                  {server.approved_at && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">Onay Tarihi</div>
+                      <div className="text-sm">{approvedAtStr}</div>
+                    </div>
+                  )}
+                  {server.approval_note && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">Onay Notu</div>
+                      <div className="text-sm bg-muted p-2 rounded">{server.approval_note}</div>
+                    </div>
+                  )}
+                  {server.reject_note && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">Reddetme Notu</div>
+                      <div className="text-sm bg-red-50 dark:bg-red-950 p-2 rounded border border-red-200 dark:border-red-800">{server.reject_note}</div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Server Details */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Key className="h-5 w-5" /> Bağlantı Bilgileri
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-3">
-                <Detail
-                  label="IP Adresi"
-                  value={server.server_ip_address}
-                  mono
-                />
-                <Detail label="Port" value={server.server_port} mono />
-                <Detail
-                  label="Şifre"
-                  value={server.server_password || "-"}
-                  mono
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Features / Events / Systems */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Özellikler</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <PillList items={server.features} />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Etkinlikler</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <PillList items={server.events} />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Sistemler</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <PillList items={server.systems} />
-            </CardContent>
-          </Card>
-
-          {/* Rules */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" /> Sunucu Kuralları
+                <Settings className="h-5 w-5" />
+                Sunucu Detayları
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {(server.server_rules
-                ? String(server.server_rules).split("\n")
-                : []
-              ).length ? (
-                <div className="space-y-2">
-                  {String(server.server_rules)
-                    .split("\n")
-                    .map((rule: string, idx: number) => (
-                      <div key={idx} className="text-sm">
-                        • {rule}
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-sm text-muted-foreground">Zorluk Seviyesi</div>
+                    <div className="font-medium">{server.server_difficulty}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Seviye Aralığı</div>
+                    <div className="font-medium">{server.server_level_range}</div>
+                  </div>
+                  {server.tag_name && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">Kategori</div>
+                      <div className="mt-1">
+                        <Badge variant="outline" className="flex items-center gap-1 w-fit">
+                          <Tag className="h-3 w-3" />
+                          {server.tag_name}
+                        </Badge>
                       </div>
-                    ))}
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <span className="text-sm text-muted-foreground">-</span>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Approval Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Onay Bilgileri</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Detail label="Onay Durumu" value={server.approval_status} />
-                <Detail label="Onaylayan" value={server.approved_by ?? "-"} />
-                <Detail label="Onay Tarihi" value={approvedAtStr} />
-                <Detail label="Onay Notu" value={server.approval_note ?? "-"} />
-                <Detail
-                  label="Reddetme Notu"
-                  value={server.reject_note ?? "-"}
-                />
-                <Detail
-                  label="Güncellenme"
-                  value={
-                    server.updated_at
-                      ? moment(server.updated_at).locale("tr").format("lll")
-                      : "-"
-                  }
-                />
+                <div className="space-y-4">
+                  {server.discord_link && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">Discord</div>
+                      <a 
+                        href={server.discord_link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 text-sm"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        Discord Sunucusu
+                      </a>
+                    </div>
+                  )}
+                  {server.website_link && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">Website</div>
+                      <a 
+                        href={server.website_link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 text-sm"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        Web Sitesi
+                      </a>
+                    </div>
+                  )}
+                  {server.youtube_links && server.youtube_links.length > 0 && (
+                    <div>
+                      <div className="text-sm text-muted-foreground">YouTube</div>
+                      <div className="space-y-1">
+                        {server.youtube_links.map((link: string, idx: number) => (
+                          <a 
+                            key={idx}
+                            href={link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 text-sm"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            Video {idx + 1}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
+
+          {/* Game Features */}
+          <div className="grid gap-6 md:grid-cols-3">
+            {server.features && server.features.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Gamepad2 className="h-5 w-5" />
+                    Özellikler
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <PillList items={server.features} />
+                </CardContent>
+              </Card>
+            )}
+
+            {server.events && server.events.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Etkinlikler</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <PillList items={server.events} />
+                </CardContent>
+              </Card>
+            )}
+
+            {server.systems && server.systems.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sistemler</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <PillList items={server.systems} />
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Server Rules */}
+          {server.server_rules && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Sunucu Kuralları
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-muted/50 p-4 rounded-lg">
+                  <div className="whitespace-pre-wrap text-sm">{server.server_rules}</div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </>
       )}
       {segment === "feedback" && (
