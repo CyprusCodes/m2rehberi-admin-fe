@@ -1,7 +1,7 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
-import { Clock, X, Check } from "lucide-react"
+import { Clock, X, Check, Settings } from "lucide-react"
 
 interface ServerStatusBadgeProps {
   status: string
@@ -15,6 +15,8 @@ export function ServerStatusBadge({ status }: ServerStatusBadgeProps) {
     case "offline":
     case "closed":
       return <Badge variant="destructive">Kapalı</Badge>
+    case "maintenance":
+      return <Badge className="bg-yellow-500 hover:bg-yellow-600"><Settings className="w-3 h-3 mr-1" />Bakım</Badge>
     case "pending":
       return <Badge className="bg-orange-500 hover:bg-orange-600"><Clock className="w-3 h-3 mr-1" />Onay Bekliyor</Badge>
     case "rejected":

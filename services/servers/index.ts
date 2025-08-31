@@ -83,3 +83,11 @@ export const answerServerFeedback = async (
   const res = await apiClient.post(serverEndpoints.feedbackAnswer(String(id)), payload);
   return res.data as { feedbackId: number; serverId: number; updated: any };
 };
+
+export const updateServerStatus = async (
+  id: string | number,
+  payload: { status: "online" | "offline" | "maintenance" }
+) => {
+  const res = await apiClient.put(serverEndpoints.updateStatus(String(id)), payload);
+  return res.data as { serverId: number; status: "updated"; updated: any };
+};
