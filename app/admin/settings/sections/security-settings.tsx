@@ -88,7 +88,7 @@ export function SecuritySettings() {
           <div className="flex gap-2">
             <Button variant="outline" size="sm"
             onClick={() => {
-              router.push("/dashboard/roles")
+              router.push("/admin/roles")
             }}
             >
               Rolleri Yönet

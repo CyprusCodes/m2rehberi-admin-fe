@@ -19,8 +19,8 @@ const orbitron = Orbitron({
 })
 
 export const metadata: Metadata = {
-  title: "MetinPort - Admin Panel",
-  description: "Metin2 Server Management System",
+  title: "MetinPort - Metin2 Server Management System",
+  description: "Metin2 Server Management System - Admin Panel & Frontend",
   generator: "v0.dev",
 }
 

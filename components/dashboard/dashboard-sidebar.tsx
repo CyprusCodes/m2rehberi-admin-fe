@@ -23,47 +23,47 @@ import {
 const navigation = [
   {
     name: "Dashboard",
-    href: "/dashboard",
+    href: "/admin",
     icon: BarChart3,
   },
   {
     name: "Users",
-    href: "/dashboard/users",
+    href: "/admin/users",
     icon: Users,
   },
   {
     name: "Servers",
-    href: "/dashboard/servers",
+    href: "/admin/servers",
     icon: Server,
   },
   {
     name: "Forums",
-    href: "/dashboard/forums",
+    href: "/admin/forums",
     icon: MessageSquare,
   },
   {
     name: "Tags",
-    href: "/dashboard/tags",
+    href: "/admin/tags",
     icon: Tags,
   },
   {
     name: "Advertisement",
-    href: "/dashboard/advertisement",
+    href: "/admin/advertisement",
     icon: Megaphone,
   },
   {
     name: "Ad Packages",
-    href: "/dashboard/advertisement/packages",
+    href: "/admin/advertisement/packages",
     icon: Package,
   },
   {
     name: "User Role Requests",
-    href: "/dashboard/server-owner-requests",
+    href: "/admin/server-owner-requests",
     icon: ShieldCheck,
   },
   {
     name: "System Settings",
-    href: "/dashboard/settings",
+    href: "/admin/settings",
     icon: Settings,
   },
 ]

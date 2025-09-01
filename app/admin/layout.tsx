@@ -1,8 +1,14 @@
 import type React from "react"
+import type { Metadata } from "next"
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 
-export default function DashboardLayout({
+export const metadata: Metadata = {
+  title: "MetinPort - Admin Panel",
+  description: "MetinPort yönetim paneli",
+}
+
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode

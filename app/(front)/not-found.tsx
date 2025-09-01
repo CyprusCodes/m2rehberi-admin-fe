@@ -50,7 +50,7 @@ export default function NotFound() {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push('/admin')}
               className="w-full sm:w-auto bg-gradient-to-r from-primary to-gray-600 hover:from-primary/90 hover:to-gray-700 text-white shadow-lg transition-all duration-300 transform hover:scale-105 group"
               size="lg"
             >
@@ -77,7 +77,7 @@ export default function NotFound() {
               <Button
                 variant="link"
                 className="p-0 h-auto text-primary hover:text-primary/80 underline"
-                onClick={() => router.push('/dashboard')}
+                onClick={() => router.push('/admin')}
               >
                 Tüm menüleri görüntüleyin
               </Button>

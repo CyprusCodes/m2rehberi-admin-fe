@@ -4,7 +4,7 @@ import { LandingFeatures } from '@/components/landing/features'
 import { LandingMobileApp } from '@/components/landing/mobile-app'
 import { LandingFooter } from '@/components/landing/footer'
 
-export default function HomePage() {
+export default function FrontendPage() {
   return (
     <div className="min-h-screen">
       <LandingNavbar />

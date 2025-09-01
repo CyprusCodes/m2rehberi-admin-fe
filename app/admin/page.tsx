@@ -2,11 +2,11 @@ import { DashboardStats } from "@/components/dashboard/dashboard-stats"
 import { RecentActivity } from "@/components/dashboard/recent-activity"
 import { ServerStatus } from "@/components/dashboard/server-status"
 
-export default function DashboardPage() {
+export default function AdminPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <p className="text-muted-foreground">MetinPort yönetim paneline hoş geldiniz</p>
       </div>
 

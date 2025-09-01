@@ -150,7 +150,7 @@ export default function ServerDetailPage() {
           <p className="text-muted-foreground mb-4">
             Aradığınız sunucu mevcut değil veya bir hata oluştu.
           </p>
-          <Link href="/dashboard/servers">
+          <Link href="/admin/servers">
             <Button>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Sunuculara Dön
@@ -239,7 +239,7 @@ export default function ServerDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-4">
-        <Link href="/dashboard/servers">
+        <Link href="/admin/servers">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Geri
