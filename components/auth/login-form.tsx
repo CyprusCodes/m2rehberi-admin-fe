@@ -27,7 +27,7 @@ export function LoginForm() {
     try {
       const ok = await doLogin(email, password)
       if (ok) {
-        router.push("/dashboard")
+        router.push("/admin")
       } else {
         setError("Geçersiz email veya şifre")
       }

@@ -28,7 +28,7 @@ export function DashboardHeader() {
   const pathname = usePathname()
 
   const segments = (pathname || "").split("/").filter(Boolean)
-  const baseIndex = segments.indexOf("dashboard")
+  const baseIndex = segments.indexOf("admin")
   const trail = baseIndex >= 0 ? segments.slice(baseIndex + 1) : []
 
   const toTitleCase = (s: string) =>
@@ -47,10 +47,10 @@ export function DashboardHeader() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+              <BreadcrumbLink href="/admin">Dashboard</BreadcrumbLink>
             </BreadcrumbItem>
             {trail.map((seg, idx) => {
-              const href = "/dashboard/" + trail.slice(0, idx + 1).join("/")
+              const href = "/admin/" + trail.slice(0, idx + 1).join("/")
               const label = toTitleCase(seg)
               const isLast = idx === trail.length - 1
               return (

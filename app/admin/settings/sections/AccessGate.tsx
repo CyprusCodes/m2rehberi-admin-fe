@@ -67,7 +67,7 @@ export function AccessGate({ onGranted }: AccessGateProps) {
       const attempts = Number(localStorage.getItem("settings_access_attempts") || "0") + 1
       localStorage.setItem("settings_access_attempts", String(attempts))
       if (attempts >= 3) {
-        router.replace("/dashboard")
+        router.replace("/admin")
         return
       }
     } catch {}
