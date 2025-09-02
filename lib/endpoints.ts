@@ -9,6 +9,41 @@ export const authEndpoints = {
   checkEmail: `${API_BASE_URL}/user/check-email`,
 }
 
+export const frontendUserEndpoints = {
+  login: `${API_BASE_URL}/user/login`,
+  register: `${API_BASE_URL}/user/register`,
+  verifyEmail: `${API_BASE_URL}/user/verify-email`,
+  changePassword: `${API_BASE_URL}/change-password`,
+  getUsers: `${API_BASE_URL}/user/users`,
+  deleteUserById: (id: number | string) => `${API_BASE_URL}/user/delete-user/${id}`,
+  getUserById: (id: number | string) => `${API_BASE_URL}/user/get-user/${id}`,
+  refreshCurrentUser: `${API_BASE_URL}/user/refresh-current-user`,
+  getCurrentUserPermissions: `${API_BASE_URL}/user/current-user-permissions`,
+  forgotPassword: `${API_BASE_URL}/user/forgot-password`,
+  editProfile: `${API_BASE_URL}/user/edit-profile`,
+  getMe: `${API_BASE_URL}/user/me`,
+}
+
+export const frontendServerEndpoints = {
+  getActiveServers: `${API_BASE_URL}/front/servers`,
+  getActiveServerById: (id: number | string) => `${API_BASE_URL}/front/servers/${id}`,
+  getServerFeedback: (id: number | string) => `${API_BASE_URL}/front/servers/${id}/feedback`,
+  createServerFeedback: (id: number | string) => `${API_BASE_URL}/front/servers/${id}/feedback`,
+  createServer: `${API_BASE_URL}/front/servers`,
+  getUserServers: `${API_BASE_URL}/front/user/servers`,
+  getUserServerById: (id: number | string) => `${API_BASE_URL}/front/user/servers/${id}`,
+  updateUserServerStatus: (id: number | string) => `${API_BASE_URL}/front/user/servers/${id}/status`,
+}
+
+export const frontendRoleEndpoints = {
+  getRequestables: `${API_BASE_URL}/front/roles?onlyRequestables=true`,
+}
+
+export const frontendServerOwnerRequestEndpoints = {
+  create: `${API_BASE_URL}/front/roles/server-owner-requestable`,
+  checkUserRequest: `${API_BASE_URL}/front/server-owner-requests/check`,
+}
+
 // Users endpoints
 export const adminUserEndpoints = {
   getAll: `${API_BASE_URL}/admin/users`,

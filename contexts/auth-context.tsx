@@ -2,23 +2,32 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { login as loginRequest, logout as logoutRequest, getMe } from "@/services/auth/login"
-import { getAuthToken, setAuthToken, removeAuthToken, setUser as setUserStorage, getUser as getUserStorage, removeUser as removeUserStorage } from "@/lib/storage"
+import { setAuthToken, getAuthToken, removeAuthToken, getUser, removeUser, setUser as setUserToStorage } from "@/lib/storage"
 
 interface User {
   id: string
   email: string
   name: string
-  role: "admin" | "moderator" | "user"
+  role: "super_admin" | "user" | "server_owner"
   avatar?: string
+  userType?: string
+  userTypeLabel?: string
+  phoneNumber?: string
+  userStatus?: string
+  emailVerifyStatus?: string
+  isServerOwnerRequestable?: number
 }
 
 interface AuthContextType {
   user: User | null
-  login: (email: string, password: string) => Promise<boolean>
+  adminLogin: (email: string, password: string) => Promise<boolean>
+  userLogin: (email: string, password: string) => Promise<boolean>
   logout: () => void
   isLoading: boolean
   isAuthenticated: boolean
+  isAdmin: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -26,69 +35,147 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+
+  const createUserData = (meData: any, email: string): User => ({
+    id: String(meData.userId ?? "self"),
+    email: meData.email ?? email,
+    name: `${meData.firstName ?? ""} ${meData.lastName ?? ""}`.trim() || email.split("@")[0],
+    role: (meData.userType ?? "user") as User["role"],
+    avatar: undefined,
+    userType: meData.userType,
+    userTypeLabel: meData.userTypeLabel,
+    phoneNumber: meData.phoneNumber,
+    userStatus: meData.userStatus,
+    emailVerifyStatus: meData.emailVerifyStatus,
+    isServerOwnerRequestable: meData.isServerOwnerRequestable
+  })
+
+  const clearStorage = () => {
+    removeAuthToken()
+    removeUser()
+  }
 
   useEffect(() => {
-    const storedUser = getUserStorage<User>()
-    if (storedUser) {
-      setUser(storedUser)
+    const initializeAuth = async () => {
+      try {
+        const storedUser = getUser<User>()
+        const token = getAuthToken()
+
+        if (storedUser && token) {
+          try {
+            const me = await getMe()
+            if (me?.user) {
+              const userData = createUserData(me.user, storedUser.email)
+              setUser(userData)
+            } else {
+              clearStorage()
+              setUser(null)
+            }
+          } catch (error) {
+            clearStorage()
+            setUser(null)
+          }
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
-    setIsLoading(false)
+
+    initializeAuth()
   }, [])
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const adminLogin = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true)
     try {
       const data = await loginRequest(email, password)
-      // Expecting { accessToken, user? }
-      if (data?.accessToken) {
-        setAuthToken(data.accessToken)
+      
+      if (!data?.accessToken) {
+        throw new Error('No access token received')
       }
-      // Fetch real user profile
+
+      setAuthToken(data.accessToken)
+      
       const me = await getMe()
-      const userData: User = {
-        id: String(me?.user?.userId ?? "self"),
-        email: me?.user?.email ?? email,
-        name: `${me?.user?.firstName ?? ""} ${me?.user?.lastName ?? ""}`.trim() || (email.split("@")[0]),
-        role: (me?.user?.userType ?? "user") as User["role"],
-        avatar: undefined
+      if (!me?.user) {
+        throw new Error('Failed to fetch user data')
       }
+
+
+      const userData = createUserData(me.user, email)
+      
+      setUserToStorage(userData)
       setUser(userData)
-      setUserStorage(userData)
-      setIsLoading(false)
+        
       return true
-    } catch (_err) {
-      setIsLoading(false)
+    } catch (error) {
+      console.error('Admin login error:', error)
       return false
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  const loginUser = async (email: string, password: string): Promise<boolean> => {
+  const userLogin = async (email: string, password: string): Promise<boolean> => {
+    setIsLoading(true)
     try {
       const data = await loginRequest(email, password)
-      if (data?.accessToken) {
-        setAuthToken(data.accessToken)
+      
+      if (!data?.accessToken) {
+        throw new Error('No access token received')
       }
+
+      // Store token in localStorage
+      setAuthToken(data.accessToken)
+      
+      const me = await getMe()
+      if (!me?.user) {
+        throw new Error('Failed to fetch user data')
+      }
+
+      const userData = createUserData(me.user, email)
+      
+      // Store user data in localStorage
+      setUserToStorage(userData)
+      
+      // Update state
+      setUser(userData)
+      
       return true
-    } catch (_err) {
+    } catch (error) {
+      console.error('User login error:', error)
       return false
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const logout = async () => {
-    try { await logoutRequest() } catch (_) {}
-    removeAuthToken()
-    removeUserStorage()
-    setUser(null)
+    try { 
+      await logoutRequest() 
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      clearStorage()
+      setUser(null)
+      router.push('/')
+    }
   }
+
+  const isAdmin = user?.role === 'super_admin'
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        login,
+        adminLogin,
+        userLogin,
         logout,
         isLoading,
         isAuthenticated: !!user,
+        isAdmin,
       }}
     >
       {children}
