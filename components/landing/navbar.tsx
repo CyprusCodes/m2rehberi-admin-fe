@@ -12,6 +12,7 @@ export function LandingNavbar() {
 
   const navItems = [
     { name: 'Features', href: '#features' },
+    { name: 'Server Başvuru', href: '#server-application' },
     { name: 'Mobile App', href: '#mobile' },
     { name: 'Contact', href: '#contact' },
   ]

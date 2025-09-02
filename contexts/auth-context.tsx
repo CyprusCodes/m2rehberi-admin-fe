@@ -62,6 +62,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const loginUser = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const data = await loginRequest(email, password)
+      if (data?.accessToken) {
+        setAuthToken(data.accessToken)
+      }
+      return true
+    } catch (_err) {
+      return false
+    }
+  }
+
   const logout = async () => {
     try { await logoutRequest() } catch (_) {}
     removeAuthToken()

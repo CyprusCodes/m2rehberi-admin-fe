@@ -6,6 +6,7 @@ export const authEndpoints = {
   logout: `${API_BASE_URL}/admin/logout`,
   me: `${API_BASE_URL}/user/me`,
   refreshToken: `${API_BASE_URL}/admin/refresh`,
+  checkEmail: `${API_BASE_URL}/user/check-email`,
 }
 
 // Users endpoints
