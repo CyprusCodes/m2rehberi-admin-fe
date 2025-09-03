@@ -98,7 +98,7 @@ export function ServersGrid() {
   }
 
   const handleViewDetails = (server: (typeof servers)[0]) => {
-    router.push(`/dashboard/servers/${server.id}`)
+    router.push(`/admin/servers/${server.id}`)
   }
 
   const handleServerAction = (serverId: string, action: string) => {

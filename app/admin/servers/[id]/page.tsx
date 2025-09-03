@@ -343,13 +343,6 @@ export default function ServerDetailPage() {
                     <div className="text-sm text-muted-foreground">Durum</div>
                     <div className="mt-1">{getStatusBadge(server.status)}</div>
                   </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">Maksimum Oyuncu</div>
-                    <div className="font-medium flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      {server.max_players}
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
