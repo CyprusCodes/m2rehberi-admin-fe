@@ -21,12 +21,20 @@ import {
   Users,
   Gamepad2,
   Settings,
+  Check,
+  Ban,
+  Power,
+  Play,
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import {
   fetchServerById,
   fetchServerFeedback,
   answerServerFeedback,
+  approveServer,
+  rejectServer,
+  updateServerStatus,
 } from "@/services/servers";
 import useFetchData from "@/lib/use-fetch-data";
 import moment from "moment";
@@ -49,6 +57,8 @@ export default function ServerDetailPage() {
   ) as any;
   const [activeReplyIndex, setActiveReplyIndex] = useState<number | null>(null);
   const [replyValue, setReplyValue] = useState<string>("");
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [approvalDialog, setApprovalDialog] = useState<{ open: boolean; action: 'approve' | 'reject'; reason: string }>({ open: false, action: 'approve', reason: '' });
 
   // Feedback mapping
   const feedbackItems = Array.isArray(fbData) ? fbData : [];
@@ -107,6 +117,37 @@ export default function ServerDetailPage() {
     }
   };
 
+  // Server management functions
+  const handleServerAction = async (action: string) => {
+    setActionLoading(action);
+    try {
+      if (action === "approve") {
+        await approveServer(serverId, { approvalNote: approvalDialog.reason || undefined });
+      } else if (action === "reject") {
+        await rejectServer(serverId, { rejectNote: approvalDialog.reason });
+      } else if (action === "online") {
+        await updateServerStatus(serverId, { status: "online" });
+      } else if (action === "offline") {
+        await updateServerStatus(serverId, { status: "offline" });
+      } else if (action === "maintenance") {
+        await updateServerStatus(serverId, { status: "maintenance" });
+      }
+      
+      // Refresh the page data
+      window.location.reload();
+    } catch (e: any) {
+      console.error("Server action failed:", e);
+      alert(e?.message || "İşlem başarısız oldu");
+    } finally {
+      setActionLoading(null);
+      setApprovalDialog({ open: false, action: 'approve', reason: '' });
+    }
+  };
+
+  const openApprovalDialog = (action: 'approve' | 'reject') => {
+    setApprovalDialog({ open: true, action, reason: '' });
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -150,7 +191,7 @@ export default function ServerDetailPage() {
           <p className="text-muted-foreground mb-4">
             Aradığınız sunucu mevcut değil veya bir hata oluştu.
           </p>
-          <Link href="/admin/servers">
+          <Link href="/dashboard/servers">
             <Button>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Sunuculara Dön
@@ -239,7 +280,7 @@ export default function ServerDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-4">
-        <Link href="/admin/servers">
+        <Link href="/dashboard/servers">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Geri
@@ -301,13 +342,6 @@ export default function ServerDetailPage() {
                   <div>
                     <div className="text-sm text-muted-foreground">Durum</div>
                     <div className="mt-1">{getStatusBadge(server.status)}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">Maksimum Oyuncu</div>
-                    <div className="font-medium flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      {server.max_players}
-                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -375,6 +409,198 @@ export default function ServerDetailPage() {
                     <div>
                       <div className="text-sm text-muted-foreground">Reddetme Notu</div>
                       <div className="text-sm bg-red-50 dark:bg-red-950 p-2 rounded border border-red-200 dark:border-red-800">{server.reject_note}</div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Admin Controls */}
+                <div className="pt-4 border-t">
+                  <div className="text-sm font-medium text-muted-foreground mb-3">Admin Kontrolleri</div>
+                  
+                  {/* Approval Controls */}
+                  {server.approval_status === "pending" && (
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => openApprovalDialog('approve')}
+                        disabled={actionLoading === 'approve'}
+                        className="w-full bg-green-600 hover:bg-green-700"
+                        size="sm"
+                      >
+                        {actionLoading === 'approve' ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        ) : (
+                          <Check className="h-4 w-4 mr-2" />
+                        )}
+                        Sunucuyu Onayla
+                      </Button>
+                      <Button
+                        onClick={() => openApprovalDialog('reject')}
+                        disabled={actionLoading === 'reject'}
+                        variant="destructive"
+                        size="sm"
+                        className="w-full"
+                      >
+                        {actionLoading === 'reject' ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        ) : (
+                          <Ban className="h-4 w-4 mr-2" />
+                        )}
+                        Sunucuyu Reddet
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Status Controls for Approved Servers */}
+                  {server.approval_status === "approved" && (
+                    <div className="space-y-2">
+                      <div className="text-xs text-muted-foreground mb-2">Sunucu Durumu</div>
+                      
+                      {server.status === "online" ? (
+                        <>
+                          <Button
+                            onClick={() => handleServerAction('offline')}
+                            disabled={actionLoading === 'offline'}
+                            variant="outline"
+                            size="sm"
+                            className="w-full text-red-600 border-red-600 hover:bg-red-50"
+                          >
+                            {actionLoading === 'offline' ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                            ) : (
+                              <Power className="h-4 w-4 mr-2" />
+                            )}
+                            Offline Yap
+                          </Button>
+                          <Button
+                            onClick={() => handleServerAction('maintenance')}
+                            disabled={actionLoading === 'maintenance'}
+                            variant="outline"
+                            size="sm"
+                            className="w-full text-yellow-600 border-yellow-600 hover:bg-yellow-50"
+                          >
+                            {actionLoading === 'maintenance' ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600"></div>
+                            ) : (
+                              <AlertTriangle className="h-4 w-4 mr-2" />
+                            )}
+                            Bakım Modu
+                          </Button>
+                        </>
+                      ) : server.status === "offline" ? (
+                        <>
+                          <Button
+                            onClick={() => handleServerAction('online')}
+                            disabled={actionLoading === 'online'}
+                            variant="outline"
+                            size="sm"
+                            className="w-full text-green-600 border-green-600 hover:bg-green-50"
+                          >
+                            {actionLoading === 'online' ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                            ) : (
+                              <Play className="h-4 w-4 mr-2" />
+                            )}
+                            Online Yap
+                          </Button>
+                          <Button
+                            onClick={() => handleServerAction('maintenance')}
+                            disabled={actionLoading === 'maintenance'}
+                            variant="outline"
+                            size="sm"
+                            className="w-full text-yellow-600 border-yellow-600 hover:bg-yellow-50"
+                          >
+                            {actionLoading === 'maintenance' ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600"></div>
+                            ) : (
+                              <AlertTriangle className="h-4 w-4 mr-2" />
+                            )}
+                            Bakım Modu
+                          </Button>
+                        </>
+                      ) : server.status === "maintenance" ? (
+                        <>
+                          <Button
+                            onClick={() => handleServerAction('online')}
+                            disabled={actionLoading === 'online'}
+                            variant="outline"
+                            size="sm"
+                            className="w-full text-green-600 border-green-600 hover:bg-green-50"
+                          >
+                            {actionLoading === 'online' ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                            ) : (
+                              <Play className="h-4 w-4 mr-2" />
+                            )}
+                            Online Yap
+                          </Button>
+                          <Button
+                            onClick={() => handleServerAction('offline')}
+                            disabled={actionLoading === 'offline'}
+                            variant="outline"
+                            size="sm"
+                            className="w-full text-red-600 border-red-600 hover:bg-red-50"
+                          >
+                            {actionLoading === 'offline' ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                            ) : (
+                              <Power className="h-4 w-4 mr-2" />
+                            )}
+                            Offline Yap
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          onClick={() => handleServerAction('online')}
+                          disabled={actionLoading === 'online'}
+                          variant="outline"
+                          size="sm"
+                          className="w-full text-green-600 border-green-600 hover:bg-green-50"
+                        >
+                          {actionLoading === 'online' ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                          ) : (
+                            <Play className="h-4 w-4 mr-2" />
+                          )}
+                          Online Yap
+                        </Button>
+                      )}
+
+                      {/* Reject approved server */}
+                      <div className="pt-2 border-t">
+                        <Button
+                          onClick={() => openApprovalDialog('reject')}
+                          disabled={actionLoading === 'reject'}
+                          variant="destructive"
+                          size="sm"
+                          className="w-full"
+                        >
+                          {actionLoading === 'reject' ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          ) : (
+                            <Ban className="h-4 w-4 mr-2" />
+                          )}
+                          Sunucuyu Reddet
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Rejected server - can only approve */}
+                  {server.approval_status === "rejected" && (
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => openApprovalDialog('approve')}
+                        disabled={actionLoading === 'approve'}
+                        className="w-full bg-green-600 hover:bg-green-700"
+                        size="sm"
+                      >
+                        {actionLoading === 'approve' ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        ) : (
+                          <Check className="h-4 w-4 mr-2" />
+                        )}
+                        Sunucuyu Onayla
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -656,6 +882,53 @@ export default function ServerDetailPage() {
             </CardContent>
           </Card>
         </>
+      )}
+
+      {/* Approval/Rejection Dialog */}
+      {approvalDialog.open && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-background border rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-4">
+              {approvalDialog.action === 'approve' ? 'Sunucuyu Onayla' : 'Sunucuyu Reddet'}
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  {approvalDialog.action === 'approve' ? 'Onay Notu (İsteğe bağlı)' : 'Red Sebebi (Gerekli)'}
+                </label>
+                <textarea
+                  value={approvalDialog.reason}
+                  onChange={(e) => setApprovalDialog({ ...approvalDialog, reason: e.target.value })}
+                  placeholder={approvalDialog.action === 'approve' ? 'Onay notu ekleyebilirsiniz...' : 'Red sebebini belirtin...'}
+                  className="w-full p-3 border rounded-md resize-none h-24"
+                  required={approvalDialog.action === 'reject'}
+                />
+              </div>
+              
+              <div className="flex gap-3 justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setApprovalDialog({ open: false, action: 'approve', reason: '' })}
+                  disabled={actionLoading === approvalDialog.action}
+                >
+                  İptal
+                </Button>
+                <Button
+                  onClick={() => handleServerAction(approvalDialog.action)}
+                  disabled={actionLoading === approvalDialog.action || (approvalDialog.action === 'reject' && !approvalDialog.reason.trim())}
+                  className={approvalDialog.action === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}
+                >
+                  {actionLoading === approvalDialog.action ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  ) : (
+                    approvalDialog.action === 'approve' ? 'Onayla' : 'Reddet'
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

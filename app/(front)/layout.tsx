@@ -1,5 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
+import { LandingNavbar } from "@/components/landing/navbar"
+import { LandingFooter } from "@/components/landing/footer"
 
 export const metadata: Metadata = {
   title: "MetinPort - Metin2 Server Management",
@@ -13,7 +15,9 @@ export default function FrontendLayout({
 }) {
   return (
     <div className="min-h-screen">
+      <LandingNavbar />
       {children}
+      <LandingFooter />
     </div>
   )
 }

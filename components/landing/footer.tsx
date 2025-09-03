@@ -15,6 +15,7 @@ import {
   Linkedin
 } from 'lucide-react'
 import Link from 'next/link'
+import { ServerApplicationForm } from './server-application-form'
 
 export function LandingFooter() {
   const footerSections = [

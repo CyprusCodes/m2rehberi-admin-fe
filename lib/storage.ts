@@ -37,8 +37,42 @@ export const setAuthToken = (token: string) => SetStorage(AUTH_TOKEN_KEY, token)
 export const getAuthToken = (): string | null => GetStorage<string>(AUTH_TOKEN_KEY);
 export const removeAuthToken = () => RemoveStorage(AUTH_TOKEN_KEY);
 
-export const setUser = <T = unknown>(user: T) => SetStorage<T>(USER_KEY, user);
+export const setCookie = (name: string, value: string, days: number = 7) => {
+  if (!isBrowser()) return;
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+};
+
+// HERE change cookie "use server!"
+export const getCookie = (name: string): string | null => {
+  if (!isBrowser()) return null;
+  
+  const cookies = document.cookie.split(';');
+  
+  for (const cookie of cookies) {
+    const [cookieName, cookieValue] = cookie.trim().split('=');
+    
+    if (cookieName === name) {
+      return cookieValue;
+    }
+  }
+  
+  return null;
+};
+
+export const removeCookie = (name: string) => {
+  if (!isBrowser()) return;
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+};
+
+export const setUser = <T = unknown>(user: T) => {
+  SetStorage<T>(USER_KEY, user);  
+  setCookie(USER_KEY, JSON.stringify(user));
+};
+
 export const getUser = <T = unknown>(): T | null => GetStorage<T>(USER_KEY);
-export const removeUser = () => RemoveStorage(USER_KEY);
-
-
+export const removeUser = () => {
+  RemoveStorage(USER_KEY);
+  removeCookie(USER_KEY);
+};

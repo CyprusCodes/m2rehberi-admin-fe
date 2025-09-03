@@ -66,6 +66,14 @@ export const rejectServer = async (
   return res.data as { serverId: number; status: "rejected"; updated: any };
 };
 
+export const updateServerStatus = async (
+  id: number | string,
+  payload: { status: "online" | "offline" | "maintenance" }
+) => {
+  const res = await apiClient.put(serverEndpoints.updateStatus(String(id)), payload);
+  return res.data as { serverId: number; status: "online" | "offline" | "maintenance"; updated: any };
+};
+
 export const fetchServerById = async (id: string | number) => {
   const res = await apiClient.get(serverEndpoints.getById(String(id)));
   return res.data as { data: any };
