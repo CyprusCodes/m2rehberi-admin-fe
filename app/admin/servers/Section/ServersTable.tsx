@@ -122,7 +122,7 @@ export function ServersTable() {
   }, [load])
 
   const handleViewDetails = (server: TableServer) => {
-    router.push(`/dashboard/servers/${server.id}`)
+    router.push(`/admin/servers/${server.id}`)
   }
 
   const handleServerAction = (serverId: string, action: string) => {
