@@ -17,7 +17,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { MoreHorizontal, Eye, Settings, Play, Power, Ban, Check, X } from "lucide-react"
 import { ServerApprovalModal, ServerStatusBadge, ServerApprovalBadge } from "./"
-import { fetchServers, approveServer, rejectServer } from "@/services/servers"
+import { fetchServers, approveServer, rejectServer, updateServerStatus } from "@/services/servers"
 
 type ApiServer = {
   server_id: number
@@ -37,7 +37,6 @@ type ApiServer = {
   owner_last_name?: string | null
   approver_first_name?: string | null
   approver_last_name?: string | null
-  // non-aliased fallback names (owner join without AS)
   first_name?: string | null
   last_name?: string | null
 }
@@ -122,11 +121,23 @@ export function ServersTable() {
   }, [load])
 
   const handleViewDetails = (server: TableServer) => {
-    router.push(`/admin/servers/${server.id}`)
+    router.push(`/dashboard/servers/${server.id}`)
   }
 
-  const handleServerAction = (serverId: string, action: string) => {
-    console.log(`Server ${serverId} action: ${action}`)
+  const handleServerAction = async (serverId: string, action: string) => {
+    try {
+      if (action === "activate" || action === "online") {
+        await updateServerStatus(serverId, { status: "online" });
+      } else if (action === "close" || action === "offline") {
+        await updateServerStatus(serverId, { status: "offline" });
+      } else if (action === "maintenance") {
+        await updateServerStatus(serverId, { status: "maintenance" });
+      }
+      await load(); // Refresh the table
+    } catch (e: any) {
+      console.error("Server action failed:", e);
+      setError(e?.message || "Sunucu durumu güncellenemedi");
+    }
   }
 
   const handleApprovalAction = (serverId: string, action: 'approve' | 'reject') => {
@@ -271,32 +282,75 @@ export function ServersTable() {
                           Ayarlar
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        {server.status === "online" || server.status === "active" ? (
+                        <DropdownMenuLabel>Sunucu Durumu</DropdownMenuLabel>
+                        {server.status === "online" ? (
                           <>
                             <DropdownMenuItem 
-                              onClick={() => handleApprovalAction(server.id, "reject")}
-                              className="text-red-600"
-                            >
-                              <Ban className="mr-2 h-4 w-4" />
-                              Reddet
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleServerAction(server.id, "close")}
+                              onClick={() => handleServerAction(server.id, "offline")}
                               className="text-red-600"
                             >
                               <Power className="mr-2 h-4 w-4" />
-                              Kapat
+                              Offline Yap
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleServerAction(server.id, "maintenance")}
+                              className="text-yellow-600"
+                            >
+                              <Settings className="mr-2 h-4 w-4" />
+                              Bakım Modu
+                            </DropdownMenuItem>
+                          </>
+                        ) : server.status === "offline" ? (
+                          <>
+                            <DropdownMenuItem 
+                              onClick={() => handleServerAction(server.id, "online")}
+                              className="text-green-600"
+                            >
+                              <Play className="mr-2 h-4 w-4" />
+                              Online Yap
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleServerAction(server.id, "maintenance")}
+                              className="text-yellow-600"
+                            >
+                              <Settings className="mr-2 h-4 w-4" />
+                              Bakım Modu
+                            </DropdownMenuItem>
+                          </>
+                        ) : server.status === "maintenance" ? (
+                          <>
+                            <DropdownMenuItem 
+                              onClick={() => handleServerAction(server.id, "online")}
+                              className="text-green-600"
+                            >
+                              <Play className="mr-2 h-4 w-4" />
+                              Online Yap
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleServerAction(server.id, "offline")}
+                              className="text-red-600"
+                            >
+                              <Power className="mr-2 h-4 w-4" />
+                              Offline Yap
                             </DropdownMenuItem>
                           </>
                         ) : (
                           <DropdownMenuItem 
-                            onClick={() => handleServerAction(server.id, "activate")}
+                            onClick={() => handleServerAction(server.id, "online")}
                             className="text-green-600"
                           >
                             <Play className="mr-2 h-4 w-4" />
-                            Aktif Et
+                            Online Yap
                           </DropdownMenuItem>
                         )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          onClick={() => handleApprovalAction(server.id, "reject")}
+                          className="text-red-600"
+                        >
+                          <Ban className="mr-2 h-4 w-4" />
+                          Sunucuyu Reddet
+                        </DropdownMenuItem>
                       </>
                     )}
                     
