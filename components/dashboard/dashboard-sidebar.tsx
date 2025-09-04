@@ -18,6 +18,7 @@ import {
   Tags,
   Package,
   ShieldCheck,
+  Image,
 } from "lucide-react"
 
 const navigation = [
@@ -55,6 +56,11 @@ const navigation = [
     name: "Ad Packages",
     href: "/admin/advertisement/packages",
     icon: Package,
+  },
+  {
+    name: "Carousel",
+    href: "/admin/carousel",
+    icon: Image,
   },
   {
     name: "User Role Requests",

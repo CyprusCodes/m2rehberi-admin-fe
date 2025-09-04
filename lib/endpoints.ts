@@ -148,3 +148,16 @@ export const systemSettingEndpoints = {
   update: (id: string | number) => `${API_BASE_URL}/admin/settings/${id}`,
   delete: (id: string | number) => `${API_BASE_URL}/admin/settings/${id}`,
 }
+
+// Carousel endpoints
+export const adminCarouselEndpoints = {
+  getAll: `${API_BASE_URL}/admin/carousels`,
+  getById: (id: string | number) => `${API_BASE_URL}/admin/carousels/${id}`,
+  create: `${API_BASE_URL}/admin/carousels`,
+  update: (id: string | number) => `${API_BASE_URL}/admin/carousels/${id}`,
+  delete: (id: string | number) => `${API_BASE_URL}/admin/carousels/${id}`,
+}
+
+export const frontendCarouselEndpoints = {
+  getAll: `${API_BASE_URL}/front/carousels`,
+}
