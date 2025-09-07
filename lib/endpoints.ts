@@ -33,6 +33,7 @@ export const frontendServerEndpoints = {
   getUserServers: `${API_BASE_URL}/front/user/servers`,
   getUserServerById: (id: number | string) => `${API_BASE_URL}/front/user/servers/${id}`,
   updateUserServerStatus: (id: number | string) => `${API_BASE_URL}/front/user/servers/${id}/status`,
+  updateUserServerDetails: (id: number | string) => `${API_BASE_URL}/front/user/servers/${id}/details`,
 }
 
 export const frontendRoleEndpoints = {
@@ -96,6 +97,8 @@ export const tagEndpoints = {
   create: `${API_BASE_URL}/admin/tags`,
   update: (id: string | number) => `${API_BASE_URL}/admin/tags/${id}`,
   delete: (id: string | number) => `${API_BASE_URL}/admin/tags/${id}`,
+
+  getActiveTags: `${API_BASE_URL}/front/tags?active=true`,
 }
 
 // Advertisement endpoints
@@ -156,6 +159,7 @@ export const adminCarouselEndpoints = {
   create: `${API_BASE_URL}/admin/carousels`,
   update: (id: string | number) => `${API_BASE_URL}/admin/carousels/${id}`,
   delete: (id: string | number) => `${API_BASE_URL}/admin/carousels/${id}`,
+  getServers: `${API_BASE_URL}/admin/carousels/servers`,
 }
 
 export const frontendCarouselEndpoints = {

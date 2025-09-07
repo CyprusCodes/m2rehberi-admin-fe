@@ -11,6 +11,7 @@ export interface Carousel {
     status: 'active' | 'inactive';
     startDate: string;
     endDate: string;
+    serverLinkId?: number;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -22,6 +23,7 @@ export interface CreateCarouselRequest {
     status: 'active' | 'inactive';
     startDate: string;
     endDate: string;
+    serverLinkId?: number;
 }
 
 export interface UpdateCarouselRequest extends CreateCarouselRequest {}
@@ -49,4 +51,9 @@ export const deleteCarousel = async (id: string) => {
 export const getCarousel = async (id: string) => {
     const response = await apiClient.get(adminCarouselEndpoints.getAll);
     return response.data;
+};
+
+export const fetchCarouselServers = async () => {
+    const response = await apiClient.get(adminCarouselEndpoints.getServers);
+    return response.data.data || [];
 };

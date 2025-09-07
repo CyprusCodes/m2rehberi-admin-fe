@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/auth-context'
 import { User, Bell, Car, Heart, FileText, MessageCircle, Settings, Crown } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -56,7 +57,16 @@ const menuItems = [
 ]
 
 export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) {
-  const { user, userType } = useAuth()
+  const { user } = useAuth()
+  const router = useRouter()
+
+  const handleTabChange = (tab: string) => {
+    onTabChange(tab)
+    // Update URL with tab parameter
+    const url = new URL(window.location.href)
+    url.searchParams.set('tab', tab)
+    router.push(url.pathname + url.search, { scroll: false })
+  }
 
   const getInitials = (name: string) => {
     return name
@@ -68,7 +78,7 @@ export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) 
   }
 
   return (
-    <div className="w-80 bg-card border-r border-border p-6 space-y-6">
+    <div className="w-80 bg-neutral-900 border-r border-border p-6 space-y-6 min-h-screen">
       {/* User Profile Summary */}
       <div className="text-center space-y-4">
         {/* Avatar */}
@@ -85,7 +95,7 @@ export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) 
           
           {/* Role Badge */}
           <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-            {userType === 'super_admin' ? (
+            {user?.role === 'super_admin' ? (
               <>
                 <Crown className="w-3 h-3 mr-1 text-yellow-500" />
                 Admin
@@ -109,7 +119,7 @@ export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) 
           return (
             <button
               key={item.id}
-              onClick={() => onTabChange(item.id)}
+              onClick={() => handleTabChange(item.id)}
               className={cn(
                 "w-full text-left p-3 rounded-lg transition-all duration-200 group",
                 isActive

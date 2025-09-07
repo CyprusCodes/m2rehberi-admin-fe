@@ -4,7 +4,10 @@ import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { FileText, Clock, CheckCircle, XCircle, Eye, Calendar, Server } from 'lucide-react'
+import { FileText, Clock, CheckCircle, XCircle, Eye, Calendar, Server, Plus, Shield } from 'lucide-react'
+import { useAuth } from '@/contexts/auth-context'
+import { ServerOwnerRequestModal } from '@/components/modals/ServerOwnerRequestModal'
+import { checkUserServerOwnerRequest, type CheckUserRequestResponse } from '@/services/server-owner-requests'
 
 interface RequestData {
   id: number
@@ -18,14 +21,62 @@ interface RequestData {
 }
 
 export function MyRequests() {
+  const { user } = useAuth()
   const [requests, setRequests] = useState<RequestData[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [showRequestModal, setShowRequestModal] = useState(false)
+  const [userRequest, setUserRequest] = useState<CheckUserRequestResponse | null>(null)
+  const [loadingRequest, setLoadingRequest] = useState(true)
+  
+  const canRequestServerOwner = user?.role === 'user'
+  
 
   useEffect(() => {
-    // TODO: Fetch user requests from API
-    // fetchUserRequests()
-    setIsLoading(false)
-  }, [])
+    loadAllRequests()
+
+    const onFocus = () => loadAllRequests()
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') loadAllRequests()
+    }
+    // window.addEventListener('focus', onFocus)
+    // document.addEventListener('visibilitychange', onVisibility)
+
+    return () => {
+      //  window.removeEventListener('focus', onFocus)
+      // document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [canRequestServerOwner])
+
+  const loadAllRequests = async () => {
+    try {
+      setIsLoading(true)
+      // Load general requests (placeholder for now)
+      // TODO: Implement fetchUserRequests API call
+      // const response = await fetchUserRequests()
+      // setRequests(response.data || [])
+      setRequests([])
+
+      if (canRequestServerOwner) {
+        await loadServerOwnerRequest()
+      }
+    } catch (error) {
+      console.error('Failed to load requests:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const loadServerOwnerRequest = async () => {
+    try {
+      setLoadingRequest(true)
+      const response = await checkUserServerOwnerRequest()
+      setUserRequest(response)
+    } catch (error) {
+      console.error('Failed to load server owner request:', error)
+    } finally {
+      setLoadingRequest(false)
+    }
+  }
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -67,8 +118,18 @@ export function MyRequests() {
   }
 
   const handleViewRequest = (requestId: number) => {
-    // TODO: Show request details
+    // TODO: Show request details modalå
     console.log('View request clicked:', requestId)
+  }
+
+  const handleCreateServerOwnerRequest = () => {
+    if (loadingRequest) return
+    if (userRequest?.hasRequest) return
+    setShowRequestModal(true)
+  }
+
+  const handleRequestSuccess = () => {
+    loadAllRequests()
   }
 
   if (isLoading) {
@@ -88,6 +149,12 @@ export function MyRequests() {
           <h1 className="text-2xl font-bold text-foreground">Taleplerim</h1>
           <p className="text-muted-foreground">Sunucu başvurularınızı ve destek taleplerinizi takip edin</p>
         </div>
+        {canRequestServerOwner && !userRequest?.hasRequest && (
+          <Button onClick={handleCreateServerOwnerRequest} disabled={loadingRequest} className="flex items-center space-x-2">
+            <Shield className="w-4 h-4" />
+            <span>Sunucu Sahibi Başvurusu</span>
+          </Button>
+        )}
       </div>
 
       {/* Stats */}
@@ -155,6 +222,36 @@ export function MyRequests() {
         </Card>
       </div>
 
+      {/* Server Owner Request Status */}
+      {canRequestServerOwner && userRequest?.hasRequest && (
+        <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/20">
+          <CardContent className="pt-6">
+            <div className="flex items-start space-x-3">
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200">
+                    Server Sahipliği Başvurusu
+                  </h3>
+                  {getStatusBadge(userRequest.request?.status || 'pending')}
+                </div>
+                <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+                  {userRequest.request?.status === 'pending' && 'Başvurunuz inceleniyor...'}
+                  {userRequest.request?.status === 'approved' && 'Başvurunuz onaylandı! Artık server oluşturabilirsiniz.'}
+                  {userRequest.request?.status === 'rejected' && `Başvurunuz reddedildi. Sebep: ${userRequest.request?.rejectReason || 'Belirtilmemiş'}`}
+                </p>
+                <div className="text-xs text-blue-600 dark:text-blue-400">
+                  <p>Talep Edilen Rol: {userRequest.request?.selectedUserTypeName}</p>
+                  <p>Talep Tarihi: {new Date(userRequest.request?.createdAt || '').toLocaleDateString('tr-TR')}</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Requests List */}
       {requests.length === 0 ? (
         <Card>
@@ -165,10 +262,14 @@ export function MyRequests() {
               <p className="text-muted-foreground mb-4">
                 Sunucu sahibi olmak veya rol değişikliği için talep gönderin
               </p>
-              <Button className="flex items-center space-x-2 mx-auto">
-                <FileText className="w-4 h-4" />
-                <span>Talep Gönder</span>
-              </Button>
+              {canRequestServerOwner && !userRequest?.hasRequest ? (
+                <Button onClick={handleCreateServerOwnerRequest} disabled={loadingRequest} className="flex items-center space-x-2 mx-auto">
+                  <Shield className="w-4 h-4" />
+                  <span>Sunucu Sahibi Başvurusu</span>
+                </Button>
+              ) : (
+                <></>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -220,6 +321,13 @@ export function MyRequests() {
           ))}
         </div>
       )}
+
+      {/* Server Owner Request Modal */}
+      <ServerOwnerRequestModal
+        open={showRequestModal}
+        onOpenChange={setShowRequestModal}
+        onSuccess={handleRequestSuccess}
+      />
     </div>
   )
 }

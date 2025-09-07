@@ -17,7 +17,6 @@ export default function FrontendLayout({
     <div className="min-h-screen">
       <LandingNavbar />
       {children}
-      <LandingFooter />
     </div>
   )
 }

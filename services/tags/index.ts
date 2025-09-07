@@ -7,7 +7,7 @@ export interface Tag {
   description?: string;
   color: string;
   parentId?: number;
-  isActive: boolean;
+  isActive: boolean | number;
   topicsCount: number;
   createdAt: string;
   updatedAt: string;
@@ -89,4 +89,9 @@ export const deleteTag = async (id: number | string): Promise<{ message: string;
 export const fetchTagStats = async (): Promise<TagStatsResponse> => {
   const res = await apiClient.get(tagEndpoints.getStats);
   return res.data as TagStatsResponse;
+};
+
+export const fetchActiveTags = async (): Promise<TagsResponse> => {
+  const res = await apiClient.get(tagEndpoints.getActiveTags);
+  return res.data as TagsResponse;
 };

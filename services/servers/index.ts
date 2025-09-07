@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/apiClient";
-import { serverEndpoints } from "@/lib/endpoints";
+import { serverEndpoints, frontendServerEndpoints } from "@/lib/endpoints";
 
 export interface ServersListParams {
   page?: string | number;
@@ -25,9 +25,12 @@ export interface CreateServerPayload {
   websiteLink?: string | null;
   youtubeLinks?: string[] | null;
   serverRules?: string;
+  serverCoverImageUrl?: string | null;
   systems?: any;
   features?: any;
   events?: any;
+  showTimeStatus?: boolean;
+  showDateTime?: string;
 }
 
 export const fetchServers = async (params: ServersListParams = {}) => {
@@ -48,6 +51,55 @@ export const fetchServers = async (params: ServersListParams = {}) => {
 export const createServer = async (payload: CreateServerPayload) => {
   const res = await apiClient.post(serverEndpoints.create, payload);
   return res.data as { insertedServerId: number };
+};
+
+// Frontend (user) facing server APIs
+export const createFrontendServer = async (payload: CreateServerPayload) => {
+  const res = await apiClient.post(frontendServerEndpoints.createServer, payload);
+  return res.data as { insertedServerId?: number; data?: any };
+};
+
+export const fetchFrontendUserServers = async () => {
+  const res = await apiClient.get(frontendServerEndpoints.getUserServers);
+  return res.data as { data: any[] };
+};
+
+export const fetchFrontendUserServerById = async (id: number | string) => {
+  const res = await apiClient.get(frontendServerEndpoints.getUserServerById(id));
+  return res.data as { data: any };
+};
+
+export const updateFrontendUserServerStatus = async (
+  id: number | string,
+  payload: { status: "online" | "offline" | "maintenance" }
+) => {
+  const res = await apiClient.put(frontendServerEndpoints.updateUserServerStatus(String(id)), payload);
+  return res.data as { serverId: number; status: "online" | "offline" | "maintenance"; updated: any };
+};
+
+export const updateFrontendUserServerDetails = async (
+  id: number | string,
+  payload: {
+    serverName: string;
+    description: string;
+    serverDifficulty: "Easy" | "Medium" | "Hard" | "Other";
+    serverLevelRange: string;
+    serverType: string;
+    tagId?: number | null;
+    discordLink?: string | null;
+    websiteLink?: string | null;
+    youtubeLinks?: string[] | null;
+    serverRules?: string | null;
+    serverCoverImageUrl?: string | null;
+    systems?: any;
+    features?: any;
+    events?: any;
+    showTimeStatus?: boolean;
+    showDateTime?: string | null;
+  }
+) => {
+  const res = await apiClient.put(frontendServerEndpoints.updateUserServerDetails(String(id)), payload);
+  return res.data as { serverId: number; status: "updated"; updated: any };
 };
 
 export const approveServer = async (
@@ -90,4 +142,20 @@ export const answerServerFeedback = async (
 ) => {
   const res = await apiClient.post(serverEndpoints.feedbackAnswer(String(id)), payload);
   return res.data as { feedbackId: number; serverId: number; updated: any };
+};
+
+export const fetchActiveServers = async (params: ServersListParams = {}) => {
+  const { page, pageSize, sortBy, direction, filters, cursor } = params;
+  const res = await apiClient.get(serverEndpoints.getAll, {
+    params: {
+      page,
+      page_size: pageSize,
+      sort_by: sortBy,
+      direction,
+      filters,
+      cursor,
+    },
+  });
+  console.log("fetchActiveServers", JSON.stringify(res.data.data, null, 2));
+  return res.data;
 };

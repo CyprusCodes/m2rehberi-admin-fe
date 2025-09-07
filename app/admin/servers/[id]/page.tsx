@@ -279,19 +279,39 @@ export default function ServerDetailPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-4">
-        <Link href="/dashboard/servers">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Geri
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold">{server.server_name}</h1>
-          <p className="text-muted-foreground">{server.description}</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Link href="/dashboard/servers">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Geri
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold">{server.server_name}</h1>
+          </div>
         </div>
         {getStatusBadge(server.status)}
       </div>
+
+      {/* Server Cover Image */}
+      {server.server_cover_image_url && (
+        <div className="relative w-96 h-48 rounded-lg overflow-hidden border border-border/30">
+          <img
+            src={server.server_cover_image_url}
+            alt={`${server.server_name} kapak resmi`}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+              const parent = target.parentElement;
+              if (parent) {
+                parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground bg-muted/30">Kapak resmi yüklenemedi</div>';
+              }
+            }}
+          />
+        </div>
+      )}
 
       {/* Segment Buttons */}
       <div className="inline-flex items-center rounded-lg border bg-muted p-1">
@@ -731,6 +751,26 @@ export default function ServerDetailPage() {
             )}
           </div>
 
+          {/* Server Description */}
+          {server.description && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Server className="h-5 w-5" />
+                  Sunucu Açıklaması
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-muted/50 p-4 rounded-lg">
+                  <div 
+                    className="prose prose-sm max-w-none text-sm"
+                    dangerouslySetInnerHTML={{ __html: server.description }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Server Rules */}
           {server.server_rules && (
             <Card>
@@ -742,7 +782,10 @@ export default function ServerDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="whitespace-pre-wrap text-sm">{server.server_rules}</div>
+                  <div 
+                    className="prose prose-sm max-w-none text-sm"
+                    dangerouslySetInnerHTML={{ __html: server.server_rules }}
+                  />
                 </div>
               </CardContent>
             </Card>

@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { LandingNavbar } from '@/components/landing/navbar'
 import { ProfileSidebar } from './components/ProfileSidebar'
 import { PersonalInfo } from './components/PersonalInfo'
@@ -12,6 +13,15 @@ import { ModeToggle } from '@/components/mode-toggle'
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('profile')
+  const [openNewServer, setOpenNewServer] = useState(false)
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab && ['profile', 'notifications', 'servers', 'favorites', 'requests', 'settings'].includes(tab)) {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
 
   const renderContent = () => {
     switch (activeTab) {
@@ -20,7 +30,7 @@ export default function ProfilePage() {
       case 'notifications':
         return <Notifications />
       case 'servers':
-        return <MyServers />
+        return <MyServers openNewServer={openNewServer} setOpenNewServer={setOpenNewServer} />
       case 'favorites':
         return <FavoriteServers />
       case 'requests':
@@ -53,7 +63,7 @@ export default function ProfilePage() {
         <ProfileSidebar activeTab={activeTab} onTabChange={setActiveTab} />
         
         {/* Main Content */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-8 bg-black min-h-screen">
           {renderContent()}
         </div>
       </div>

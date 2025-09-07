@@ -13,13 +13,19 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, Edit, Trash2, Eye, Calendar, Image as ImageIcon } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
-import { Carousel, CreateCarouselRequest, UpdateCarouselRequest, getCarousels, postCarousel, updateCarousel, deleteCarousel } from "@/services/carousels"
+import { Carousel, CreateCarouselRequest, UpdateCarouselRequest, getCarousels, postCarousel, updateCarousel, deleteCarousel, fetchCarouselServers } from "@/services/carousels"
 import { format } from "date-fns"
 import { tr } from "date-fns/locale"
+import moment from "moment"
+import "moment/locale/tr"
 
 export default function CarouselPage() {
   const [carousels, setCarousels] = useState<Carousel[]>([])
+  const [activeServers, setActiveServers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+
+  // Moment'i Türkçe locale ile ayarla
+  moment.locale('tr')
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editingCarousel, setEditingCarousel] = useState<Carousel | null>(null)
@@ -29,7 +35,8 @@ export default function CarouselPage() {
     imageUrl: "",
     status: "active",
     startDate: "",
-    endDate: ""
+    endDate: "",
+    serverLinkId: undefined
   })
 
   const fetchCarousels = async () => {
@@ -48,8 +55,18 @@ export default function CarouselPage() {
     }
   }
 
+  const fetchActiveServersData = async () => {
+    try {
+      const servers = await fetchCarouselServers()
+      setActiveServers(servers)
+    } catch (error) {
+      console.error("Aktif sunucular yüklenirken hata:", error)
+    }
+  }
+
   useEffect(() => {
     fetchCarousels()
+    fetchActiveServersData()
   }, [])
 
   const handleCreate = async () => {
@@ -62,10 +79,12 @@ export default function CarouselPage() {
       setIsCreateModalOpen(false)
       resetForm()
       fetchCarousels()
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Carousel creation error:", error)
+      const errorMessage = error?.response?.data?.message || error?.message || "Carousel oluşturulurken bir hata oluştu."
       toast({
         title: "Hata",
-        description: "Carousel oluşturulurken bir hata oluştu.",
+        description: errorMessage,
         variant: "destructive"
       })
     }
@@ -84,10 +103,12 @@ export default function CarouselPage() {
       setEditingCarousel(null)
       resetForm()
       fetchCarousels()
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Carousel update error:", error)
+      const errorMessage = error?.response?.data?.message || error?.message || "Carousel güncellenirken bir hata oluştu."
       toast({
         title: "Hata",
-        description: "Carousel güncellenirken bir hata oluştu.",
+        description: errorMessage,
         variant: "destructive"
       })
     }
@@ -117,7 +138,8 @@ export default function CarouselPage() {
       imageUrl: "",
       status: "active",
       startDate: "",
-      endDate: ""
+      endDate: "",
+      serverLinkId: undefined
     })
   }
 
@@ -129,7 +151,8 @@ export default function CarouselPage() {
       imageUrl: carousel.imageUrl,
       status: carousel.status,
       startDate: carousel.startDate,
-      endDate: carousel.endDate
+      endDate: carousel.endDate,
+      serverLinkId: carousel.serverLinkId
     })
     setIsEditModalOpen(true)
   }
@@ -147,6 +170,42 @@ export default function CarouselPage() {
       return format(new Date(dateString), "dd MMM yyyy HH:mm", { locale: tr })
     } catch {
       return dateString
+    }
+  }
+
+  const getDaysUntilStart = (dateString: string) => {
+    try {
+      const startDate = moment(dateString)
+      const now = moment()
+      const daysDiff = startDate.diff(now, 'days')
+      
+      if (daysDiff > 0) {
+        return `${daysDiff} gün sonra`
+      } else if (daysDiff === 0) {
+        return "Bugün başlıyor"
+      } else {
+        return `${Math.abs(daysDiff)} gün önce başladı`
+      }
+    } catch {
+      return "Tarih hesaplanamadı"
+    }
+  }
+
+  const getDaysUntilEnd = (dateString: string) => {
+    try {
+      const endDate = moment(dateString)
+      const now = moment()
+      const daysDiff = endDate.diff(now, 'days')
+      
+      if (daysDiff > 0) {
+        return `${daysDiff} gün kaldı`
+      } else if (daysDiff === 0) {
+        return "Bugün bitiyor"
+      } else {
+        return `${Math.abs(daysDiff)} gün önce bitti`
+      }
+    } catch {
+      return "Tarih hesaplanamadı"
     }
   }
 
@@ -220,6 +279,31 @@ export default function CarouselPage() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="serverLinkId">Bağlı Sunucu (Opsiyonel)</Label>
+                <Select 
+                  value={formData.serverLinkId?.toString() || "none"} 
+                  onValueChange={(value) => setFormData({ ...formData, serverLinkId: value === "none" ? undefined : parseInt(value) })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sunucu seçin (opsiyonel)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Sunucu seçilmedi</SelectItem>
+                    {activeServers && activeServers.length > 0 ? (
+                      activeServers.map((server) => (
+                        <SelectItem key={server.server_id} value={server.server_id?.toString() || "none"}>
+                          {server.server_name || "Bilinmeyen Sunucu"}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-servers" disabled>
+                        Aktif sunucu bulunamadı
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="startDate">Başlangıç Tarihi</Label>
@@ -265,6 +349,7 @@ export default function CarouselPage() {
                 <TableHead>Başlık</TableHead>
                 <TableHead>Açıklama</TableHead>
                 <TableHead>Durum</TableHead>
+                <TableHead>Bağlı Sunucu</TableHead>
                 <TableHead>Başlangıç</TableHead>
                 <TableHead>Bitiş</TableHead>
                 <TableHead>Oluşturulma</TableHead>
@@ -272,21 +357,45 @@ export default function CarouselPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {carousels.map((carousel) => (
+              {carousels.map((carousel) => {
+                const linkedServer = activeServers?.find(server => server.server_id === carousel.serverLinkId)
+                return (
                 <TableRow key={carousel.carouselId}>
                   <TableCell className="font-medium">{carousel.title}</TableCell>
                   <TableCell className="max-w-xs truncate">{carousel.description}</TableCell>
                   <TableCell>{getStatusBadge(carousel.status)}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {formatDate(carousel.startDate)}
+                    {linkedServer ? (
+                      <div className="space-y-1">
+                        <Badge variant="outline">{linkedServer.server_name}</Badge>
+                        <div className="text-xs text-muted-foreground">
+                          {linkedServer.first_name} {linkedServer.last_name}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">Bağlı sunucu yok</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        <span className="text-sm">{formatDate(carousel.startDate)}</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {getDaysUntilStart(carousel.startDate)}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {formatDate(carousel.endDate)}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        <span className="text-sm">{formatDate(carousel.endDate)}</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {getDaysUntilEnd(carousel.endDate)}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -335,7 +444,8 @@ export default function CarouselPage() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+                )
+              })}
             </TableBody>
           </Table>
         </CardContent>
@@ -388,6 +498,31 @@ export default function CarouselPage() {
                 <SelectContent>
                   <SelectItem value="active">Aktif</SelectItem>
                   <SelectItem value="inactive">Pasif</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-serverLinkId">Bağlı Sunucu (Opsiyonel)</Label>
+              <Select 
+                value={formData.serverLinkId?.toString() || "none"} 
+                onValueChange={(value) => setFormData({ ...formData, serverLinkId: value === "none" ? undefined : parseInt(value) })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sunucu seçin (opsiyonel)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sunucu seçilmedi</SelectItem>
+                  {activeServers && activeServers.length > 0 ? (
+                    activeServers.map((server) => (
+                      <SelectItem key={server.server_id} value={server.server_id?.toString() || "none"}>
+                        {server.server_name || "Bilinmeyen Sunucu"}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-servers" disabled>
+                      Aktif sunucu bulunamadı
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>

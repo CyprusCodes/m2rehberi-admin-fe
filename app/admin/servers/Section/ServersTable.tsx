@@ -33,6 +33,7 @@ type ApiServer = {
   location: string | null
   tag_id?: number | null
   reject_note?: string | null
+  server_cover_image_url?: string | null
   owner_first_name?: string | null
   owner_last_name?: string | null
   approver_first_name?: string | null
@@ -76,7 +77,7 @@ const mapToTable = (s: ApiServer): TableServer => ({
   uptime: "-",
   location: s.location || "-",
   tagId: s.tag_id ?? null,
-  banner: undefined,
+  banner: s.server_cover_image_url || undefined,
   rules: undefined,
   description: undefined,
   links: {
@@ -116,7 +117,7 @@ export function ServersTable() {
 
   useEffect(() => {
     const handler = () => load()
-    window.addEventListener("servers:refresh", handler)
+      window.addEventListener("servers:refresh", handler)
     return () => window.removeEventListener("servers:refresh", handler)
   }, [load])
 
