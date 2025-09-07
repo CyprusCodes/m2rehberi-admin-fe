@@ -15,6 +15,7 @@ import {
   BarChart3,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Tags,
   Package,
   ShieldCheck,
@@ -27,6 +28,7 @@ const navigation = [
     href: "/admin",
     icon: BarChart3,
   },
+
   {
     name: "Users",
     href: "/admin/users",
@@ -76,6 +78,7 @@ const navigation = [
 
 export function DashboardSidebar() {
   const [collapsed, setCollapsed] = useState(false)
+  const [supportOpen, setSupportOpen] = useState(true)
   const pathname = usePathname()
 
   return (
@@ -110,6 +113,31 @@ export function DashboardSidebar() {
               </Link>
             )
           })}
+
+          {/* Support accordion */}
+          <div className="mt-2">
+            <Button
+              variant={pathname.startsWith('/admin/support') ? "secondary" : "ghost"}
+              className={cn("w-full justify-between h-10", collapsed && "justify-center px-2")}
+              onClick={() => setSupportOpen(prev => !prev)}
+            >
+              <span className="flex items-center gap-3">
+                <MessageSquare className="h-4 w-4" />
+                {!collapsed && <span>Support</span>}
+              </span>
+              {!collapsed && (supportOpen ? <ChevronDown className="h-4 w-4"/> : <ChevronRight className="h-4 w-4"/>) }
+            </Button>
+            {!collapsed && supportOpen && (
+              <div className="ml-8 mt-1 space-y-1">
+                <Link href="/admin/support/categories">
+                  <Button variant={pathname === '/admin/support/categories' ? "secondary" : "ghost"} className="w-full justify-start h-9">Kategoriler</Button>
+                </Link>
+                <Link href="/admin/support/tickets">
+                  <Button variant={pathname === '/admin/support/tickets' ? "secondary" : "ghost"} className="w-full justify-start h-9">Ticketlar</Button>
+                </Link>
+              </div>
+            )}
+          </div>
         </nav>
       </ScrollArea>
     </div>

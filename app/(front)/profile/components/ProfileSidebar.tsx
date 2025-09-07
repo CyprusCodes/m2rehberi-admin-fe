@@ -43,6 +43,12 @@ const menuItems = [
     description: 'Sunucu başvurularınızı takip edin'
   },
   {
+    id: 'support',
+    label: 'Destek Taleplerim',
+    icon: MessageCircle,
+    description: 'Destek taleplerini yönet'
+  },
+  {
     id: 'messages',
     label: 'Mesajlarım',
     icon: MessageCircle,

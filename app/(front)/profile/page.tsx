@@ -10,6 +10,7 @@ import { MyServers } from './components/MyServers'
 import { FavoriteServers } from './components/FavoriteServers'
 import { MyRequests } from './components/MyRequests'
 import { ModeToggle } from '@/components/mode-toggle'
+import SupportTicketsSection from './components/Support/SupportTickets'
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('profile')
@@ -18,7 +19,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const tab = searchParams.get('tab')
-    if (tab && ['profile', 'notifications', 'servers', 'favorites', 'requests', 'settings'].includes(tab)) {
+    if (tab && ['profile', 'notifications', 'servers', 'favorites', 'requests', 'support', 'settings'].includes(tab)) {
       setActiveTab(tab)
     }
   }, [searchParams])
@@ -35,6 +36,8 @@ export default function ProfilePage() {
         return <FavoriteServers />
       case 'requests':
         return <MyRequests />
+      case 'support':
+        return <SupportTicketsSection />
       case 'settings':
         return (
           <div className="space-y-6">

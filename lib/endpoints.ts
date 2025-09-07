@@ -165,3 +165,29 @@ export const adminCarouselEndpoints = {
 export const frontendCarouselEndpoints = {
   getAll: `${API_BASE_URL}/front/carousels`,
 }
+
+// Front Support endpoints for authenticated users
+export const frontSupportEndpoints = {
+  getCategories: `${API_BASE_URL}/front/support/categories`,
+  createTicket: `${API_BASE_URL}/front/support/tickets`,
+  myTickets: `${API_BASE_URL}/front/support/tickets/mine`,
+  getTicketById: (id: string | number) => `${API_BASE_URL}/front/support/tickets/${id}`,
+  getMessages: (id: string | number) => `${API_BASE_URL}/front/support/tickets/${id}/messages`,
+  createMessage: (id: string | number) => `${API_BASE_URL}/front/support/tickets/${id}/messages`,
+}
+// Support endpoints (Admin)
+export const adminSupportCategoryEndpoints = {
+  getAll: `${API_BASE_URL}/admin/support/categories`,
+  create: `${API_BASE_URL}/admin/support/categories`,
+  update: (id: string | number) => `${API_BASE_URL}/admin/support/categories/${id}`,
+  delete: (id: string | number) => `${API_BASE_URL}/admin/support/categories/${id}`,
+}
+
+export const adminSupportTicketEndpoints = {
+  getAll: `${API_BASE_URL}/admin/support/tickets`,
+  getById: (id: string | number) => `${API_BASE_URL}/admin/support/tickets/${id}`,
+  assign: (id: string | number) => `${API_BASE_URL}/admin/support/tickets/${id}/assign`,
+  updateStatus: (id: string | number) => `${API_BASE_URL}/admin/support/tickets/${id}/status`,
+  getMessages: (id: string | number) => `${API_BASE_URL}/admin/support/tickets/${id}/messages`,
+  createMessage: (id: string | number) => `${API_BASE_URL}/admin/support/tickets/${id}/messages`,
+}
