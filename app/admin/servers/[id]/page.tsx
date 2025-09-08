@@ -14,6 +14,7 @@ import {
   Reply,
   Send,
   X,
+  Trash,
   ExternalLink,
   Calendar,
   User,
@@ -32,6 +33,7 @@ import {
   fetchServerById,
   fetchServerFeedback,
   answerServerFeedback,
+  deleteServerFeedback,
   approveServer,
   rejectServer,
   updateServerStatus,
@@ -58,10 +60,26 @@ export default function ServerDetailPage() {
   const [activeReplyIndex, setActiveReplyIndex] = useState<number | null>(null);
   const [replyValue, setReplyValue] = useState<string>("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [approvalDialog, setApprovalDialog] = useState<{ open: boolean; action: 'approve' | 'reject'; reason: string }>({ open: false, action: 'approve', reason: '' });
+  const [approvalDialog, setApprovalDialog] = useState<{
+    open: boolean;
+    action: "approve" | "reject";
+    reason: string;
+  }>({ open: false, action: "approve", reason: "" });
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    feedbackId: number | null;
+    loading: boolean;
+  }>({ open: false, feedbackId: null, loading: false });
 
-  // Feedback mapping
-  const feedbackItems = Array.isArray(fbData) ? fbData : [];
+  // Feedback mapping (supports { data: { feedback, stats } } and raw array)
+  const feedbackContainer: any = fbData?.data ?? fbData ?? {};
+  const feedbackItems = Array.isArray(feedbackContainer)
+    ? feedbackContainer
+    : Array.isArray(feedbackContainer.feedback)
+    ? feedbackContainer.feedback
+    : [];
+  const feedbackStats = feedbackContainer.stats ?? null;
+
   const comments = feedbackItems.map((f: any) => ({
     id: f.feedbackId || f.feedback_id,
     user:
@@ -89,10 +107,15 @@ export default function ServerDetailPage() {
         : [],
   }));
 
-  const averageRating = comments.length
-    ? comments.reduce((sum, c) => sum + (Number(c.stars) || 0), 0) /
-      comments.length
-    : 0;
+  const averageRating =
+    typeof feedbackStats?.averageRating === "number"
+      ? Number(feedbackStats.averageRating)
+      : comments.length
+      ? comments.reduce(
+          (sum: number, c: any) => sum + (Number(c.stars) || 0),
+          0
+        ) / comments.length
+      : 0;
 
   const toggleReply = (idx: number) => {
     setActiveReplyIndex((current) => (current === idx ? null : idx));
@@ -122,7 +145,9 @@ export default function ServerDetailPage() {
     setActionLoading(action);
     try {
       if (action === "approve") {
-        await approveServer(serverId, { approvalNote: approvalDialog.reason || undefined });
+        await approveServer(serverId, {
+          approvalNote: approvalDialog.reason || undefined,
+        });
       } else if (action === "reject") {
         await rejectServer(serverId, { rejectNote: approvalDialog.reason });
       } else if (action === "online") {
@@ -132,7 +157,7 @@ export default function ServerDetailPage() {
       } else if (action === "maintenance") {
         await updateServerStatus(serverId, { status: "maintenance" });
       }
-      
+
       // Refresh the page data
       window.location.reload();
     } catch (e: any) {
@@ -140,12 +165,12 @@ export default function ServerDetailPage() {
       alert(e?.message || "İşlem başarısız oldu");
     } finally {
       setActionLoading(null);
-      setApprovalDialog({ open: false, action: 'approve', reason: '' });
+      setApprovalDialog({ open: false, action: "approve", reason: "" });
     }
   };
 
-  const openApprovalDialog = (action: 'approve' | 'reject') => {
-    setApprovalDialog({ open: true, action, reason: '' });
+  const openApprovalDialog = (action: "approve" | "reject") => {
+    setApprovalDialog({ open: true, action, reason: "" });
   };
 
   if (loading) {
@@ -264,7 +289,9 @@ export default function ServerDetailPage() {
       ? items.split("\n")
       : [];
     if (!arr.length)
-      return <span className="text-sm text-muted-foreground">Belirtilmemiş</span>;
+      return (
+        <span className="text-sm text-muted-foreground">Belirtilmemiş</span>
+      );
     return (
       <div className="flex flex-wrap gap-2">
         {arr.map((it: any, idx: number) => (
@@ -303,10 +330,11 @@ export default function ServerDetailPage() {
             className="w-full h-full object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
+              target.style.display = "none";
               const parent = target.parentElement;
               if (parent) {
-                parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground bg-muted/30">Kapak resmi yüklenemedi</div>';
+                parent.innerHTML =
+                  '<div class="w-full h-full flex items-center justify-center text-muted-foreground bg-muted/30">Kapak resmi yüklenemedi</div>';
               }
             }}
           />
@@ -352,12 +380,18 @@ export default function ServerDetailPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div>
-                    <div className="text-sm text-muted-foreground">Sunucu ID</div>
+                    <div className="text-sm text-muted-foreground">
+                      Sunucu ID
+                    </div>
                     <div className="font-medium">#{server.server_id}</div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Oyun Türü</div>
-                    <div className="font-medium capitalize">{server.game_type}</div>
+                    <div className="text-sm text-muted-foreground">
+                      Oyun Türü
+                    </div>
+                    <div className="font-medium capitalize">
+                      {server.game_type}
+                    </div>
                   </div>
                   <div>
                     <div className="text-sm text-muted-foreground">Durum</div>
@@ -378,21 +412,29 @@ export default function ServerDetailPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div>
-                    <div className="text-sm text-muted-foreground">Sunucu Sahibi</div>
+                    <div className="text-sm text-muted-foreground">
+                      Sunucu Sahibi
+                    </div>
                     <div className="font-medium">{ownerName}</div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Oluşturulma</div>
+                    <div className="text-sm text-muted-foreground">
+                      Oluşturulma
+                    </div>
                     <div className="text-sm flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       {createdAtStr}
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Son Güncelleme</div>
+                    <div className="text-sm text-muted-foreground">
+                      Son Güncelleme
+                    </div>
                     <div className="text-sm flex items-center gap-2">
                       <Clock className="h-4 w-4 text-muted-foreground" />
-                      {server.updated_at ? moment(server.updated_at).locale("tr").format("lll") : "-"}
+                      {server.updated_at
+                        ? moment(server.updated_at).locale("tr").format("lll")
+                        : "-"}
                     </div>
                   </div>
                 </div>
@@ -411,42 +453,56 @@ export default function ServerDetailPage() {
                 <div className="space-y-3">
                   <div>
                     <div className="text-sm text-muted-foreground">Durum</div>
-                    <div className="mt-1">{getApprovalBadge(server.approval_status)}</div>
+                    <div className="mt-1">
+                      {getApprovalBadge(server.approval_status)}
+                    </div>
                   </div>
                   {server.approved_at && (
                     <div>
-                      <div className="text-sm text-muted-foreground">Onay Tarihi</div>
+                      <div className="text-sm text-muted-foreground">
+                        Onay Tarihi
+                      </div>
                       <div className="text-sm">{approvedAtStr}</div>
                     </div>
                   )}
                   {server.approval_note && (
                     <div>
-                      <div className="text-sm text-muted-foreground">Onay Notu</div>
-                      <div className="text-sm bg-muted p-2 rounded">{server.approval_note}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Onay Notu
+                      </div>
+                      <div className="text-sm bg-muted p-2 rounded">
+                        {server.approval_note}
+                      </div>
                     </div>
                   )}
                   {server.reject_note && (
                     <div>
-                      <div className="text-sm text-muted-foreground">Reddetme Notu</div>
-                      <div className="text-sm bg-red-50 dark:bg-red-950 p-2 rounded border border-red-200 dark:border-red-800">{server.reject_note}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Reddetme Notu
+                      </div>
+                      <div className="text-sm bg-red-50 dark:bg-red-950 p-2 rounded border border-red-200 dark:border-red-800">
+                        {server.reject_note}
+                      </div>
                     </div>
                   )}
                 </div>
 
                 {/* Admin Controls */}
                 <div className="pt-4 border-t">
-                  <div className="text-sm font-medium text-muted-foreground mb-3">Admin Kontrolleri</div>
-                  
+                  <div className="text-sm font-medium text-muted-foreground mb-3">
+                    Admin Kontrolleri
+                  </div>
+
                   {/* Approval Controls */}
                   {server.approval_status === "pending" && (
                     <div className="space-y-2">
                       <Button
-                        onClick={() => openApprovalDialog('approve')}
-                        disabled={actionLoading === 'approve'}
+                        onClick={() => openApprovalDialog("approve")}
+                        disabled={actionLoading === "approve"}
                         className="w-full bg-green-600 hover:bg-green-700"
                         size="sm"
                       >
-                        {actionLoading === 'approve' ? (
+                        {actionLoading === "approve" ? (
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                         ) : (
                           <Check className="h-4 w-4 mr-2" />
@@ -454,13 +510,13 @@ export default function ServerDetailPage() {
                         Sunucuyu Onayla
                       </Button>
                       <Button
-                        onClick={() => openApprovalDialog('reject')}
-                        disabled={actionLoading === 'reject'}
+                        onClick={() => openApprovalDialog("reject")}
+                        disabled={actionLoading === "reject"}
                         variant="destructive"
                         size="sm"
                         className="w-full"
                       >
-                        {actionLoading === 'reject' ? (
+                        {actionLoading === "reject" ? (
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                         ) : (
                           <Ban className="h-4 w-4 mr-2" />
@@ -473,18 +529,20 @@ export default function ServerDetailPage() {
                   {/* Status Controls for Approved Servers */}
                   {server.approval_status === "approved" && (
                     <div className="space-y-2">
-                      <div className="text-xs text-muted-foreground mb-2">Sunucu Durumu</div>
-                      
+                      <div className="text-xs text-muted-foreground mb-2">
+                        Sunucu Durumu
+                      </div>
+
                       {server.status === "online" ? (
                         <>
                           <Button
-                            onClick={() => handleServerAction('offline')}
-                            disabled={actionLoading === 'offline'}
+                            onClick={() => handleServerAction("offline")}
+                            disabled={actionLoading === "offline"}
                             variant="outline"
                             size="sm"
                             className="w-full text-red-600 border-red-600 hover:bg-red-50"
                           >
-                            {actionLoading === 'offline' ? (
+                            {actionLoading === "offline" ? (
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
                             ) : (
                               <Power className="h-4 w-4 mr-2" />
@@ -492,13 +550,13 @@ export default function ServerDetailPage() {
                             Offline Yap
                           </Button>
                           <Button
-                            onClick={() => handleServerAction('maintenance')}
-                            disabled={actionLoading === 'maintenance'}
+                            onClick={() => handleServerAction("maintenance")}
+                            disabled={actionLoading === "maintenance"}
                             variant="outline"
                             size="sm"
                             className="w-full text-yellow-600 border-yellow-600 hover:bg-yellow-50"
                           >
-                            {actionLoading === 'maintenance' ? (
+                            {actionLoading === "maintenance" ? (
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600"></div>
                             ) : (
                               <AlertTriangle className="h-4 w-4 mr-2" />
@@ -509,13 +567,13 @@ export default function ServerDetailPage() {
                       ) : server.status === "offline" ? (
                         <>
                           <Button
-                            onClick={() => handleServerAction('online')}
-                            disabled={actionLoading === 'online'}
+                            onClick={() => handleServerAction("online")}
+                            disabled={actionLoading === "online"}
                             variant="outline"
                             size="sm"
                             className="w-full text-green-600 border-green-600 hover:bg-green-50"
                           >
-                            {actionLoading === 'online' ? (
+                            {actionLoading === "online" ? (
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
                             ) : (
                               <Play className="h-4 w-4 mr-2" />
@@ -523,13 +581,13 @@ export default function ServerDetailPage() {
                             Online Yap
                           </Button>
                           <Button
-                            onClick={() => handleServerAction('maintenance')}
-                            disabled={actionLoading === 'maintenance'}
+                            onClick={() => handleServerAction("maintenance")}
+                            disabled={actionLoading === "maintenance"}
                             variant="outline"
                             size="sm"
                             className="w-full text-yellow-600 border-yellow-600 hover:bg-yellow-50"
                           >
-                            {actionLoading === 'maintenance' ? (
+                            {actionLoading === "maintenance" ? (
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600"></div>
                             ) : (
                               <AlertTriangle className="h-4 w-4 mr-2" />
@@ -540,13 +598,13 @@ export default function ServerDetailPage() {
                       ) : server.status === "maintenance" ? (
                         <>
                           <Button
-                            onClick={() => handleServerAction('online')}
-                            disabled={actionLoading === 'online'}
+                            onClick={() => handleServerAction("online")}
+                            disabled={actionLoading === "online"}
                             variant="outline"
                             size="sm"
                             className="w-full text-green-600 border-green-600 hover:bg-green-50"
                           >
-                            {actionLoading === 'online' ? (
+                            {actionLoading === "online" ? (
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
                             ) : (
                               <Play className="h-4 w-4 mr-2" />
@@ -554,13 +612,13 @@ export default function ServerDetailPage() {
                             Online Yap
                           </Button>
                           <Button
-                            onClick={() => handleServerAction('offline')}
-                            disabled={actionLoading === 'offline'}
+                            onClick={() => handleServerAction("offline")}
+                            disabled={actionLoading === "offline"}
                             variant="outline"
                             size="sm"
                             className="w-full text-red-600 border-red-600 hover:bg-red-50"
                           >
-                            {actionLoading === 'offline' ? (
+                            {actionLoading === "offline" ? (
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
                             ) : (
                               <Power className="h-4 w-4 mr-2" />
@@ -570,13 +628,13 @@ export default function ServerDetailPage() {
                         </>
                       ) : (
                         <Button
-                          onClick={() => handleServerAction('online')}
-                          disabled={actionLoading === 'online'}
+                          onClick={() => handleServerAction("online")}
+                          disabled={actionLoading === "online"}
                           variant="outline"
                           size="sm"
                           className="w-full text-green-600 border-green-600 hover:bg-green-50"
                         >
-                          {actionLoading === 'online' ? (
+                          {actionLoading === "online" ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
                           ) : (
                             <Play className="h-4 w-4 mr-2" />
@@ -588,13 +646,13 @@ export default function ServerDetailPage() {
                       {/* Reject approved server */}
                       <div className="pt-2 border-t">
                         <Button
-                          onClick={() => openApprovalDialog('reject')}
-                          disabled={actionLoading === 'reject'}
+                          onClick={() => openApprovalDialog("reject")}
+                          disabled={actionLoading === "reject"}
                           variant="destructive"
                           size="sm"
                           className="w-full"
                         >
-                          {actionLoading === 'reject' ? (
+                          {actionLoading === "reject" ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                           ) : (
                             <Ban className="h-4 w-4 mr-2" />
@@ -609,12 +667,12 @@ export default function ServerDetailPage() {
                   {server.approval_status === "rejected" && (
                     <div className="space-y-2">
                       <Button
-                        onClick={() => openApprovalDialog('approve')}
-                        disabled={actionLoading === 'approve'}
+                        onClick={() => openApprovalDialog("approve")}
+                        disabled={actionLoading === "approve"}
                         className="w-full bg-green-600 hover:bg-green-700"
                         size="sm"
                       >
-                        {actionLoading === 'approve' ? (
+                        {actionLoading === "approve" ? (
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                         ) : (
                           <Check className="h-4 w-4 mr-2" />
@@ -640,18 +698,31 @@ export default function ServerDetailPage() {
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-4">
                   <div>
-                    <div className="text-sm text-muted-foreground">Zorluk Seviyesi</div>
-                    <div className="font-medium">{server.server_difficulty}</div>
+                    <div className="text-sm text-muted-foreground">
+                      Zorluk Seviyesi
+                    </div>
+                    <div className="font-medium">
+                      {server.server_difficulty}
+                    </div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Seviye Aralığı</div>
-                    <div className="font-medium">{server.server_level_range}</div>
+                    <div className="text-sm text-muted-foreground">
+                      Seviye Aralığı
+                    </div>
+                    <div className="font-medium">
+                      {server.server_level_range}
+                    </div>
                   </div>
                   {server.tag_name && (
                     <div>
-                      <div className="text-sm text-muted-foreground">Kategori</div>
+                      <div className="text-sm text-muted-foreground">
+                        Kategori
+                      </div>
                       <div className="mt-1">
-                        <Badge variant="outline" className="flex items-center gap-1 w-fit">
+                        <Badge
+                          variant="outline"
+                          className="flex items-center gap-1 w-fit"
+                        >
                           <Tag className="h-3 w-3" />
                           {server.tag_name}
                         </Badge>
@@ -662,10 +733,12 @@ export default function ServerDetailPage() {
                 <div className="space-y-4">
                   {server.discord_link && (
                     <div>
-                      <div className="text-sm text-muted-foreground">Discord</div>
-                      <a 
-                        href={server.discord_link} 
-                        target="_blank" 
+                      <div className="text-sm text-muted-foreground">
+                        Discord
+                      </div>
+                      <a
+                        href={server.discord_link}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 text-sm"
                       >
@@ -676,10 +749,12 @@ export default function ServerDetailPage() {
                   )}
                   {server.website_link && (
                     <div>
-                      <div className="text-sm text-muted-foreground">Website</div>
-                      <a 
-                        href={server.website_link} 
-                        target="_blank" 
+                      <div className="text-sm text-muted-foreground">
+                        Website
+                      </div>
+                      <a
+                        href={server.website_link}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 text-sm"
                       >
@@ -690,20 +765,24 @@ export default function ServerDetailPage() {
                   )}
                   {server.youtube_links && server.youtube_links.length > 0 && (
                     <div>
-                      <div className="text-sm text-muted-foreground">YouTube</div>
+                      <div className="text-sm text-muted-foreground">
+                        YouTube
+                      </div>
                       <div className="space-y-1">
-                        {server.youtube_links.map((link: string, idx: number) => (
-                          <a 
-                            key={idx}
-                            href={link} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 text-sm"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            Video {idx + 1}
-                          </a>
-                        ))}
+                        {server.youtube_links.map(
+                          (link: string, idx: number) => (
+                            <a
+                              key={idx}
+                              href={link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 text-sm"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              Video {idx + 1}
+                            </a>
+                          )
+                        )}
                       </div>
                     </div>
                   )}
@@ -762,7 +841,7 @@ export default function ServerDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="bg-muted/50 p-4 rounded-lg">
-                  <div 
+                  <div
                     className="prose prose-sm max-w-none text-sm"
                     dangerouslySetInnerHTML={{ __html: server.description }}
                   />
@@ -782,7 +861,7 @@ export default function ServerDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="bg-muted/50 p-4 rounded-lg">
-                  <div 
+                  <div
                     className="prose prose-sm max-w-none text-sm"
                     dangerouslySetInnerHTML={{ __html: server.server_rules }}
                   />
@@ -838,7 +917,7 @@ export default function ServerDetailPage() {
                     Henüz geri bildirim yok.
                   </div>
                 ) : (
-                  comments.map((r, idx) => (
+                  comments.map((r: any, idx: number) => (
                     <div key={idx} className="p-4 rounded-lg border">
                       <div className="flex items-center justify-between">
                         <div>
@@ -870,7 +949,20 @@ export default function ServerDetailPage() {
                           >
                             <Reply className="h-4 w-4" />
                           </Button>
-                          {/* Delete is not available in current API */}
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() =>
+                              setDeleteDialog({
+                                open: true,
+                                feedbackId: r.id,
+                                loading: false,
+                              })
+                            }
+                            title="Sil"
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                       <p className="mt-3 text-sm">{r.comment}</p>
@@ -878,7 +970,7 @@ export default function ServerDetailPage() {
                       {/* Existing replies */}
                       {r.replies && r.replies.length > 0 && (
                         <div className="mt-3 space-y-2">
-                          {r.replies.map((rep, ridx) => (
+                          {r.replies.map((rep: any, ridx: number) => (
                             <div key={ridx} className="pl-3 border-l text-sm">
                               <div className="flex items-center justify-between">
                                 <div className="font-medium">{rep.user}</div>
@@ -932,43 +1024,128 @@ export default function ServerDetailPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-background border rounded-lg p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold mb-4">
-              {approvalDialog.action === 'approve' ? 'Sunucuyu Onayla' : 'Sunucuyu Reddet'}
+              {approvalDialog.action === "approve"
+                ? "Sunucuyu Onayla"
+                : "Sunucuyu Reddet"}
             </h3>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  {approvalDialog.action === 'approve' ? 'Onay Notu (İsteğe bağlı)' : 'Red Sebebi (Gerekli)'}
+                  {approvalDialog.action === "approve"
+                    ? "Onay Notu (İsteğe bağlı)"
+                    : "Red Sebebi (Gerekli)"}
                 </label>
                 <textarea
                   value={approvalDialog.reason}
-                  onChange={(e) => setApprovalDialog({ ...approvalDialog, reason: e.target.value })}
-                  placeholder={approvalDialog.action === 'approve' ? 'Onay notu ekleyebilirsiniz...' : 'Red sebebini belirtin...'}
+                  onChange={(e) =>
+                    setApprovalDialog({
+                      ...approvalDialog,
+                      reason: e.target.value,
+                    })
+                  }
+                  placeholder={
+                    approvalDialog.action === "approve"
+                      ? "Onay notu ekleyebilirsiniz..."
+                      : "Red sebebini belirtin..."
+                  }
                   className="w-full p-3 border rounded-md resize-none h-24"
-                  required={approvalDialog.action === 'reject'}
+                  required={approvalDialog.action === "reject"}
                 />
               </div>
-              
+
               <div className="flex gap-3 justify-end">
                 <Button
                   variant="outline"
-                  onClick={() => setApprovalDialog({ open: false, action: 'approve', reason: '' })}
+                  onClick={() =>
+                    setApprovalDialog({
+                      open: false,
+                      action: "approve",
+                      reason: "",
+                    })
+                  }
                   disabled={actionLoading === approvalDialog.action}
                 >
                   İptal
                 </Button>
                 <Button
                   onClick={() => handleServerAction(approvalDialog.action)}
-                  disabled={actionLoading === approvalDialog.action || (approvalDialog.action === 'reject' && !approvalDialog.reason.trim())}
-                  className={approvalDialog.action === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}
+                  disabled={
+                    actionLoading === approvalDialog.action ||
+                    (approvalDialog.action === "reject" &&
+                      !approvalDialog.reason.trim())
+                  }
+                  className={
+                    approvalDialog.action === "approve"
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-red-600 hover:bg-red-700"
+                  }
                 >
                   {actionLoading === approvalDialog.action ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  ) : approvalDialog.action === "approve" ? (
+                    "Onayla"
                   ) : (
-                    approvalDialog.action === 'approve' ? 'Onayla' : 'Reddet'
+                    "Reddet"
                   )}
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Feedback Dialog */}
+      {deleteDialog.open && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-background border rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-4">Yorumu sil</h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              Bu işlemi geri alamazsınız. Emin misiniz?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setDeleteDialog({
+                    open: false,
+                    feedbackId: null,
+                    loading: false,
+                  })
+                }
+                disabled={deleteDialog.loading}
+              >
+                İptal
+              </Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700"
+                disabled={deleteDialog.loading}
+                onClick={async () => {
+                  if (!deleteDialog.feedbackId) return;
+                  setDeleteDialog((prev) => ({ ...prev, loading: true }));
+                  try {
+                    await deleteServerFeedback(
+                      serverId,
+                      deleteDialog.feedbackId
+                    );
+                    await refetchFeedback();
+                  } catch (e) {
+                    alert("Yorum silinemedi");
+                  } finally {
+                    setDeleteDialog({
+                      open: false,
+                      feedbackId: null,
+                      loading: false,
+                    });
+                  }
+                }}
+              >
+                {deleteDialog.loading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                ) : (
+                  "Sil"
+                )}
+              </Button>
             </div>
           </div>
         </div>

@@ -1,5 +1,9 @@
 import { apiClient } from "@/lib/apiClient";
-import { serverEndpoints, frontendServerEndpoints } from "@/lib/endpoints";
+import {
+  serverEndpoints,
+  frontendServerEndpoints,
+  adminFeedbackEndpoints,
+} from "@/lib/endpoints";
 
 export interface ServersListParams {
   page?: string | number;
@@ -55,7 +59,10 @@ export const createServer = async (payload: CreateServerPayload) => {
 
 // Frontend (user) facing server APIs
 export const createFrontendServer = async (payload: CreateServerPayload) => {
-  const res = await apiClient.post(frontendServerEndpoints.createServer, payload);
+  const res = await apiClient.post(
+    frontendServerEndpoints.createServer,
+    payload
+  );
   return res.data as { insertedServerId?: number; data?: any };
 };
 
@@ -65,7 +72,9 @@ export const fetchFrontendUserServers = async () => {
 };
 
 export const fetchFrontendUserServerById = async (id: number | string) => {
-  const res = await apiClient.get(frontendServerEndpoints.getUserServerById(id));
+  const res = await apiClient.get(
+    frontendServerEndpoints.getUserServerById(id)
+  );
   return res.data as { data: any };
 };
 
@@ -73,8 +82,15 @@ export const updateFrontendUserServerStatus = async (
   id: number | string,
   payload: { status: "online" | "offline" | "maintenance" }
 ) => {
-  const res = await apiClient.put(frontendServerEndpoints.updateUserServerStatus(String(id)), payload);
-  return res.data as { serverId: number; status: "online" | "offline" | "maintenance"; updated: any };
+  const res = await apiClient.put(
+    frontendServerEndpoints.updateUserServerStatus(String(id)),
+    payload
+  );
+  return res.data as {
+    serverId: number;
+    status: "online" | "offline" | "maintenance";
+    updated: any;
+  };
 };
 
 export const updateFrontendUserServerDetails = async (
@@ -98,7 +114,10 @@ export const updateFrontendUserServerDetails = async (
     showDateTime?: string | null;
   }
 ) => {
-  const res = await apiClient.put(frontendServerEndpoints.updateUserServerDetails(String(id)), payload);
+  const res = await apiClient.put(
+    frontendServerEndpoints.updateUserServerDetails(String(id)),
+    payload
+  );
   return res.data as { serverId: number; status: "updated"; updated: any };
 };
 
@@ -122,8 +141,15 @@ export const updateServerStatus = async (
   id: number | string,
   payload: { status: "online" | "offline" | "maintenance" }
 ) => {
-  const res = await apiClient.put(serverEndpoints.updateStatus(String(id)), payload);
-  return res.data as { serverId: number; status: "online" | "offline" | "maintenance"; updated: any };
+  const res = await apiClient.put(
+    serverEndpoints.updateStatus(String(id)),
+    payload
+  );
+  return res.data as {
+    serverId: number;
+    status: "online" | "offline" | "maintenance";
+    updated: any;
+  };
 };
 
 export const fetchServerById = async (id: string | number) => {
@@ -140,8 +166,26 @@ export const answerServerFeedback = async (
   id: string | number,
   payload: { feedbackId: number; response: string }
 ) => {
-  const res = await apiClient.post(serverEndpoints.feedbackAnswer(String(id)), payload);
+  const res = await apiClient.post(
+    serverEndpoints.feedbackAnswer(String(id)),
+    payload
+  );
   return res.data as { feedbackId: number; serverId: number; updated: any };
+};
+
+export const deleteServerFeedback = async (
+  serverId: number | string,
+  feedbackId: number | string
+) => {
+  const res = await apiClient.delete(
+    adminFeedbackEndpoints.deleteById(String(serverId), String(feedbackId))
+  );
+  return res.data as {
+    success: boolean;
+    serverId: number;
+    feedbackId: number;
+    deleted: any;
+  };
 };
 
 export const fetchActiveServers = async (params: ServersListParams = {}) => {

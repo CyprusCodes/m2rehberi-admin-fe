@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Auth endpoints
 export const authEndpoints = {
@@ -7,7 +7,7 @@ export const authEndpoints = {
   me: `${API_BASE_URL}/user/me`,
   refreshToken: `${API_BASE_URL}/admin/refresh`,
   checkEmail: `${API_BASE_URL}/user/check-email`,
-}
+};
 
 export const frontendUserEndpoints = {
   login: `${API_BASE_URL}/user/login`,
@@ -15,35 +15,42 @@ export const frontendUserEndpoints = {
   verifyEmail: `${API_BASE_URL}/user/verify-email`,
   changePassword: `${API_BASE_URL}/change-password`,
   getUsers: `${API_BASE_URL}/user/users`,
-  deleteUserById: (id: number | string) => `${API_BASE_URL}/user/delete-user/${id}`,
+  deleteUserById: (id: number | string) =>
+    `${API_BASE_URL}/user/delete-user/${id}`,
   getUserById: (id: number | string) => `${API_BASE_URL}/user/get-user/${id}`,
   refreshCurrentUser: `${API_BASE_URL}/user/refresh-current-user`,
   getCurrentUserPermissions: `${API_BASE_URL}/user/current-user-permissions`,
   forgotPassword: `${API_BASE_URL}/user/forgot-password`,
   editProfile: `${API_BASE_URL}/user/edit-profile`,
   getMe: `${API_BASE_URL}/user/me`,
-}
+};
 
 export const frontendServerEndpoints = {
   getActiveServers: `${API_BASE_URL}/front/servers`,
-  getActiveServerById: (id: number | string) => `${API_BASE_URL}/front/servers/${id}`,
-  getServerFeedback: (id: number | string) => `${API_BASE_URL}/front/servers/${id}/feedback`,
-  createServerFeedback: (id: number | string) => `${API_BASE_URL}/front/servers/${id}/feedback`,
+  getActiveServerById: (id: number | string) =>
+    `${API_BASE_URL}/front/servers/${id}`,
+  getServerFeedback: (id: number | string) =>
+    `${API_BASE_URL}/front/servers/${id}/feedback`,
+  createServerFeedback: (id: number | string) =>
+    `${API_BASE_URL}/front/servers/${id}/feedback`,
   createServer: `${API_BASE_URL}/front/servers`,
   getUserServers: `${API_BASE_URL}/front/user/servers`,
-  getUserServerById: (id: number | string) => `${API_BASE_URL}/front/user/servers/${id}`,
-  updateUserServerStatus: (id: number | string) => `${API_BASE_URL}/front/user/servers/${id}/status`,
-  updateUserServerDetails: (id: number | string) => `${API_BASE_URL}/front/user/servers/${id}/details`,
-}
+  getUserServerById: (id: number | string) =>
+    `${API_BASE_URL}/front/user/servers/${id}`,
+  updateUserServerStatus: (id: number | string) =>
+    `${API_BASE_URL}/front/user/servers/${id}/status`,
+  updateUserServerDetails: (id: number | string) =>
+    `${API_BASE_URL}/front/user/servers/${id}/details`,
+};
 
 export const frontendRoleEndpoints = {
   getRequestables: `${API_BASE_URL}/front/roles?onlyRequestables=true`,
-}
+};
 
 export const frontendServerOwnerRequestEndpoints = {
   create: `${API_BASE_URL}/front/roles/server-owner-requestable`,
   checkUserRequest: `${API_BASE_URL}/front/server-owner-requests/check`,
-}
+};
 
 // Users endpoints
 export const adminUserEndpoints = {
@@ -57,7 +64,7 @@ export const adminUserEndpoints = {
   unban: (id: string) => `${API_BASE_URL}/admin/users/${id}/unban`,
   verifyEmail: (id: string) => `${API_BASE_URL}/admin/users/${id}/verify-email`,
   sendPasswordReset: `${API_BASE_URL}/admin/recovery-request`,
-}
+};
 
 // Servers endpoints
 export const serverEndpoints = {
@@ -68,26 +75,41 @@ export const serverEndpoints = {
   delete: (id: string) => `${API_BASE_URL}/admin/servers/${id}`,
   getStatus: (id: string) => `${API_BASE_URL}/admin/servers/${id}/status`,
   updateStatus: (id: string) => `${API_BASE_URL}/admin/servers/${id}/status`,
-  approve: (id: string | number) => `${API_BASE_URL}/admin/servers/${id}/approve`,
+  approve: (id: string | number) =>
+    `${API_BASE_URL}/admin/servers/${id}/approve`,
   reject: (id: string | number) => `${API_BASE_URL}/admin/servers/${id}/reject`,
-  feedbackList: (id: string | number) => `${API_BASE_URL}/admin/servers/${id}/feedback`,
-  feedbackCreate: (id: string | number) => `${API_BASE_URL}/admin/servers/${id}/feedback`,
-  feedbackAnswer: (id: string | number) => `${API_BASE_URL}/admin/servers/${id}/feedback/answer`,
-}
+  feedbackList: (id: string | number) =>
+    `${API_BASE_URL}/admin/servers/${id}/feedback`,
+  feedbackCreate: (id: string | number) =>
+    `${API_BASE_URL}/admin/servers/${id}/feedback`,
+  feedbackAnswer: (id: string | number) =>
+    `${API_BASE_URL}/admin/servers/${id}/feedback/answer`,
+};
+
+export const adminFeedbackEndpoints = {
+  deleteById: (serverId: string | number, feedbackId: string | number) =>
+    `${API_BASE_URL}/admin/servers/${serverId}/feedback/${feedbackId}`,
+};
 
 // Forums endpoints
 export const forumEndpoints = {
   getCategories: `${API_BASE_URL}/admin/forums/categories`,
-  getTopics: (categoryId?: string) => `${API_BASE_URL}/admin/forums/topics${categoryId ? `?category=${categoryId}` : ""}`,
+  getTopics: (categoryId?: string) =>
+    `${API_BASE_URL}/admin/forums/topics${
+      categoryId ? `?category=${categoryId}` : ""
+    }`,
   getTopicById: (id: string) => `${API_BASE_URL}/admin/forums/topics/${id}`,
   createTopic: `${API_BASE_URL}/admin/forums/topics`,
   updateTopic: (id: string) => `${API_BASE_URL}/admin/forums/topics/${id}`,
   deleteTopic: (id: string) => `${API_BASE_URL}/admin/forums/topics/${id}`,
   closeTopic: (id: string) => `${API_BASE_URL}/admin/forums/topics/${id}/close`,
-  getPosts: (topicId: string) => `${API_BASE_URL}/admin/forums/topics/${topicId}/posts`,
-  createPost: (topicId: string) => `${API_BASE_URL}/admin/forums/topics/${topicId}/posts`,
-  deletePost: (topicId: string, postId: string) => `${API_BASE_URL}/admin/forums/topics/${topicId}/posts/${postId}`,
-}
+  getPosts: (topicId: string) =>
+    `${API_BASE_URL}/admin/forums/topics/${topicId}/posts`,
+  createPost: (topicId: string) =>
+    `${API_BASE_URL}/admin/forums/topics/${topicId}/posts`,
+  deletePost: (topicId: string, postId: string) =>
+    `${API_BASE_URL}/admin/forums/topics/${topicId}/posts/${postId}`,
+};
 
 // Tags endpoints
 export const tagEndpoints = {
@@ -99,7 +121,7 @@ export const tagEndpoints = {
   delete: (id: string | number) => `${API_BASE_URL}/admin/tags/${id}`,
 
   getActiveTags: `${API_BASE_URL}/front/tags?active=true`,
-}
+};
 
 // Advertisement endpoints
 export const advertisementEndpoints = {
@@ -110,15 +132,17 @@ export const advertisementEndpoints = {
   delete: (id: string) => `${API_BASE_URL}/admin/advertisements/${id}`,
   approve: (id: string) => `${API_BASE_URL}/admin/advertisements/${id}/approve`,
   reject: (id: string) => `${API_BASE_URL}/admin/advertisements/${id}/reject`,
-}
+};
 
 // Server Owner Requests
 export const serverOwnerRequestEndpoints = {
   getAll: `${API_BASE_URL}/admin/server-owner-requests`,
   create: `${API_BASE_URL}/admin/server-owner-requests`,
-  approve: (id: string | number) => `${API_BASE_URL}/admin/server-owner-requests/${id}/approve`,
-  reject: (id: string | number) => `${API_BASE_URL}/admin/server-owner-requests/${id}/reject`,
-}
+  approve: (id: string | number) =>
+    `${API_BASE_URL}/admin/server-owner-requests/${id}/approve`,
+  reject: (id: string | number) =>
+    `${API_BASE_URL}/admin/server-owner-requests/${id}/reject`,
+};
 
 // Analytics endpoints
 export const analyticsEndpoints = {
@@ -126,14 +150,14 @@ export const analyticsEndpoints = {
   getUsers: `${API_BASE_URL}/admin/analytics/users`,
   getServers: `${API_BASE_URL}/admin/analytics/servers`,
   getForums: `${API_BASE_URL}/admin/analytics/forums`,
-}
+};
 
 // Upload endpoints
 export const uploadEndpoints = {
   image: `${API_BASE_URL}/admin/upload/image`,
   banner: `${API_BASE_URL}/admin/upload/banner`,
   avatar: `${API_BASE_URL}/admin/upload/avatar`,
-}
+};
 
 // Roles (User Types) endpoints
 export const roleEndpoints = {
@@ -143,14 +167,14 @@ export const roleEndpoints = {
   create: `${API_BASE_URL}/admin/roles`,
   update: (id: string | number) => `${API_BASE_URL}/admin/roles/${id}`,
   delete: (id: string | number) => `${API_BASE_URL}/admin/roles/${id}`,
-}
+};
 
 export const systemSettingEndpoints = {
   getAll: `${API_BASE_URL}/admin/settings`,
   create: `${API_BASE_URL}/admin/settings`,
   update: (id: string | number) => `${API_BASE_URL}/admin/settings/${id}`,
   delete: (id: string | number) => `${API_BASE_URL}/admin/settings/${id}`,
-}
+};
 
 // Carousel endpoints
 export const adminCarouselEndpoints = {
@@ -160,34 +184,44 @@ export const adminCarouselEndpoints = {
   update: (id: string | number) => `${API_BASE_URL}/admin/carousels/${id}`,
   delete: (id: string | number) => `${API_BASE_URL}/admin/carousels/${id}`,
   getServers: `${API_BASE_URL}/admin/carousels/servers`,
-}
+};
 
 export const frontendCarouselEndpoints = {
   getAll: `${API_BASE_URL}/front/carousels`,
-}
+};
 
 // Front Support endpoints for authenticated users
 export const frontSupportEndpoints = {
   getCategories: `${API_BASE_URL}/front/support/categories`,
   createTicket: `${API_BASE_URL}/front/support/tickets`,
   myTickets: `${API_BASE_URL}/front/support/tickets/mine`,
-  getTicketById: (id: string | number) => `${API_BASE_URL}/front/support/tickets/${id}`,
-  getMessages: (id: string | number) => `${API_BASE_URL}/front/support/tickets/${id}/messages`,
-  createMessage: (id: string | number) => `${API_BASE_URL}/front/support/tickets/${id}/messages`,
-}
+  getTicketById: (id: string | number) =>
+    `${API_BASE_URL}/front/support/tickets/${id}`,
+  getMessages: (id: string | number) =>
+    `${API_BASE_URL}/front/support/tickets/${id}/messages`,
+  createMessage: (id: string | number) =>
+    `${API_BASE_URL}/front/support/tickets/${id}/messages`,
+};
 // Support endpoints (Admin)
 export const adminSupportCategoryEndpoints = {
   getAll: `${API_BASE_URL}/admin/support/categories`,
   create: `${API_BASE_URL}/admin/support/categories`,
-  update: (id: string | number) => `${API_BASE_URL}/admin/support/categories/${id}`,
-  delete: (id: string | number) => `${API_BASE_URL}/admin/support/categories/${id}`,
-}
+  update: (id: string | number) =>
+    `${API_BASE_URL}/admin/support/categories/${id}`,
+  delete: (id: string | number) =>
+    `${API_BASE_URL}/admin/support/categories/${id}`,
+};
 
 export const adminSupportTicketEndpoints = {
   getAll: `${API_BASE_URL}/admin/support/tickets`,
-  getById: (id: string | number) => `${API_BASE_URL}/admin/support/tickets/${id}`,
-  assign: (id: string | number) => `${API_BASE_URL}/admin/support/tickets/${id}/assign`,
-  updateStatus: (id: string | number) => `${API_BASE_URL}/admin/support/tickets/${id}/status`,
-  getMessages: (id: string | number) => `${API_BASE_URL}/admin/support/tickets/${id}/messages`,
-  createMessage: (id: string | number) => `${API_BASE_URL}/admin/support/tickets/${id}/messages`,
-}
+  getById: (id: string | number) =>
+    `${API_BASE_URL}/admin/support/tickets/${id}`,
+  assign: (id: string | number) =>
+    `${API_BASE_URL}/admin/support/tickets/${id}/assign`,
+  updateStatus: (id: string | number) =>
+    `${API_BASE_URL}/admin/support/tickets/${id}/status`,
+  getMessages: (id: string | number) =>
+    `${API_BASE_URL}/admin/support/tickets/${id}/messages`,
+  createMessage: (id: string | number) =>
+    `${API_BASE_URL}/admin/support/tickets/${id}/messages`,
+};
