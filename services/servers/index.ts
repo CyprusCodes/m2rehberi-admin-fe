@@ -203,3 +203,47 @@ export const fetchActiveServers = async (params: ServersListParams = {}) => {
   console.log("fetchActiveServers", JSON.stringify(res.data.data, null, 2));
   return res.data;
 };
+
+// User liked servers interface
+export interface LikedServer {
+  server_id: number;
+  server_name: string;
+  status: 'online' | 'offline' | 'maintenance';
+  server_cover_image_url?: string;
+  liked_at: string;
+  like_count: string | number;
+  comment_count: number;
+  average_rating: string | number;
+}
+
+export const fetchUserLikedServers = async (): Promise<{ data: LikedServer[] }> => {
+  try {
+    const response = await apiClient.get(frontendServerEndpoints.getUserLikedServers);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Like/Unlike server functionality
+export interface LikeServerPayload {
+  likeType: 'like' | 'dislike';
+}
+
+export const likeServer = async (serverId: number | string, payload: LikeServerPayload): Promise<{ success: boolean; message: string }> => {
+  try {
+    const response = await apiClient.post(frontendServerEndpoints.likeServer(serverId), payload);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const removeServerLike = async (serverId: number | string): Promise<{ success: boolean; message: string }> => {
+  try {
+    const response = await apiClient.post(frontendServerEndpoints.likeServer(serverId), { likeType: 'dislike' });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

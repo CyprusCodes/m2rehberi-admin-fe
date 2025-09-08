@@ -37,6 +37,9 @@ export const frontendServerEndpoints = {
   getUserServers: `${API_BASE_URL}/front/user/servers`,
   getUserServerById: (id: number | string) =>
     `${API_BASE_URL}/front/user/servers/${id}`,
+  getUserLikedServers: `${API_BASE_URL}/front/user/liked-servers`,
+  likeServer: (id: number | string) =>
+    `${API_BASE_URL}/front/servers/${id}/like`,
   updateUserServerStatus: (id: number | string) =>
     `${API_BASE_URL}/front/user/servers/${id}/status`,
   updateUserServerDetails: (id: number | string) =>

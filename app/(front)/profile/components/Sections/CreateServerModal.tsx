@@ -28,6 +28,15 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
   const [submitting, setSubmitting] = useState(false)
   const [tags, setTags] = useState<Tag[]>([])
   const [loadingTags, setLoadingTags] = useState(false)
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      if (typeof window !== "undefined") {
+        window.location.reload()
+      }
+    }
+    onOpenChange(isOpen)
+  }
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -98,7 +107,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
         showDateTime: form.showDateTime || undefined,
       }
       await createFrontendServer(payload)
-      onOpenChange(false)
+      handleOpenChange(false)
       setForm({
         name: "",
         description: "",
@@ -128,7 +137,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="min-w-7xl max-h-[95vh] p-0 gap-0 bg-gradient-to-br from-background via-background to-muted/20">
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent" />
@@ -556,7 +565,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
           <div className="flex justify-end gap-3 px-8 py-6">
             <Button
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => handleOpenChange(false)}
               className="h-11 px-6 border-border/50 hover:bg-muted/50 transition-colors"
             >
               İptal

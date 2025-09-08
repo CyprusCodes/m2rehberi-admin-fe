@@ -423,9 +423,9 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
                         </div>
                       </div>
                       
-                      <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
-                        {server.description || "Açıklama bulunmuyor"}
-                      </p>
+                      <div className="text-sm text-muted-foreground line-clamp-1 mb-2">
+                        {server.description ? <div dangerouslySetInnerHTML={{ __html: server.description }} /> : "Açıklama bulunmuyor"}
+                      </div>
                       
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <div className="flex items-center gap-1.5">

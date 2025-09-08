@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,8 @@ import {
   Power,
   Play,
   AlertTriangle,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -70,6 +72,7 @@ export default function ServerDetailPage() {
     feedbackId: number | null;
     loading: boolean;
   }>({ open: false, feedbackId: null, loading: false });
+  const [expandedUsers, setExpandedUsers] = useState<Set<number>>(new Set());
 
   // Feedback mapping (supports { data: { feedback, stats } } and raw array)
   const feedbackContainer: any = fbData?.data ?? fbData ?? {};
@@ -79,6 +82,74 @@ export default function ServerDetailPage() {
     ? feedbackContainer.feedback
     : [];
   const feedbackStats = feedbackContainer.stats ?? null;
+
+  // Group feedback by user ID (memoized)
+  const groupedFeedbackArray = useMemo(() => {
+    const groupedFeedback = feedbackItems.reduce((acc: any, f: any) => {
+      const userId = f.userId || f.user_id;
+      const userName = `${f.firstName || f.first_name || ""} ${
+        f.lastName || f.last_name || ""
+      }`.trim() || `user#${userId}`;
+      
+      if (!acc[userId]) {
+        acc[userId] = {
+          userId,
+          userName,
+          feedbacks: []
+        };
+      }
+      
+      acc[userId].feedbacks.push({
+        id: f.feedbackId || f.feedback_id,
+        stars: Number(f.rating) || 0,
+        comment: f.message,
+        date: f.createdAt || f.created_at,
+        replies:
+          f.adminResponse || f.admin_response
+            ? [
+                {
+                  user: "Admin",
+                  comment: f.adminResponse || f.admin_response,
+                  date:
+                    f.respondedAt ||
+                    f.responded_at ||
+                    f.updatedAt ||
+                    f.updated_at ||
+                    f.createdAt ||
+                    f.created_at,
+                },
+              ]
+            : [],
+      });
+      
+      return acc;
+    }, {});
+
+    return Object.values(groupedFeedback).map((group: any) => ({
+      ...group,
+      feedbacks: group.feedbacks.sort((a: any, b: any) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      )
+    })).sort((a: any, b: any) => 
+      new Date(b.feedbacks[0].date).getTime() - new Date(a.feedbacks[0].date).getTime()
+    );
+  }, [feedbackItems]);
+
+  useEffect(() => {
+    if (groupedFeedbackArray.length === 0) return;
+    
+    const singleFeedbackUsers = groupedFeedbackArray
+      .filter((group: any) => group.feedbacks.length === 1)
+      .map((group: any) => group.userId);
+    
+    setExpandedUsers((prev) => {
+      const newSet = new Set(prev);
+      singleFeedbackUsers.forEach((userId: number) => {
+        newSet.add(userId);
+      });
+      return newSet;
+    });
+  }, [groupedFeedbackArray]); 
 
   const comments = feedbackItems.map((f: any) => ({
     id: f.feedbackId || f.feedback_id,
@@ -122,14 +193,24 @@ export default function ServerDetailPage() {
     setReplyValue("");
   };
 
-  const submitReply = async (idx: number) => {
+  const toggleUserExpansion = (userId: number) => {
+    setExpandedUsers((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(userId)) {
+        newSet.delete(userId);
+      } else {
+        newSet.add(userId);
+      }
+      return newSet;
+    });
+  };
+
+  const submitReply = async (feedbackId: number) => {
     const text = replyValue.trim();
     if (!text) return;
-    const target = comments[idx];
-    if (!target?.id) return;
     try {
       await answerServerFeedback(serverId, {
-        feedbackId: target.id,
+        feedbackId: feedbackId,
         response: text,
       });
       await refetchFeedback();
@@ -902,7 +983,7 @@ export default function ServerDetailPage() {
                 </div>
               </div>
 
-              {/* Reviews List (stateful with admin actions) */}
+              {/* Reviews List (grouped by user with accordion) */}
               <div className="space-y-4">
                 {fbLoading ? (
                   <div className="text-sm text-muted-foreground">
@@ -912,106 +993,167 @@ export default function ServerDetailPage() {
                   <div className="text-sm text-red-500">
                     Geri bildirimler yüklenemedi.
                   </div>
-                ) : comments.length === 0 ? (
+                ) : groupedFeedbackArray.length === 0 ? (
                   <div className="text-sm text-muted-foreground">
                     Henüz geri bildirim yok.
                   </div>
                 ) : (
-                  comments.map((r: any, idx: number) => (
-                    <div key={idx} className="p-4 rounded-lg border">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium">{r.user}</div>
-                          <div className="mt-1 text-sm text-muted-foreground">
-                            {moment(r.date).locale("tr").format("ll")}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center mr-2">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={
-                                  i < r.stars
-                                    ? "text-yellow-500"
-                                    : "text-muted-foreground"
-                                }
-                                size={16}
-                                fill={i < r.stars ? "currentColor" : "none"}
-                              />
-                            ))}
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => toggleReply(idx)}
-                            title="Yanıtla"
-                          >
-                            <Reply className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() =>
-                              setDeleteDialog({
-                                open: true,
-                                feedbackId: r.id,
-                                loading: false,
-                              })
-                            }
-                            title="Sil"
-                          >
-                            <Trash className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                      <p className="mt-3 text-sm">{r.comment}</p>
-
-                      {/* Existing replies */}
-                      {r.replies && r.replies.length > 0 && (
-                        <div className="mt-3 space-y-2">
-                          {r.replies.map((rep: any, ridx: number) => (
-                            <div key={ridx} className="pl-3 border-l text-sm">
-                              <div className="flex items-center justify-between">
-                                <div className="font-medium">{rep.user}</div>
-                                <div className="text-xs text-muted-foreground">
-                                  {moment(rep.date).locale("tr").format("lll")}
+                  groupedFeedbackArray.map((userGroup: any) => {
+                    const isExpanded = expandedUsers.has(userGroup.userId);
+                    const latestFeedback = userGroup.feedbacks[0];
+                    const totalFeedbacks = userGroup.feedbacks.length;
+                    
+                    return (
+                      <div key={userGroup.userId} className="border rounded-lg">
+                        <div 
+                          className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                          onClick={() => toggleUserExpansion(userGroup.userId)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center">
+                                {isExpanded ? (
+                                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                ) : (
+                                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                )}
+                              </div>
+                              <div>
+                                <div className="font-medium">{userGroup.userName}</div>
+                                <div className="text-sm text-muted-foreground">
+                                  {totalFeedbacks} yorum • Son yorum: {moment(latestFeedback.date).locale("tr").format("ll")}
                                 </div>
                               </div>
-                              <div className="mt-1">{rep.comment}</div>
                             </div>
-                          ))}
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={
+                                      i < latestFeedback.stars
+                                        ? "text-yellow-500"
+                                        : "text-muted-foreground"
+                                    }
+                                    size={16}
+                                    fill={i < latestFeedback.stars ? "currentColor" : "none"}
+                                  />
+                                ))}
+                              </div>
+                              <Badge variant="secondary" className="text-xs">
+                                {totalFeedbacks} yorum
+                              </Badge>
+                            </div>
+                          </div>
                         </div>
-                      )}
 
-                      {/* Reply form */}
-                      {activeReplyIndex === idx && (
-                        <div className="mt-3 flex items-center gap-2">
-                          <input
-                            className="flex-1 px-3 py-2 border rounded-md text-sm bg-background"
-                            placeholder="Yanıt yazın..."
-                            value={replyValue}
-                            onChange={(e) => setReplyValue(e.target.value)}
-                          />
-                          <Button
-                            variant="secondary"
-                            onClick={() => submitReply(idx)}
-                          >
-                            <Send className="h-4 w-4 mr-1" /> Gönder
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            onClick={() => {
-                              setActiveReplyIndex(null);
-                              setReplyValue("");
-                            }}
-                          >
-                            <X className="h-4 w-4 mr-1" /> İptal
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  ))
+                        {/* Expanded Content */}
+                        {isExpanded && (
+                          <div className="border-t bg-muted/20">
+                            {userGroup.feedbacks.map((feedback: any, feedbackIdx: number) => (
+                              <div key={feedback.id} className="p-4 border-b last:border-b-0">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex items-center">
+                                      {[...Array(5)].map((_, i) => (
+                                        <Star
+                                          key={i}
+                                          className={
+                                            i < feedback.stars
+                                              ? "text-yellow-500"
+                                              : "text-muted-foreground"
+                                          }
+                                          size={14}
+                                          fill={i < feedback.stars ? "currentColor" : "none"}
+                                        />
+                                      ))}
+                                    </div>
+                                    <span className="text-xs text-muted-foreground">
+                                      {moment(feedback.date).locale("tr").format("lll")}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Button
+                                      variant="outline"
+                                      size="icon"
+                                      className="h-8 w-8"
+                                      onClick={() => toggleReply(feedback.id)}
+                                      title="Yanıtla"
+                                    >
+                                      <Reply className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="icon"
+                                      className="h-8 w-8"
+                                      onClick={() =>
+                                        setDeleteDialog({
+                                          open: true,
+                                          feedbackId: feedback.id,
+                                          loading: false,
+                                        })
+                                      }
+                                      title="Sil"
+                                    >
+                                      <Trash className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                                
+                                <p className="text-sm mb-3">{feedback.comment}</p>
+
+                                {/* Existing replies */}
+                                {feedback.replies && feedback.replies.length > 0 && (
+                                  <div className="mt-3 space-y-2">
+                                    {feedback.replies.map((rep: any, ridx: number) => (
+                                      <div key={ridx} className="pl-3 border-l-2 border-blue-200 dark:border-blue-800 text-sm">
+                                        <div className="flex items-center justify-between">
+                                          <div className="font-medium text-blue-600 dark:text-blue-400">{rep.user}</div>
+                                          <div className="text-xs text-muted-foreground">
+                                            {moment(rep.date).locale("tr").format("lll")}
+                                          </div>
+                                        </div>
+                                        <div className="mt-1">{rep.comment}</div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Reply form */}
+                                {activeReplyIndex === feedback.id && (
+                                  <div className="mt-3 flex items-center gap-2">
+                                    <input
+                                      className="flex-1 px-3 py-2 border rounded-md text-sm bg-background"
+                                      placeholder="Yanıt yazın..."
+                                      value={replyValue}
+                                      onChange={(e) => setReplyValue(e.target.value)}
+                                    />
+                                    <Button
+                                      variant="secondary"
+                                      size="sm"
+                                      onClick={() => submitReply(feedback.id)}
+                                    >
+                                      <Send className="h-4 w-4 mr-1" /> Gönder
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setActiveReplyIndex(null);
+                                        setReplyValue("");
+                                      }}
+                                    >
+                                      <X className="h-4 w-4 mr-1" /> İptal
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
             </CardContent>

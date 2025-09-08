@@ -7,7 +7,7 @@ import { ProfileSidebar } from './components/ProfileSidebar'
 import { PersonalInfo } from './components/PersonalInfo'
 import { Notifications } from './components/Notifications'
 import { MyServers } from './components/MyServers'
-import { FavoriteServers } from './components/FavoriteServers'
+import { FavoriteServers } from './components/FavoriteServer/FavoriteServers'
 import { MyRequests } from './components/MyRequests'
 import { ModeToggle } from '@/components/mode-toggle'
 import SupportTicketsSection from './components/Support/SupportTickets'
@@ -68,7 +68,7 @@ export default function ProfilePage() {
         {/* Main Content */}
         <div className="flex-1 p-8 bg-black min-h-screen">
           {renderContent()}
-        </div>
+        </div>       
       </div>
     </div>
   )
