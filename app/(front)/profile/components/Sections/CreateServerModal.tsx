@@ -1,4 +1,4 @@
-"use client"
+ "use client"
 
 import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -9,12 +9,13 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Switch } from "@/components/ui/switch"
-import { Check, Server, Globe, MessageCircle, Calendar, Shield, Gamepad2, Settings, Star, Zap, Image } from "lucide-react"
+import { Check, Server, Globe, MessageCircle, Calendar, Shield, Gamepad2, Settings, Star, Zap, Image, Upload, X } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { createFrontendServer, type CreateServerPayload } from "@/services/servers"
 import { fetchActiveTags, type Tag } from "@/services/tags"
 import { LEVEL_RANGES, DIFFICULTY_LEVELS, SERVER_TYPES, METIN2_SYSTEMS, METIN2_FEATURES, METIN2_EVENTS } from "@/lib/helpersConstants"
 import { HtmlEditor } from "@/components/ui/html-editor"
+import { uploadAsset } from "@/services/uploads"
 
 interface CreateServerModalProps {
   open: boolean
@@ -28,6 +29,8 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
   const [submitting, setSubmitting] = useState(false)
   const [tags, setTags] = useState<Tag[]>([])
   const [loadingTags, setLoadingTags] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [dragActive, setDragActive] = useState(false)
 
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
@@ -73,6 +76,61 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
     }
     load()
   }, [open])
+
+  const handleFileUpload = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Lütfen sadece resim dosyası yükleyin.')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      alert('Dosya boyutu 5MB\'dan büyük olamaz.')
+      return
+    }
+
+    try {
+      setUploading(true)
+      const response = await uploadAsset(file)
+      console.log('Upload response:', response)
+      console.log('URL to set:', response.data.url)
+      setForm({ ...form, serverCoverImageUrl: response.data.url })
+    } catch (error) {
+      console.error('Upload failed:', error)
+      alert('Dosya yüklenirken hata oluştu.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true)
+    } else if (e.type === "dragleave") {
+      setDragActive(false)
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragActive(false)
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileUpload(e.dataTransfer.files[0])
+    }
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFileUpload(e.target.files[0])
+    }
+  }
+
+  const removeImage = () => {
+    setForm({ ...form, serverCoverImageUrl: "" })
+  }
 
   const handleSubmit = async () => {
     if (!user?.id) return
@@ -476,25 +534,58 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
                 <div className="space-y-2">
                   <Label className="text-sm font-medium flex items-center gap-2">
                     <Image className="w-4 h-4" />
-                    Sunucu Kapak Resmi URL
+                    Sunucu Kapak Resmi
                   </Label>
-                  <Input
-                    value={form.serverCoverImageUrl}
-                    onChange={(e) => setForm({ ...form, serverCoverImageUrl: e.target.value })}
-                    placeholder="https://example.com/cover-image.jpg"
-                    className="h-11 border-border/50 focus:border-primary/50 transition-colors"
-                  />
-                  {form.serverCoverImageUrl && (
-                    <div className="mt-3 p-3 bg-muted/30 rounded-lg border border-border/30">
-                      <Label className="text-sm font-medium text-muted-foreground mb-2 block">
-                        Önizleme:
-                      </Label>
+                  
+                  {!form.serverCoverImageUrl ? (
+                    <div
+                      className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
+                        dragActive 
+                          ? 'border-primary bg-primary/5' 
+                          : 'border-border/50 hover:border-primary/50 hover:bg-muted/30'
+                      }`}
+                      onDragEnter={handleDrag}
+                      onDragLeave={handleDrag}
+                      onDragOver={handleDrag}
+                      onDrop={handleDrop}
+                      onClick={() => document.getElementById('cover-image-input')?.click()}
+                    >
+                      <input
+                        id="cover-image-input"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
+                      
+                      {uploading ? (
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                          <p className="text-sm text-muted-foreground">Yükleniyor...</p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-2">
+                          <Upload className="w-8 h-8 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm font-medium">Resim sürükleyip bırakın</p>
+                            <p className="text-xs text-muted-foreground">veya tıklayarak seçin</p>
+                          </div>
+                          <p className="text-xs text-muted-foreground">PNG, JPG, GIF (max 5MB)</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="relative group">
                       <div className="relative w-full h-32 rounded-lg overflow-hidden border border-border/30">
                         <img
                           src={form.serverCoverImageUrl}
-                          alt="Sunucu kapak resmi önizlemesi"
+                          alt="Sunucu kapak resmi"
                           className="w-full h-full object-cover"
+                          onLoad={() => {
+                            console.log('Image loaded successfully:', form.serverCoverImageUrl)
+                          }}
                           onError={(e) => {
+                            console.log('Image failed to load:', form.serverCoverImageUrl)
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
                             const parent = target.parentElement;
@@ -503,7 +594,34 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
                             }
                           }}
                         />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => document.getElementById('cover-image-input')?.click()}
+                            className="h-8 px-3"
+                          >
+                            <Upload className="w-3 h-3 mr-1" />
+                            Değiştir
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={removeImage}
+                            className="h-8 px-3"
+                          >
+                            <X className="w-3 h-3 mr-1" />
+                            Kaldır
+                          </Button>
+                        </div>
                       </div>
+                      <input
+                        id="cover-image-input"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
                     </div>
                   )}
                 </div>
@@ -560,6 +678,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
             </div>
           </div>
         </ScrollArea>
+
 
         <div className="relative border-t border-border/50 bg-gradient-to-r from-background via-background to-muted/10">
           <div className="flex justify-end gap-3 px-8 py-6">

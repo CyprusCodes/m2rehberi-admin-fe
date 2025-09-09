@@ -160,6 +160,7 @@ export const uploadEndpoints = {
   image: `${API_BASE_URL}/admin/upload/image`,
   banner: `${API_BASE_URL}/admin/upload/banner`,
   avatar: `${API_BASE_URL}/admin/upload/avatar`,
+  asset: `${API_BASE_URL}/upload-asset`,
 };
 
 // Roles (User Types) endpoints
