@@ -20,6 +20,7 @@ import {
   Package,
   ShieldCheck,
   Image,
+  Video,
 } from "lucide-react"
 
 const navigation = [
@@ -38,6 +39,11 @@ const navigation = [
     name: "Servers",
     href: "/admin/servers",
     icon: Server,
+  },
+  {
+    name: "Yayıncılar",
+    href: "/admin/streamers",
+    icon: Video,
   },
   {
     name: "Forums",

@@ -229,3 +229,16 @@ export const adminSupportTicketEndpoints = {
   createMessage: (id: string | number) =>
     `${API_BASE_URL}/admin/support/tickets/${id}/messages`,
 };
+
+// Streamers endpoints
+export const streamerEndpoints = {
+  getAll: `${API_BASE_URL}/admin/streamers`,
+  getById: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}`,
+  create: `${API_BASE_URL}/admin/streamers`,
+  update: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}`,
+  delete: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}`,
+  approve: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}/approve`,
+  reject: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}/reject`,
+  toggleStatus: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}/status`,
+  toggleVerification: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}/verification`,
+};
