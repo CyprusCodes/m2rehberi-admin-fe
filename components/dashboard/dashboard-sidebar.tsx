@@ -21,6 +21,7 @@ import {
   ShieldCheck,
   Image,
   Video,
+  Flag,
 } from "lucide-react"
 
 const navigation = [
@@ -44,6 +45,11 @@ const navigation = [
     name: "Yayıncılar",
     href: "/admin/streamers",
     icon: Video,
+  },
+  {
+    name: "Raporlanan Postlar",
+    href: "/admin/reported-posts",
+    icon: Flag,
   },
   {
     name: "Forums",

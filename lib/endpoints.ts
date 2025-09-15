@@ -242,3 +242,11 @@ export const streamerEndpoints = {
   toggleStatus: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}/status`,
   toggleVerification: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}/verification`,
 };
+
+export const streamerPostReportEndpoints = {
+  list: `${API_BASE_URL}/admin/streamer-post-reports`,
+  stats: `${API_BASE_URL}/admin/streamer-post-reports/stats`,
+  getById: (id: string | number) => `${API_BASE_URL}/admin/streamer-post-reports/${id}`,
+  updateStatus: (id: string | number) => `${API_BASE_URL}/admin/streamer-post-reports/${id}/status`,
+  deletePost: (id: string | number) => `${API_BASE_URL}/admin/streamer-post-reports/${id}/post`,
+};
