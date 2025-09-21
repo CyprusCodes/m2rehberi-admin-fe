@@ -73,7 +73,7 @@ export function LandingFooter() {
             Ready to Launch Your Server?
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join thousands of server owners who trust M2Rehberi for their Metin2 server management needs.
+            Join thousands of server owners who trust Oyna.gg for their Metin2 server management needs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/login">
@@ -100,7 +100,7 @@ export function LandingFooter() {
                   <Gamepad2 className="w-8 h-8 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-foreground">M2Rehberi</h3>
+                  <h3 className="text-2xl font-bold text-foreground">Oyna.gg</h3>
                   <p className="text-sm text-muted-foreground">Metin2 Server Management Platform</p>
                 </div>
               </div>
@@ -155,7 +155,7 @@ export function LandingFooter() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <span>© 2024 M2Rehberi. All rights reserved.</span>
+              <span>© 2024 Oyna.gg. All rights reserved.</span>
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4" />
                 <span>Secure Platform</span>

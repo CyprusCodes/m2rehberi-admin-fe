@@ -133,7 +133,7 @@ export function ServerApplicationForm() {
               Server Başvuru Formu
             </CardTitle>
             <p className="text-muted-foreground max-w-lg mx-auto mb-6">
-              Server'ınızı M2Rehberi platformuna eklemek için aşağıdaki formu doldurun
+              Sunucunuzu Oyna.gg platformuna eklemek için aşağıdaki formu doldurun
             </p>
           </CardHeader>
           

@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
 import { useAuth } from '@/contexts/auth-context'
 import { User, Mail, Calendar, Shield, CheckCircle, Edit, Save, X } from 'lucide-react'
 
@@ -39,70 +38,65 @@ export function PersonalInfo() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Kişisel Bilgiler</h1>
-          <p className="text-muted-foreground">Profil bilgilerinizi yönetin ve güncelleyin</p>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold text-slate-100">Kişisel Bilgiler</h2>
+          <p className="text-sm text-slate-400">Profilini güncelle, bilgilerini her zaman güncel tut.</p>
         </div>
-        <div className="flex items-center space-x-3">
-          {!isEditing && (
-            <Button onClick={() => setIsEditing(true)} className="flex items-center space-x-2">
-              <Edit className="w-4 h-4" />
-              <span>Düzenle</span>
-            </Button>
-          )}
-        </div>
+        {!isEditing && (
+          <Button onClick={() => setIsEditing(true)} className="flex items-center gap-2">
+            <Edit className="h-4 w-4" />
+            <span>Düzenle</span>
+          </Button>
+        )}
       </div>
 
-      {/* Profile Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Ad Soyad */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-                <User className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-muted-foreground">Ad Soyad</p>
+        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/50 p-5 shadow-lg shadow-black/30">
+          <div className="flex items-start gap-4">
+            <div className="rounded-xl bg-gradient-to-br from-indigo-500/20 to-slate-500/20 p-3">
+              <User className="h-5 w-5 text-indigo-200" />
+            </div>
+            <div className="flex-1 space-y-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.32em] text-slate-500">Ad Soyad</p>
                 {isEditing ? (
-                  <div className="flex space-x-2 mt-1">
+                  <div className="mt-3 flex gap-2">
                     <Input
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleInputChange}
                       placeholder="Ad"
-                      className="w-24 h-8"
+                      className="h-10 rounded-xl border border-indigo-500/20 bg-slate-900/60 text-slate-100 focus:border-indigo-400 focus:ring-indigo-400"
                     />
                     <Input
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleInputChange}
                       placeholder="Soyad"
-                      className="w-24 h-8"
+                      className="h-10 rounded-xl border border-indigo-500/20 bg-slate-900/60 text-slate-100 focus:border-indigo-400 focus:ring-indigo-400"
                     />
                   </div>
                 ) : (
-                  <p className="text-base font-semibold text-foreground">
-                    {user?.name || 'Ad Soyad'}
-                  </p>
+                  <p className="text-lg font-semibold text-slate-100">{user?.name || 'Ad Soyad'}</p>
                 )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* E-posta */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
-                <Mail className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-muted-foreground">E-posta</p>
+        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/50 p-5 shadow-lg shadow-black/30">
+          <div className="flex items-start gap-4">
+            <div className="rounded-xl bg-gradient-to-br from-amber-500/20 to-slate-500/20 p-3">
+              <Mail className="h-5 w-5 text-amber-200" />
+            </div>
+            <div className="flex-1 space-y-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.32em] text-slate-500">E-posta</p>
                 {isEditing ? (
                   <Input
                     name="email"
@@ -110,102 +104,88 @@ export function PersonalInfo() {
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="E-posta adresiniz"
-                    className="mt-1 h-8"
+                    className="mt-3 h-10 rounded-xl border border-indigo-500/20 bg-slate-900/60 text-slate-100 focus:border-indigo-400 focus:ring-indigo-400"
                   />
                 ) : (
-                  <p className="text-base font-semibold text-foreground">
-                    {user?.email || 'email@example.com'}
-                  </p>
+                  <p className="text-lg font-semibold text-slate-100">{user?.email || 'email@example.com'}</p>
                 )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Üyelik Tarihi */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                <Calendar className="w-4 h-4 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Üyelik Tarihi</p>
-                <p className="text-base font-semibold text-foreground">
-                  18 Ocak 2025
-                </p>
-              </div>
+        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/50 p-5 shadow-lg shadow-black/30">
+          <div className="flex items-start gap-4">
+            <div className="rounded-xl bg-gradient-to-br from-emerald-500/20 to-slate-500/20 p-3">
+              <Calendar className="h-5 w-5 text-emerald-200" />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <p className="text-xs uppercase tracking-[0.32em] text-slate-500">Üyelik Tarihi</p>
+              <p className="mt-3 text-lg font-semibold text-slate-100">18 Ocak 2025</p>
+            </div>
+          </div>
+        </div>
 
         {/* Hesap Türü */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-                <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Hesap Türü</p>
-                <p className="text-base font-semibold text-foreground">
-                  {user?.userType === 'admin' ? 'Admin Hesabı' : 'Kullanıcı Hesabı'}
-                </p>
-              </div>
+        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/50 p-5 shadow-lg shadow-black/30">
+          <div className="flex items-start gap-4">
+            <div className="rounded-xl bg-gradient-to-br from-purple-500/20 to-slate-500/20 p-3">
+              <Shield className="h-5 w-5 text-purple-200" />
             </div>
-          </CardContent>
-        </Card>
+            <div>
+              <p className="text-xs uppercase tracking-[0.32em] text-slate-500">Hesap Türü</p>
+              <p className="mt-3 text-lg font-semibold text-slate-100">{user?.userType === 'admin' ? 'Admin Hesabı' : 'Kullanıcı Hesabı'}</p>
+            </div>
+          </div>
+        </div>
 
         {/* Hesap Durumu */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Hesap Durumu</p>
-                <div className="flex items-center space-x-2">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400">
-                    Aktif
-                  </span>
-                  <CheckCircle className="w-3 h-3 text-green-500" />
-                </div>
+        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/50 p-5 shadow-lg shadow-black/30">
+          <div className="flex items-start gap-4">
+            <div className="rounded-xl bg-gradient-to-br from-emerald-500/20 to-slate-500/20 p-3">
+              <CheckCircle className="h-5 w-5 text-emerald-200" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.32em] text-slate-500">Hesap Durumu</p>
+              <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-100">
+                Aktif
+                <CheckCircle className="h-3.5 w-3.5" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* E-posta Doğrulama */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">E-posta Doğrulama</p>
-                <div className="flex items-center space-x-2">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400">
-                    Doğrulanmış
-                  </span>
-                  <CheckCircle className="w-3 h-3 text-green-500" />
-                </div>
+        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/50 p-5 shadow-lg shadow-black/30">
+          <div className="flex items-start gap-4">
+            <div className="rounded-xl bg-gradient-to-br from-emerald-500/20 to-slate-500/20 p-3">
+              <CheckCircle className="h-5 w-5 text-emerald-200" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.32em] text-slate-500">E-posta Doğrulama</p>
+              <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-100">
+                Doğrulanmış
+                <CheckCircle className="h-3.5 w-3.5" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Action Buttons */}
       {isEditing && (
-        <div className="flex justify-end space-x-3">
-          <Button variant="outline" onClick={handleCancel} className="flex items-center space-x-2">
-            <X className="w-4 h-4" />
+        <div className="flex justify-end gap-3">
+          <Button
+            variant="outline"
+            onClick={handleCancel}
+            className="flex items-center gap-2 rounded-xl border border-slate-700/60 bg-slate-900/60 text-slate-200 hover:border-slate-500"
+          >
+            <X className="h-4 w-4" />
             <span>İptal</span>
           </Button>
-          <Button onClick={handleSave} className="flex items-center space-x-2">
-            <Save className="w-4 h-4" />
+          <Button onClick={handleSave} className="flex items-center gap-2 rounded-xl">
+            <Save className="h-4 w-4" />
             <span>Kaydet</span>
           </Button>
         </div>

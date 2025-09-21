@@ -11,25 +11,27 @@ interface EmptyStateProps {
 
 export function EmptyState({ onSearchServers }: EmptyStateProps) {
   return (
-    <Card className="border-dashed">
-      <CardContent className="pt-6">
-        <div className="text-center py-16">
-          <div className="relative mb-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-pink-100 dark:from-red-900/20 dark:to-pink-900/20 rounded-full flex items-center justify-center mx-auto">
-              <Heart className="w-12 h-12 text-red-500 dark:text-red-400" />
-            </div>
-            
+    <Card className="rounded-3xl border border-slate-800/60 bg-slate-900/50 shadow-xl shadow-black/30">
+      <CardContent className="py-16">
+        <div className="space-y-6 text-center">
+          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-rose-500/20 to-slate-500/20">
+            <Heart className="h-10 w-10 text-rose-200" />
           </div>
-          
-          <h3 className="text-xl font-semibold text-foreground mb-3">
-            Henüz favori sunucunuz yok
-          </h3>
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            Beğendiğiniz sunucuları favorilere ekleyerek kolayca takip edin ve 
-            burada görüntüleyin.
-          </p>
-          
-          
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold text-slate-100">Henüz favori sunucunuz yok</h3>
+            <p className="mx-auto max-w-md text-sm text-slate-400">
+              Beğendiğiniz yayınları ve sunucuları favorilere ekleyerek Oyna.gg ana sayfanızda hızlıca erişin.
+            </p>
+          </div>
+          {onSearchServers && (
+            <Button
+              onClick={onSearchServers}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-slate-600 px-5 py-2 shadow-lg shadow-indigo-900/40"
+            >
+              <Search className="h-4 w-4" />
+              Sunucuları Keşfet
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>

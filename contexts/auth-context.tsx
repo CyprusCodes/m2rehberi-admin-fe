@@ -4,6 +4,8 @@ import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { login as loginRequest, logout as logoutRequest, getMe } from "@/services/auth/login"
+import { registerUser } from "@/services/auth/register"
+import { verifyEmail as verifyEmailRequest } from "@/services/auth/verifyEmail"
 import { setAuthToken, getAuthToken, removeAuthToken, getUser, removeUser, setUser as setUserToStorage } from "@/lib/storage"
 
 interface User {
@@ -20,10 +22,20 @@ interface User {
   isServerOwnerRequestable?: number
 }
 
+interface RegisterData {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  phoneNumber?: string
+}
+
 interface AuthContextType {
   user: User | null
   adminLogin: (email: string, password: string) => Promise<boolean>
   userLogin: (email: string, password: string) => Promise<boolean>
+  userRegister: (data: RegisterData) => Promise<boolean>
+  verifyEmail: (email: string, code: string) => Promise<boolean>
   logout: () => void
   isLoading: boolean
   isAuthenticated: boolean
@@ -152,6 +164,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const userRegister = async (data: RegisterData): Promise<boolean> => {
+    setIsLoading(true)
+    try {
+      console.log('Register attempt with:', data)
+      
+      const response = await registerUser(data)
+      
+      if (response?.message) {
+        console.log('Registration successful:', response.message)
+        return true
+      }
+      
+      return false
+    } catch (error: any) {
+      console.error('Registration error:', error)
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const verifyEmail = async (email: string, code: string): Promise<boolean> => {
+    setIsLoading(true)
+    try {
+      const response = await verifyEmailRequest({ email, verifyCode: code })
+      
+      if (response?.message) {
+        console.log('Email verification successful:', response.message)
+        return true
+      }
+      
+      return false
+    } catch (error: any) {
+      console.error('Email verification error:', error)
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const logout = async () => {
     try { 
       await logoutRequest() 
@@ -172,6 +224,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         adminLogin,
         userLogin,
+        userRegister,
+        verifyEmail,
         logout,
         isLoading,
         isAuthenticated: !!user,

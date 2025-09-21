@@ -45,6 +45,18 @@ const navigation = [
     name: "Yayıncılar",
     href: "/admin/streamers",
     icon: Video,
+    submenu: [
+      {
+        name: "Yayıncıları Yönet",
+        href: "/admin/streamers",
+        icon: Video,
+      },
+      {
+        name: "Postları Yönet",
+        href: "/admin/streamers/posts",
+        icon: MessageSquare,
+      },
+    ],
   },
   {
     name: "Raporlanan Postlar",
@@ -91,6 +103,7 @@ const navigation = [
 export function DashboardSidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const [supportOpen, setSupportOpen] = useState(true)
+  const [streamersOpen, setStreamersOpen] = useState(true)
   const pathname = usePathname()
 
   return (
@@ -112,7 +125,41 @@ export function DashboardSidebar() {
       <ScrollArea className="flex-1 px-3 py-4">
         <nav className="space-y-2">
           {navigation.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href || (item.submenu && item.submenu.some(sub => pathname === sub.href))
+            
+            if (item.submenu) {
+              return (
+                <div key={item.name} className="mt-2">
+                  <Button
+                    variant={isActive ? "secondary" : "ghost"}
+                    className={cn("w-full justify-between h-10", collapsed && "justify-center px-2")}
+                    onClick={() => setStreamersOpen(prev => !prev)}
+                  >
+                    <span className="flex items-center gap-3">
+                      <item.icon className="h-4 w-4" />
+                      {!collapsed && <span>{item.name}</span>}
+                    </span>
+                    {!collapsed && (streamersOpen ? <ChevronDown className="h-4 w-4"/> : <ChevronRight className="h-4 w-4"/>) }
+                  </Button>
+                  {!collapsed && streamersOpen && (
+                    <div className="ml-8 mt-1 space-y-1">
+                      {item.submenu.map((subItem) => {
+                        const isSubActive = pathname === subItem.href
+                        return (
+                          <Link key={subItem.name} href={subItem.href}>
+                            <Button variant={isSubActive ? "secondary" : "ghost"} className="w-full justify-start h-9">
+                              <subItem.icon className="h-4 w-4 mr-2" />
+                              {subItem.name}
+                            </Button>
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            }
+            
             return (
               <Link key={item.name} href={item.href}>
                 <Button

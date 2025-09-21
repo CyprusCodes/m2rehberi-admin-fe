@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Heart, MessageCircle, Star, Eye, Trash2, Calendar, Server, Zap } from "lucide-react"
+import { Heart, MessageCircle, Star, Eye, Trash2, Calendar, Server } from "lucide-react"
 import Image from "next/image"
 
 interface FavoriteServer {
@@ -22,19 +22,6 @@ interface ServerListProps {
   onRemoveFavorite: (serverId: number) => void
 }
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "online":
-      return "bg-green-500"
-    case "offline":
-      return "bg-red-500"
-    case "maintenance":
-      return "bg-yellow-500"
-    default:
-      return "bg-gray-500"
-  }
-}
-
 const getStatusText = (status: string) => {
   switch (status) {
     case "online":
@@ -48,130 +35,114 @@ const getStatusText = (status: string) => {
   }
 }
 
+const getStatusDot = (status: string) => {
+  switch (status) {
+    case "online":
+      return "bg-emerald-400"
+    case "offline":
+      return "bg-rose-400"
+    case "maintenance":
+      return "bg-amber-300"
+    default:
+      return "bg-slate-400"
+  }
+}
+
 export function ServerList({ favorites, onViewServer, onRemoveFavorite }: ServerListProps) {
   return (
     <div className="space-y-4">
       {favorites.map((server) => (
         <Card
           key={server.id}
-          className="group overflow-hidden border-0 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1"
+          className="group overflow-hidden border border-slate-800/60 bg-slate-900/60 shadow-lg shadow-black/30 transition-all duration-300 hover:border-indigo-500/40 hover:bg-slate-900/70 hover:-translate-y-1"
         >
           <CardContent className="p-0">
             <div className="flex flex-col lg:flex-row">
-              <div className="relative w-full lg:w-72 h-48 lg:h-auto overflow-hidden">
+              <div className="relative h-48 w-full overflow-hidden rounded-t-2xl lg:h-auto lg:w-72 lg:rounded-none">
                 {server.coverImageUrl ? (
-                  <div className="relative w-full h-full rounded-lg">
+                  <div className="relative h-full w-full">
                     <Image
                       src={server.coverImageUrl || "/placeholder.svg"}
                       alt={server.name}
                       fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105 rounded-lg"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
                       sizes="(max-width: 768px) 100vw, 288px"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
                   </div>
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-primary/80 via-primary to-primary/60 flex items-center justify-center relative overflow-hidden">
-                    <div
-                      className="absolute inset-0 opacity-30"
-                      style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.1'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                        backgroundSize: "60px 60px",
-                      }}
-                    />
-                    <div className="relative z-10 flex flex-col items-center space-y-2">
-                      <Server className="w-8 h-8 text-white/90" />
-                      <div className="text-white text-2xl font-bold tracking-wide">
-                        {server.name.charAt(0).toUpperCase()}
-                      </div>
-                    </div>
+                  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-600 via-slate-700 to-slate-900">
+                    <Server className="h-8 w-8 text-slate-100" />
                   </div>
                 )}
 
-                <div className="absolute top-4 left-4">
-                  <Badge
-                    variant="secondary"
-                    className={`${getStatusColor(server.status)} text-white border-0 shadow-lg backdrop-blur-sm font-medium px-3 py-1`}
-                  >
-                    <div
-                      className={`w-2 h-2 ${server.status === "online" ? "bg-green-300" : server.status === "offline" ? "bg-red-300" : "bg-yellow-300"} rounded-full mr-2 animate-pulse`}
-                    ></div>
+                <div className="absolute left-4 top-4">
+                  <Badge className="flex items-center gap-2 rounded-full border border-slate-700/60 bg-slate-900/70 px-3 py-1 text-xs font-medium text-slate-100">
+                    <span className={`h-2 w-2 rounded-full ${getStatusDot(server.status)} animate-pulse`} />
                     {getStatusText(server.status)}
                   </Badge>
                 </div>
 
-                <div className="absolute top-4 right-4">
-                  <Badge className="bg-red-500/90 hover:bg-red-500 text-white border-0 shadow-lg backdrop-blur-sm font-medium px-3 py-1">
-                    <Heart className="w-3 h-3 mr-1 fill-current" />
+                <div className="absolute right-4 top-4">
+                  <Badge className="rounded-full border border-rose-500/40 bg-rose-500/20 px-3 py-1 text-xs font-medium text-rose-100">
+                    <Heart className="mr-1 h-3 w-3 fill-current" />
                     Favori
-                  </Badge>
-                </div>
-
-                <div className="absolute bottom-4 left-4">
-                  <Badge variant="outline" className="bg-black/20 text-white border-white/20 backdrop-blur-sm">
-                    <Zap className="w-3 h-3 mr-1" />
-                    Gaming
                   </Badge>
                 </div>
               </div>
 
               <div className="flex-1 p-6 lg:p-8">
-                <div className="flex flex-col h-full">
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-6">
+                <div className="flex h-full flex-col">
+                  <div className="mb-6 flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-200">
+                      <h3 className="mb-3 text-2xl font-semibold text-slate-100 transition-colors duration-200 group-hover:text-indigo-200">
                         {server.name}
                       </h3>
-                      <div className="flex items-center flex-wrap gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center space-x-2 bg-muted/50 rounded-full px-3 py-1">
-                          <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                          <span className="font-semibold text-foreground">{server.rating.toFixed(1)}</span>
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
+                        <div className="flex items-center gap-2 rounded-full border border-slate-700/60 bg-slate-900/60 px-3 py-1">
+                          <Star className="h-4 w-4 text-amber-300" />
+                          <span className="font-semibold text-slate-100">{server.rating.toFixed(1)}</span>
                           <span className="text-xs">rating</span>
                         </div>
-                        <div className="flex items-center space-x-2 bg-muted/50 rounded-full px-3 py-1">
-                          <Heart className="w-4 h-4 text-red-500 fill-current" />
-                          <span className="font-semibold text-foreground">{server.likeCount}</span>
+                        <div className="flex items-center gap-2 rounded-full border border-slate-700/60 bg-slate-900/60 px-3 py-1">
+                          <Heart className="h-4 w-4 text-rose-300" />
+                          <span className="font-semibold text-slate-100">{server.likeCount}</span>
                           <span className="text-xs">beğeni</span>
                         </div>
-                        <div className="flex items-center space-x-2 bg-muted/50 rounded-full px-3 py-1">
-                          <MessageCircle className="w-4 h-4 text-blue-500" />
-                          <span className="font-semibold text-foreground">{server.commentCount}</span>
+                        <div className="flex items-center gap-2 rounded-full border border-slate-700/60 bg-slate-900/60 px-3 py-1">
+                          <MessageCircle className="h-4 w-4 text-indigo-200" />
+                          <span className="font-semibold text-slate-100">{server.commentCount}</span>
                           <span className="text-xs">yorum</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex-1 flex flex-col justify-end">
-                    <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                        <Calendar className="w-4 h-4 text-primary" />
-                        <span className="font-medium">
-                          {new Date(server.addedAt).toLocaleDateString("tr-TR")} tarihinde beğenildi
-                        </span>
-                      </div>
+                  <div className="mt-auto flex items-center justify-between border-t border-slate-800/60 pt-4">
+                    <div className="flex items-center gap-2 text-sm text-slate-400">
+                      <Calendar className="h-4 w-4 text-indigo-200" />
+                      <span className="font-medium text-slate-100">
+                        {new Date(server.addedAt).toLocaleDateString("tr-TR")} tarihinde beğenildi
+                      </span>
+                    </div>
 
-                      <div className="flex items-center space-x-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onViewServer(server.id)}
-                          className="flex items-center space-x-2 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200 font-medium"
-                        >
-                          <Eye className="w-4 h-4" />
-                          <span>Görüntüle</span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onRemoveFavorite(server.id)}
-                          className="flex items-center space-x-2 text-destructive hover:text-destructive-foreground hover:bg-destructive hover:border-destructive transition-all duration-200 font-medium"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                          <span>Kaldır</span>
-                        </Button>
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <Button
+                        size="sm"
+                        onClick={() => onViewServer(server.id)}
+                        className="flex items-center gap-2 rounded-xl border border-slate-700/60 bg-transparent text-slate-200 hover:border-indigo-400/40 hover:bg-slate-900/70"
+                      >
+                        <Eye className="h-4 w-4" />
+                        <span>Görüntüle</span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => onRemoveFavorite(server.id)}
+                        className="flex items-center gap-2 rounded-xl border border-rose-500/40 bg-rose-500/10 text-rose-100 hover:bg-rose-500/20"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span>Kaldır</span>
+                      </Button>
                     </div>
                   </div>
                 </div>

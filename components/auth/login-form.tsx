@@ -11,8 +11,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, Shield } from "lucide-react"
 
 export function LoginForm() {
-  const [email, setEmail] = useState("admin@example.com")
-  const [password, setPassword] = useState("password")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -29,7 +29,7 @@ export function LoginForm() {
       if (ok) {
         router.push("/admin")
       } else {
-        setError("Geçersiz email veya şifre")
+        setError("Geçersiz e-posta veya şifre")
       }
     } catch (_err) {
       setError("Giriş yapılırken bir hata oluştu")
@@ -41,28 +41,28 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <Alert variant="destructive" className="bg-red-500/10 border-red-500/20 text-red-400">
+        <Alert variant="destructive" className="border-rose-500/30 bg-rose-500/10 text-rose-200">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-white/90 font-medium">
-          Email Adresi
+        <Label htmlFor="email" className="text-sm font-medium text-slate-200">
+          E-posta Adresi
         </Label>
         <Input
           id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="admin@metinport.com"
+          placeholder="admin@oyna.gg"
           required
-          className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-amber-400/50 focus:ring-amber-400/20 h-12"
+          className="h-12 rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 text-slate-100 placeholder:text-slate-500 focus:border-indigo-400/60"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-white/90 font-medium">
+        <Label htmlFor="password" className="text-sm font-medium text-slate-200">
           Şifre
         </Label>
         <div className="relative">
@@ -73,13 +73,13 @@ export function LoginForm() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
             required
-            className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-amber-400/50 focus:ring-amber-400/20 h-12 pr-12"
+            className="h-12 rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 pr-12 text-slate-100 placeholder:text-slate-500 focus:border-indigo-400/60"
           />
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="absolute right-0 top-0 h-full px-3 text-white/60 hover:text-white hover:bg-white/10"
+            className="absolute right-0 top-0 h-full px-3 text-slate-400 hover:bg-slate-900/60 hover:text-slate-100"
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -89,19 +89,19 @@ export function LoginForm() {
 
       <Button
         type="submit"
-        className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold h-12 shadow-lg"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-slate-600 text-slate-100 shadow-lg shadow-indigo-900/40 disabled:opacity-50"
         disabled={isLoading}
       >
         {isLoading ? (
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          <>
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-100/60 border-t-transparent" />
             Giriş yapılıyor...
-          </div>
+          </>
         ) : (
-          <div className="flex items-center gap-2">
+          <>
             <Shield className="h-4 w-4" />
-            Admin Paneline Giriş
-          </div>
+            Oyna.gg Admin Paneli
+          </>
         )}
       </Button>
     </form>

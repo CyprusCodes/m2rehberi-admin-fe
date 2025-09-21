@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { FileText, Clock, CheckCircle, XCircle, Eye, Calendar, Server, Plus, Shield } from 'lucide-react'
+import { FileText, Clock, CheckCircle, XCircle, Eye, Calendar, Server, Shield } from 'lucide-react'
 import { useAuth } from '@/contexts/auth-context'
 import { ServerOwnerRequestModal } from '@/components/modals/ServerOwnerRequestModal'
 import { checkUserServerOwnerRequest, type CheckUserRequestResponse } from '@/services/server-owner-requests'
@@ -80,16 +79,31 @@ export function MyRequests() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      pending: { variant: 'outline', text: 'Beklemede', color: 'text-yellow-600 border-yellow-600' },
-      approved: { variant: 'default', text: 'Onaylandı', color: 'bg-green-500' },
-      rejected: { variant: 'destructive', text: 'Reddedildi', color: 'bg-red-500' },
-      in_review: { variant: 'secondary', text: 'İnceleniyor', color: 'bg-blue-500' }
+      pending: {
+        text: 'Beklemede',
+        className: 'border-amber-400/40 bg-amber-500/10 text-amber-200'
+      },
+      approved: {
+        text: 'Onaylandı',
+        className: 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
+      },
+      rejected: {
+        text: 'Reddedildi',
+        className: 'border-rose-400/40 bg-rose-500/10 text-rose-200'
+      },
+      in_review: {
+        text: 'İnceleniyor',
+        className: 'border-indigo-400/40 bg-indigo-500/10 text-indigo-200'
+      }
     }
-    
+
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
-    
+
     return (
-      <Badge variant={config.variant as any} className={config.color}>
+      <Badge
+        variant="outline"
+        className={`rounded-full border px-3 py-1 text-xs font-semibold ${config.className}`}
+      >
         {config.text}
       </Badge>
     )
@@ -107,13 +121,13 @@ export function MyRequests() {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'server_owner':
-        return <Server className="w-4 h-4" />
+        return <Server className="h-5 w-5 text-indigo-200" />
       case 'role_change':
-        return <FileText className="w-4 h-4" />
+        return <FileText className="h-5 w-5 text-indigo-200" />
       case 'support':
-        return <FileText className="w-4 h-4" />
+        return <FileText className="h-5 w-5 text-indigo-200" />
       default:
-        return <FileText className="w-4 h-4" />
+        return <FileText className="h-5 w-5 text-indigo-200" />
     }
   }
 
@@ -132,197 +146,194 @@ export function MyRequests() {
     loadAllRequests()
   }
 
+  const pendingCount = requests.filter(r => r.status === 'pending').length
+  const approvedCount = requests.filter(r => r.status === 'approved').length
+  const rejectedCount = requests.filter(r => r.status === 'rejected').length
+
+  const stats = [
+    {
+      label: 'Toplam Talep',
+      value: requests.length,
+      icon: FileText,
+      accent: 'from-indigo-500/20 to-slate-500/20'
+    },
+    {
+      label: 'Bekleyen',
+      value: pendingCount,
+      icon: Clock,
+      accent: 'from-amber-500/20 to-slate-500/20'
+    },
+    {
+      label: 'Onaylanan',
+      value: approvedCount,
+      icon: CheckCircle,
+      accent: 'from-emerald-500/20 to-slate-500/20'
+    },
+    {
+      label: 'Reddedilen',
+      value: rejectedCount,
+      icon: XCircle,
+      accent: 'from-rose-500/20 to-slate-500/20'
+    }
+  ]
+
   if (isLoading) {
     return (
-      <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-        <p className="mt-4 text-muted-foreground">Talepler yükleniyor...</p>
+      <div className="flex min-h-[320px] items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="relative">
+            <div className="h-16 w-16 animate-spin rounded-full border-4 border-indigo-500/20 border-t-indigo-400 mx-auto" />
+            <Shield className="absolute inset-0 m-auto h-6 w-6 text-indigo-200" />
+          </div>
+          <p className="text-sm text-slate-400">Talepler yükleniyor...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Taleplerim</h1>
-          <p className="text-muted-foreground">Sunucu başvurularınızı ve destek taleplerinizi takip edin</p>
+    <div className="space-y-8">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold text-slate-100">Taleplerim</h2>
+          <p className="text-sm text-slate-400">Sunucu ve rol taleplerini tek panelden yönet.</p>
         </div>
         {canRequestServerOwner && !userRequest?.hasRequest && (
-          <Button onClick={handleCreateServerOwnerRequest} disabled={loadingRequest} className="flex items-center space-x-2">
-            <Shield className="w-4 h-4" />
+          <Button
+            onClick={handleCreateServerOwnerRequest}
+            disabled={loadingRequest}
+            className="flex items-center gap-2 rounded-xl"
+          >
+            <Shield className="h-4 w-4" />
             <span>Sunucu Sahibi Başvurusu</span>
           </Button>
         )}
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-                <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Toplam Talep</p>
-                <p className="text-2xl font-bold text-foreground">{requests.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
-                <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Bekleyen</p>
-                <p className="text-2xl font-bold text-foreground">
-                  {requests.filter(r => r.status === 'pending').length}
-                </p>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {stats.map((item, idx) => {
+          const Icon = item.icon
+          return (
+            <div
+              key={idx}
+              className="rounded-2xl border border-slate-800/60 bg-slate-900/60 p-5 shadow-lg shadow-black/30"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">{item.label}</p>
+                  <p className="mt-2 text-2xl font-semibold text-slate-100">{item.value}</p>
+                </div>
+                <div className={`rounded-xl bg-gradient-to-br ${item.accent} p-3`}>
+                  <Icon className="h-5 w-5 text-slate-100/80" />
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Onaylanan</p>
-                <p className="text-2xl font-bold text-foreground">
-                  {requests.filter(r => r.status === 'approved').length}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-red-100 dark:bg-red-900/20 rounded-lg">
-                <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Reddedilen</p>
-                <p className="text-2xl font-bold text-foreground">
-                  {requests.filter(r => r.status === 'rejected').length}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          )
+        })}
       </div>
 
-      {/* Server Owner Request Status */}
       {canRequestServerOwner && userRequest?.hasRequest && (
-        <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/20">
-          <CardContent className="pt-6">
-            <div className="flex items-start space-x-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        <div className="rounded-3xl border border-indigo-500/40 bg-gradient-to-br from-indigo-500/15 via-slate-900/50 to-slate-900/70 p-6 shadow-xl shadow-black/40">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="rounded-2xl bg-indigo-500/20 p-3">
+                <Shield className="h-5 w-5 text-indigo-200" />
               </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200">
-                    Server Sahipliği Başvurusu
-                  </h3>
+              <div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <h3 className="text-lg font-semibold text-slate-100">Server Sahipliği Başvurusu</h3>
                   {getStatusBadge(userRequest.request?.status || 'pending')}
                 </div>
-                <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
-                  {userRequest.request?.status === 'pending' && 'Başvurunuz inceleniyor...'}
-                  {userRequest.request?.status === 'approved' && 'Başvurunuz onaylandı! Artık server oluşturabilirsiniz.'}
-                  {userRequest.request?.status === 'rejected' && `Başvurunuz reddedildi. Sebep: ${userRequest.request?.rejectReason || 'Belirtilmemiş'}`}
+                <p className="mt-2 max-w-2xl text-sm text-indigo-100/80">
+                  {userRequest.request?.status === 'pending' && 'Başvurunuz inceleniyor. Moderatörlerimiz kısa süre içinde geri dönüş sağlayacak.'}
+                  {userRequest.request?.status === 'approved' && 'Başvurunuz onaylandı! Artık server oluşturabilir ve yönetim araçlarını kullanabilirsiniz.'}
+                  {userRequest.request?.status === 'rejected' && `Başvurunuz reddedildi. Sebep: ${userRequest.request?.rejectReason || 'Belirtilmedi'}`}
                 </p>
-                <div className="text-xs text-blue-600 dark:text-blue-400">
-                  <p>Talep Edilen Rol: {userRequest.request?.selectedUserTypeName}</p>
-                  <p>Talep Tarihi: {new Date(userRequest.request?.createdAt || '').toLocaleDateString('tr-TR')}</p>
+                <div className="mt-3 flex flex-wrap gap-4 text-xs text-indigo-100/70">
+                  <span className="inline-flex items-center gap-2">
+                    <Badge variant="outline" className="rounded-full border border-indigo-400/40 bg-indigo-500/10 text-indigo-100">
+                      {userRequest.request?.selectedUserTypeName || 'Sunucu Sahibi'}
+                    </Badge>
+                  </span>
+                  <span>Talep Tarihi: {new Date(userRequest.request?.createdAt || '').toLocaleDateString('tr-TR')}</span>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
-      {/* Requests List */}
       {requests.length === 0 ? (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center py-12">
-              <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-2">Henüz talep göndermediniz</h3>
-              <p className="text-muted-foreground mb-4">
-                Sunucu sahibi olmak veya rol değişikliği için talep gönderin
-              </p>
-              {canRequestServerOwner && !userRequest?.hasRequest ? (
-                <Button onClick={handleCreateServerOwnerRequest} disabled={loadingRequest} className="flex items-center space-x-2 mx-auto">
-                  <Shield className="w-4 h-4" />
-                  <span>Sunucu Sahibi Başvurusu</span>
-                </Button>
-              ) : (
-                <></>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="rounded-3xl border border-slate-800/60 bg-slate-900/50 p-12 text-center shadow-xl shadow-black/30">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-800/60">
+            <FileText className="h-7 w-7 text-slate-400" />
+          </div>
+          <h3 className="mt-6 text-lg font-semibold text-slate-100">Henüz talep göndermediniz</h3>
+          <p className="mt-2 text-sm text-slate-400">
+            Sunucu sahibi olmak veya rol değişikliği için yeni bir başvuru oluşturabilirsiniz.
+          </p>
+          {canRequestServerOwner && !userRequest?.hasRequest && (
+            <Button
+              onClick={handleCreateServerOwnerRequest}
+              disabled={loadingRequest}
+              className="mt-6 inline-flex items-center gap-2 rounded-xl"
+            >
+              <Shield className="h-4 w-4" />
+              <span>Sunucu Sahibi Başvurusu</span>
+            </Button>
+          )}
+        </div>
       ) : (
         <div className="space-y-4">
           {requests.map((request) => (
-            <Card key={request.id}>
-              <CardContent className="pt-6">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
-                  <div className="flex-1 space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2 bg-muted rounded-lg">
-                        {getTypeIcon(request.type)}
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-foreground">{request.title}</h3>
-                        <p className="text-sm text-muted-foreground">{getTypeLabel(request.type)}</p>
-                      </div>
-                      {getStatusBadge(request.status)}
+            <div
+              key={request.id}
+              className="rounded-2xl border border-slate-800/60 bg-slate-900/50 p-5 shadow-lg shadow-black/30"
+            >
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex-1 space-y-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="rounded-xl bg-slate-800/80 p-3">
+                      {getTypeIcon(request.type)}
                     </div>
-                    <p className="text-muted-foreground">{request.description}</p>
-                    <div className="flex items-center space-x-6 text-sm text-muted-foreground">
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(request.createdAt).toLocaleDateString('tr-TR')}</span>
-                      </div>
-                      {request.response && (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-green-600 dark:text-green-400">Yanıtlandı</span>
-                        </div>
-                      )}
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-100">{request.title}</h3>
+                      <p className="text-sm text-slate-400">{getTypeLabel(request.type)}</p>
                     </div>
+                    {getStatusBadge(request.status)}
                   </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewRequest(request.id)}
-                      className="flex items-center space-x-2"
-                    >
-                      <Eye className="w-4 h-4" />
-                      <span>Detayları Gör</span>
-                    </Button>
+                  <p className="text-sm text-slate-400">{request.description}</p>
+                  <div className="flex flex-wrap items-center gap-6 text-xs text-slate-500">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      <span>{new Date(request.createdAt).toLocaleDateString('tr-TR')}</span>
+                    </div>
+                    {request.response && (
+                      <span className="inline-flex items-center gap-2 text-emerald-300">
+                        <CheckCircle className="h-4 w-4" />
+                        Yanıtlandı
+                      </span>
+                    )}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleViewRequest(request.id)}
+                    className="flex items-center gap-2 rounded-xl border border-slate-700/60 bg-transparent text-slate-200 hover:border-indigo-400/40"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>Detayları Gör</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       )}
 
-      {/* Server Owner Request Modal */}
       <ServerOwnerRequestModal
         open={showRequestModal}
         onOpenChange={setShowRequestModal}

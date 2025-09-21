@@ -126,36 +126,32 @@ export default function MyServerDetailPage() {
   };
 
   const getStatusBgColor = (srv: any) => {
-    if (srv?.approval_status === "pending")
-      return "bg-yellow-100 dark:bg-yellow-900/20";
-    if (srv?.approval_status === "rejected")
-      return "bg-red-100 dark:bg-red-900/20";
+    if (srv?.approval_status === "pending") return "border border-amber-400/40 bg-amber-500/10";
+    if (srv?.approval_status === "rejected") return "border border-rose-400/40 bg-rose-500/10";
     switch (srv?.status) {
       case "online":
-        return "bg-green-100 dark:bg-green-900/20";
+        return "border border-emerald-400/40 bg-emerald-500/10";
       case "maintenance":
-        return "bg-yellow-100 dark:bg-yellow-900/20";
+        return "border border-indigo-400/40 bg-indigo-500/10";
       case "offline":
-        return "bg-red-100 dark:bg-red-900/20";
+        return "border border-rose-400/40 bg-rose-500/10";
       default:
-        return "bg-gray-100 dark:bg-gray-900/20";
+        return "border border-slate-500/40 bg-slate-500/10";
     }
   };
 
   const getStatusTextColor = (srv: any) => {
-    if (srv?.approval_status === "pending")
-      return "text-yellow-800 dark:text-yellow-200";
-    if (srv?.approval_status === "rejected")
-      return "text-red-800 dark:text-red-200";
+    if (srv?.approval_status === "pending") return "text-amber-100";
+    if (srv?.approval_status === "rejected") return "text-rose-100";
     switch (srv?.status) {
       case "online":
-        return "text-green-800 dark:text-green-200";
+        return "text-emerald-100";
       case "maintenance":
-        return "text-yellow-800 dark:text-yellow-200";
+        return "text-indigo-100";
       case "offline":
-        return "text-red-800 dark:text-red-200";
+        return "text-rose-100";
       default:
-        return "text-gray-800 dark:text-gray-200";
+        return "text-slate-200";
     }
   };
 

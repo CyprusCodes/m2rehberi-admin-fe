@@ -87,16 +87,21 @@ export default function SupportTicketsSection() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="rounded-3xl border border-slate-800/60 bg-slate-900/50 p-6 shadow-xl shadow-black/30 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <Headphones className="w-8 h-8 text-white" />
+          <div className="rounded-2xl bg-gradient-to-br from-indigo-500/20 to-slate-500/20 p-3">
+            <Headphones className="h-6 w-6 text-indigo-200" />
+          </div>
           <div>
-            <h2 className="text-3xl font-bold text-white">Destek Talepleri</h2>
-            <p className="text-white/70 text-sm mt-1">Sorularınız için bizimle iletişime geçin</p>
+            <h2 className="text-2xl font-semibold text-slate-100">Destek Talepleri</h2>
+            <p className="mt-1 text-sm text-slate-400">Oyna.gg ekibiyle tüm destek iletişimlerinizi yönetin</p>
           </div>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5" onClick={() => setCreateOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
+        <Button
+          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-slate-600 px-5 py-2 shadow-lg shadow-indigo-900/40"
+          onClick={() => setCreateOpen(true)}
+        >
+          <Plus className="h-4 w-4" />
           Yeni Talep
         </Button>
       </div>

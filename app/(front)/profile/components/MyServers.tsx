@@ -6,10 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Server,
   Plus,
-  Users,
   Calendar,
   Shield,
-  ArrowRight,
   Eye,
   CheckCircle,
   XCircle,
@@ -143,32 +141,17 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
   }
 
   const getStatusColor = (server: ServerData) => {
-    if (server.approvalStatus === "pending") return "text-purple-600 dark:text-purple-400"
-    if (server.approvalStatus === "rejected") return "text-red-600 dark:text-red-400"
+    if (server.approvalStatus === "pending") return "text-purple-200"
+    if (server.approvalStatus === "rejected") return "text-rose-200"
     switch (server.status) {
       case "online":
-        return "text-emerald-600 dark:text-emerald-400"
+        return "text-emerald-200"
       case "maintenance":
-        return "text-purple-600 dark:text-purple-400"
+        return "text-purple-200"
       case "offline":
-        return "text-red-600 dark:text-red-400"
+        return "text-rose-200"
       default:
-        return "text-slate-600 dark:text-slate-400"
-    }
-  }
-
-  const getStatusBgColor = (server: ServerData) => {
-    if (server.approvalStatus === "pending") return "bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20"
-    if (server.approvalStatus === "rejected") return "bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20"
-    switch (server.status) {
-      case "online":
-        return "bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20"
-      case "maintenance":
-        return "bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20"
-      case "offline":
-        return "bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20"
-      default:
-        return "bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900/20 dark:to-slate-800/20"
+        return "text-slate-300"
     }
   }
 
@@ -181,15 +164,15 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-[400px] flex items-center justify-center">
-        <div className="text-center space-y-6">
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="space-y-3 text-center">
           <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary/20 border-t-primary mx-auto"></div>
-            <Gamepad2 className="w-6 h-6 text-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+            <div className="mx-auto h-14 w-14 animate-spin rounded-full border-2 border-indigo-500/20 border-t-indigo-400" />
+            <Gamepad2 className="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 text-indigo-200" />
           </div>
-          <div className="space-y-2">
-            <p className="text-lg font-semibold text-foreground">Sunucular yükleniyor...</p>
-            <p className="text-sm text-muted-foreground">Sunucu bilgileriniz getiriliyor</p>
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-slate-100">Sunucular yükleniyor...</p>
+            <p className="text-xs text-slate-400">Sunucu bilgileriniz getiriliyor</p>
           </div>
         </div>
       </div>
@@ -197,41 +180,41 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="bg-gradient-to-r from-black/5 via-background to-secondary/5 rounded-2xl p-8 border">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-6 sm:space-y-0">
+      <div className="rounded-3xl border border-slate-800/60 bg-slate-900/50 p-8 shadow-xl shadow-black/30">
+        <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-primary/10 rounded-xl">
-                <Gamepad2 className="w-8 h-8 text-primary" />
+              <div className="rounded-2xl bg-gradient-to-br from-indigo-500/20 to-slate-500/20 p-3">
+                <Gamepad2 className="h-8 w-8 text-indigo-200" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-foreground">Sunucularım</h1>
-                <p className="text-muted-foreground text-lg">
+                <h1 className="text-3xl font-semibold text-slate-100">Sunucularım</h1>
+                <p className="text-sm text-slate-400">
                   Yönettiğiniz sunucuları görüntüleyin ve yönetin
                 </p>
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-3">
             {canAddServer ? (
               <Button
                 onClick={handleCreateServer}
-                className="flex items-center space-x-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg"
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-slate-600 px-6 py-3 shadow-lg shadow-indigo-900/40"
                 size="lg"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="h-5 w-5" />
                 <span>Sunucu Ekle</span>
               </Button>
             ) : (
               <Button
                 onClick={handleRequestRoleUpgrade}
                 variant="outline"
-                className="flex items-center space-x-2 border-2 hover:bg-primary/5"
+                className="flex items-center gap-2 rounded-xl border border-slate-700/60 bg-transparent text-slate-200 hover:border-indigo-400/40"
                 size="lg"
               >
-                <Shield className="w-5 h-5" />
+                <Shield className="h-5 w-5" />
                 <span>Rol Değiştir</span>
               </Button>
             )}
@@ -240,37 +223,37 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <Card className="border border-slate-800/60 bg-slate-900/60">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="space-y-2">
-                <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                <p className="text-xs uppercase tracking-[0.25em] text-slate-500">
                   Toplam Sunucu
                 </p>
-                <p className="text-3xl font-bold text-blue-700 dark:text-blue-300">
+                <p className="text-3xl font-semibold text-slate-100">
                   {servers.length}
                 </p>
               </div>
-              <div className="p-4 bg-blue-100 dark:bg-blue-900/30 rounded-2xl">
-                <Server className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              <div className="rounded-2xl bg-gradient-to-br from-indigo-500/20 to-slate-500/20 p-4">
+                <Server className="h-8 w-8 text-indigo-200" />
               </div>
             </div>
-            <div className="mt-4 flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-              <TrendingUp className="w-4 h-4" />
+            <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+              <TrendingUp className="h-4 w-4 text-indigo-200" />
               <span>Toplam sunucu sayınız</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
+        <Card className="border border-slate-800/60 bg-slate-900/60">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="space-y-2">
-                <p className="text-sm font-semibold text-green-600 dark:text-green-400">
+                <p className="text-xs uppercase tracking-[0.25em] text-slate-500">
                   Aktif Sunucu
                 </p>
-                <p className="text-3xl font-bold text-green-700 dark:text-green-300">
+                <p className="text-3xl font-semibold text-slate-100">
                   {
                     servers.filter(
                       (s) =>
@@ -279,34 +262,34 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
                   }
                 </p>
               </div>
-              <div className="p-4 bg-green-100 dark:bg-green-900/30 rounded-2xl">
-                <Activity className="w-8 h-8 text-green-600 dark:text-green-400" />
+              <div className="rounded-2xl bg-gradient-to-br from-emerald-500/20 to-slate-500/20 p-4">
+                <Activity className="h-8 w-8 text-emerald-200" />
               </div>
             </div>
-            <div className="mt-4 flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-              <CheckCircle className="w-4 h-4" />
+            <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+              <CheckCircle className="h-4 w-4 text-emerald-200" />
               <span>Çevrimiçi sunucular</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200 dark:border-purple-800">
+        <Card className="border border-slate-800/60 bg-slate-900/60">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="space-y-2">
-                <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                <p className="text-xs uppercase tracking-[0.25em] text-slate-500">
                   Bekleyen
                 </p>
-                <p className="text-3xl font-bold text-purple-700 dark:text-purple-300">
+                <p className="text-3xl font-semibold text-slate-100">
                   {servers.filter((s) => s.approvalStatus === "pending").length}
                 </p>
               </div>
-              <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-2xl">
-                <Clock className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+              <div className="rounded-2xl bg-gradient-to-br from-purple-500/20 to-slate-500/20 p-4">
+                <Clock className="h-8 w-8 text-purple-200" />
               </div>
             </div>
-            <div className="mt-4 flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400">
-              <Calendar className="w-4 h-4" />
+            <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+              <Calendar className="h-4 w-4 text-purple-200" />
               <span>Onay bekleyen sunucular</span>
             </div>
           </CardContent>
@@ -315,52 +298,54 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
 
       {/* Servers List */}
       {servers.length === 0 ? (
-        <Card className="border border-dashed border-muted-foreground/25">
-          <CardContent className="pt-16 pb-16">
-            <div className="text-center space-y-6">
-              <div className="mx-auto w-20 h-20 bg-muted/50 rounded-full flex items-center justify-center">
-                <Server className="w-10 h-10 text-muted-foreground" />
+        <Card className="rounded-3xl border border-slate-800/60 bg-slate-900/50 shadow-xl shadow-black/30">
+          <CardContent className="py-16">
+            <div className="space-y-6 text-center">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-slate-800/70">
+                <Server className="h-10 w-10 text-slate-400" />
               </div>
               
               {canAddServer ? (
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-xl font-semibold text-foreground">
+                    <h3 className="text-xl font-semibold text-slate-100">
                       Henüz sunucunuz yok
                     </h3>
-                    <p className="text-muted-foreground mt-2">
+                    <p className="mt-2 text-sm text-slate-400">
                       İlk sunucunuzu ekleyerek başlayın
                     </p>
                   </div>
                   <Button
                     onClick={handleCreateServer}
-                    className="inline-flex items-center gap-2"
+                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-slate-600"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="h-4 w-4" />
                     Sunucu Ekle
                   </Button>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-xl font-semibold text-foreground">
+                    <h3 className="text-xl font-semibold text-slate-100">
                       Sunucu eklemek için yetkiniz yok
                     </h3>
-                    <p className="text-muted-foreground mt-2 max-w-md mx-auto">
+                    <p className="mt-2 max-w-md mx-auto text-sm text-slate-400">
                       Sunucu ekleyebilmek için "Sunucu Sahibi" rolüne sahip olmanız gerekiyor.
                     </p>
                   </div>
-                  <div className="flex gap-3 justify-center">
+                  <div className="flex justify-center gap-3">
                     <Button
                       onClick={handleRequestRoleUpgrade}
                       variant="outline"
+                      className="rounded-xl border border-slate-700/60 text-slate-200 hover:border-indigo-400/40"
                     >
-                      <Shield className="w-4 h-4 mr-2" />
+                      <Shield className="mr-2 h-4 w-4" />
                       Rol Değiştir
                     </Button>
                     <Button
                       onClick={() => router.push("/profile?tab=requests")}
                       variant="ghost"
+                      className="rounded-xl text-indigo-200 hover:bg-indigo-500/10"
                     >
                       Taleplerim
                     </Button>
@@ -375,7 +360,7 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
           {servers.map((server) => (
             <Card
               key={server.id}
-              className="group hover:shadow-md transition-all duration-200 cursor-pointer border-l-4 border-l-primary"
+              className="group cursor-pointer border border-slate-800/60 bg-slate-900/50 shadow-lg shadow-black/30 transition-all duration-200 hover:border-indigo-500/40"
               onClick={() => handleViewServer(server.id)}
             >
               <CardContent className="p-6">
@@ -383,37 +368,17 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
                   {/* Server Info */}
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="flex-shrink-0">
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                        server.approvalStatus === "approved" && server.status === "online"
-                          ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400"
-                          : server.approvalStatus === "pending"
-                          ? "bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400"
-                          : server.approvalStatus === "rejected"
-                          ? "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400"
-                          : "bg-muted text-muted-foreground"
-                      }`}>
-                        <Server className="w-6 h-6" />
+                      <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800/70 ${getStatusPulse(server)}`}>
+                        <Server className={`h-6 w-6 ${getStatusColor(server)}`} />
                       </div>
                     </div>
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1">
-                        <h3 className="text-lg font-semibold text-foreground truncate">
+                        <h3 className="truncate text-lg font-semibold text-slate-100">
                           {server.name}
                         </h3>
-                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                          server.approvalStatus === "approved"
-                            ? server.status === "online" 
-                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
-                              : server.status === "offline"
-                              ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
-                              : server.status === "maintenance"
-                              ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                              : "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-300"
-                            : server.approvalStatus === "pending"
-                            ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-                            : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
-                        }`}>
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-700/60 bg-slate-800/60 px-3 py-1 text-xs font-medium text-slate-200">
                           {getStatusIcon(server)}
                           {server.approvalStatus === "approved"
                             ? server.status === "online" ? "Çevrimiçi" : 
@@ -423,26 +388,26 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
                         </div>
                       </div>
                       
-                      <div className="text-sm text-muted-foreground line-clamp-1 mb-2">
-                        {server.description ? <div dangerouslySetInnerHTML={{ __html: server.description }} /> : "Açıklama bulunmuyor"}
+                      <div className="mb-2 line-clamp-1 text-sm text-slate-400">
+                        {server.description ? <div dangerouslySetInnerHTML={{ __html: server.description }} /> : 'Açıklama bulunmuyor'}
                       </div>
                       
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-4 text-xs text-slate-500">
                         <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5" />
+                          <Calendar className="h-3.5 w-3.5" />
                           <span>{new Date(server.createdAt).toLocaleDateString("tr-TR")}</span>
                         </div>
                         
                         {server.website && (
-                          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+                          <div className="flex items-center gap-1.5 text-emerald-300">
+                            <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                             <span>Website</span>
                           </div>
                         )}
                         
                         {server.discord && (
-                          <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
-                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                          <div className="flex items-center gap-1.5 text-indigo-300">
+                            <div className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
                             <span>Discord</span>
                           </div>
                         )}
@@ -455,9 +420,9 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="rounded-xl px-4 py-2 text-slate-200 opacity-0 transition-opacity group-hover:opacity-100"
                     >
-                      <Eye className="w-4 h-4 mr-2" />
+                      <Eye className="mr-2 h-4 w-4" />
                       Yönet
                     </Button>
                   </div>
@@ -465,10 +430,10 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
 
                 {/* Status Messages */}
                 {server.approvalStatus === "pending" && (
-                  <div className="mt-4 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                      <p className="text-sm text-purple-800 dark:text-purple-200">
+                  <div className="mt-4 rounded-xl border border-purple-500/30 bg-purple-500/10 p-3">
+                    <div className="flex items-center gap-2 text-sm text-purple-200">
+                      <Clock className="h-4 w-4" />
+                      <p>
                         Admin onayı bekleniyor - Sunucunuz inceleniyor
                       </p>
                     </div>
@@ -476,14 +441,14 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
                 )}
                 
                 {server.approvalStatus === "rejected" && server.rejectNote && (
-                  <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                  <div className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3">
                     <div className="flex items-center gap-2">
-                      <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                      <XCircle className="h-4 w-4 text-rose-200" />
                       <div>
-                        <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                        <p className="text-sm font-medium text-rose-100">
                           Sunucunuz reddedildi
                         </p>
-                        <p className="text-xs text-red-700 dark:text-red-300 mt-0.5">
+                        <p className="mt-0.5 text-xs text-rose-200/80">
                           Sebep: {server.rejectNote}
                         </p>
                       </div>
@@ -496,13 +461,11 @@ export function MyServers({ openNewServer, setOpenNewServer }: MyServersProps) {
         </div>
       )}
 
-      <div className="">
       <CreateServerModal
         open={openNewServer}
         onOpenChange={setOpenNewServer}
         onCreated={loadServers}
       />
-      </div>
     </div>
   );
 }

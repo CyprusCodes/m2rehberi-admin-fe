@@ -4,9 +4,11 @@ import React from 'react'
 
 export function LoadingState() {
   return (
-    <div className="text-center py-12">
-      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-      <p className="mt-4 text-muted-foreground">Favoriler yükleniyor...</p>
+    <div className="flex min-h-[240px] items-center justify-center">
+      <div className="space-y-3 text-center">
+        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-2 border-indigo-500/20 border-t-indigo-400" />
+        <p className="text-sm text-slate-400">Favoriler yükleniyor...</p>
+      </div>
     </div>
   )
 }

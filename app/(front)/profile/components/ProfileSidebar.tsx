@@ -3,7 +3,7 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/auth-context'
-import { User, Bell, Car, Heart, FileText, MessageCircle, Settings, Crown } from 'lucide-react'
+import { User, Bell, Gamepad2, Heart, FileText, MessageCircle, Settings, Crown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface ProfileSidebarProps {
@@ -27,7 +27,7 @@ const menuItems = [
   {
     id: 'servers',
     label: 'Sunucularım',
-    icon: Car,
+    icon: Gamepad2,
     description: 'Yönettiğiniz sunucuları görüntüleyin'
   },
   {
@@ -84,34 +84,41 @@ export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) 
   }
 
   return (
-    <div className="w-80 bg-neutral-900 border-r border-border p-6 space-y-6 min-h-screen">
+    <aside className="w-80 min-h-screen space-y-6 border-r border-slate-800/60 bg-gradient-to-br from-[#0b1120] via-[#050816] to-[#03050d] p-6 shadow-xl shadow-black/30">
       {/* User Profile Summary */}
-      <div className="text-center space-y-4">
-        {/* Avatar */}
-        <div className="mx-auto w-20 h-20 bg-muted rounded-full flex items-center justify-center">
-          <span className="text-2xl font-bold text-muted-foreground">
-            {getInitials(user?.name || 'U')}
-          </span>
-        </div>
-        
-        {/* User Info */}
-        <div className="space-y-2">
-          <h2 className="text-xl font-bold text-foreground">{user?.name || 'Kullanıcı'}</h2>
-          <p className="text-sm text-muted-foreground">{user?.email || 'email@example.com'}</p>
-          
-          {/* Role Badge */}
-          <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-            {user?.role === 'super_admin' ? (
-              <>
-                <Crown className="w-3 h-3 mr-1 text-yellow-500" />
-                Admin
-              </>
-            ) : (
-              <>
-                <User className="w-3 h-3 mr-1 text-blue-500" />
-                {user?.userTypeLabel || 'Kullanıcı'}
-              </>
-            )}
+      <div className="relative overflow-hidden rounded-2xl border border-slate-800/60 bg-slate-900/40 px-6 py-8 text-center shadow-lg shadow-black/40">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-slate-900/40" />
+        <div className="relative space-y-5">
+          {/* Avatar */}
+          <div className="mx-auto h-20 w-20 rounded-full bg-gradient-to-br from-indigo-500/40 to-slate-700/40 p-[3px] shadow-lg">
+            <div className="flex h-full w-full items-center justify-center rounded-full bg-slate-900/80">
+              <span className="text-2xl font-bold text-slate-200">
+                {getInitials(user?.name || 'U')}
+              </span>
+            </div>
+          </div>
+
+          {/* User Info */}
+          <div className="space-y-3">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-100">{user?.name || 'Kullanıcı'}</h2>
+              <p className="text-xs tracking-wide text-slate-400">{user?.email || 'email@example.com'}</p>
+            </div>
+
+            {/* Role Badge */}
+            <div className="mx-auto inline-flex items-center gap-1 rounded-full bg-indigo-500/15 px-3 py-1 text-xs font-medium text-indigo-200">
+              {user?.role === 'super_admin' ? (
+                <>
+                  <Crown className="h-3 w-3 text-amber-300" />
+                  Admin
+                </>
+              ) : (
+                <>
+                  <User className="h-3 w-3 text-indigo-300" />
+                  {user?.userTypeLabel || 'Kullanıcı'}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -127,24 +134,24 @@ export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) 
               key={item.id}
               onClick={() => handleTabChange(item.id)}
               className={cn(
-                "w-full text-left p-3 rounded-lg transition-all duration-200 group",
+                'group w-full rounded-xl border border-transparent p-3 text-left transition-all duration-200',
                 isActive
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? 'border-indigo-500/60 bg-gradient-to-r from-indigo-600/90 to-slate-700/90 text-white shadow-lg shadow-indigo-900/40'
+                  : 'text-slate-400 hover:border-slate-700/80 hover:bg-slate-900/60 hover:text-slate-100'
               )}
             >
               <div className="flex items-center space-x-3">
                 <Icon 
                   className={cn(
-                    "w-5 h-5 transition-colors duration-200",
-                    isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"
+                    'h-5 w-5 transition-colors duration-200',
+                    isActive ? 'text-white' : 'text-indigo-300 group-hover:text-indigo-100'
                   )} 
                 />
                 <div className="flex-1 text-left">
-                  <div className="font-medium">{item.label}</div>
+                  <div className="font-medium tracking-wide">{item.label}</div>
                   <div className={cn(
-                    "text-xs transition-colors duration-200",
-                    isActive ? "text-primary-foreground/70" : "text-muted-foreground group-hover:text-muted-foreground"
+                    'text-xs transition-colors duration-200',
+                    isActive ? 'text-indigo-100/70' : 'text-slate-500 group-hover:text-slate-300'
                   )}>
                     {item.description}
                   </div>
@@ -156,12 +163,14 @@ export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) 
       </nav>
 
       {/* Footer Info */}
-      <div className="pt-6 border-t border-border">
-        <div className="text-xs text-muted-foreground text-center">
-          <p>M2Rehberi Platform</p>
-          <p>Hesap Yönetimi</p>
+      <div className="rounded-2xl border border-slate-800/60 bg-slate-900/40 px-4 py-5 text-center shadow-inner shadow-black/40">
+        <div className="text-[11px] uppercase tracking-[0.3em] text-slate-500">
+          Oyna.gg Platform
+        </div>
+        <div className="mt-2 text-xs text-slate-400">
+          Hesap yönetimini buradan kontrol edin
         </div>
       </div>
-    </div>
+    </aside>
   )
 }

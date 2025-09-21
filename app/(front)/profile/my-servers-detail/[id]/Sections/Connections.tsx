@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ExternalLink, Pencil } from "lucide-react"
 
@@ -26,95 +27,99 @@ export default function Connections({
   onEditValueChange
 }: ConnectionsProps) {
   return (
-    <Card>
+    <Card className="border border-slate-800/60 bg-slate-900/60 shadow-lg shadow-black/30">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <ExternalLink className="w-5 h-5 text-primary" />
+        <CardTitle className="flex items-center gap-2 text-slate-100">
+          <ExternalLink className="h-5 w-5 text-indigo-200" />
           Bağlantılar
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6 text-slate-200">
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Discord</span>
+            <span className="text-sm font-medium text-slate-300">Discord</span>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onStartEditing("discordLink", server.discord_link)}
-              className="h-6 w-6 p-0"
+              className="h-6 w-6 p-0 text-slate-400 hover:text-slate-100"
             >
               <Pencil className="h-3 w-3" />
             </Button>
           </div>
           {editingField === "discordLink" ? (
-            <div className="flex gap-2">
-              <input
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Input
                 type="url"
                 value={editValue}
                 onChange={(e) => onEditValueChange(e.target.value)}
-                className="flex-1 px-2 py-1 border rounded text-sm"
                 placeholder="Discord linki"
+                className="flex-1 rounded-xl border border-slate-700/60 bg-slate-900/70 text-slate-100 placeholder:text-slate-500 focus:border-indigo-400/60"
               />
-              <Button size="sm" onClick={onSaveEdit} disabled={saving}>
-                Kaydet
-              </Button>
-              <Button size="sm" variant="outline" onClick={onCancelEditing}>
-                İptal
-              </Button>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={onSaveEdit} disabled={saving} className="rounded-xl">
+                  Kaydet
+                </Button>
+                <Button size="sm" variant="outline" onClick={onCancelEditing} className="rounded-xl border border-slate-700/60 text-slate-200">
+                  İptal
+                </Button>
+              </div>
             </div>
           ) : server.discord_link ? (
-            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-              <span className="text-sm truncate">{server.discord_link}</span>
-              <Button variant="ghost" size="sm" asChild>
+            <div className="flex items-center justify-between rounded-xl border border-slate-800/60 bg-slate-900/70 px-4 py-3">
+              <span className="truncate text-sm text-slate-200">{server.discord_link}</span>
+              <Button variant="ghost" size="sm" asChild className="text-indigo-200 hover:text-indigo-100">
                 <a href={server.discord_link} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-4 h-4" />
+                  <ExternalLink className="h-4 w-4" />
                 </a>
               </Button>
             </div>
           ) : (
-            <p className="text-muted-foreground text-sm">Discord linki eklenmemiş</p>
+            <p className="text-sm text-slate-400">Discord linki eklenmemiş</p>
           )}
         </div>
 
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Website</span>
+            <span className="text-sm font-medium text-slate-300">Website</span>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onStartEditing("websiteLink", server.website_link)}
-              className="h-6 w-6 p-0"
+              className="h-6 w-6 p-0 text-slate-400 hover:text-slate-100"
             >
               <Pencil className="h-3 w-3" />
             </Button>
           </div>
           {editingField === "websiteLink" ? (
-            <div className="flex gap-2">
-              <input
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Input
                 type="url"
                 value={editValue}
                 onChange={(e) => onEditValueChange(e.target.value)}
-                className="flex-1 px-2 py-1 border rounded text-sm"
                 placeholder="Website linki"
+                className="flex-1 rounded-xl border border-slate-700/60 bg-slate-900/70 text-slate-100 placeholder:text-slate-500 focus:border-indigo-400/60"
               />
-              <Button size="sm" onClick={onSaveEdit} disabled={saving}>
-                Kaydet
-              </Button>
-              <Button size="sm" variant="outline" onClick={onCancelEditing}>
-                İptal
-              </Button>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={onSaveEdit} disabled={saving} className="rounded-xl">
+                  Kaydet
+                </Button>
+                <Button size="sm" variant="outline" onClick={onCancelEditing} className="rounded-xl border border-slate-700/60 text-slate-200">
+                  İptal
+                </Button>
+              </div>
             </div>
           ) : server.website_link ? (
-            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-              <span className="text-sm truncate">{server.website_link}</span>
-              <Button variant="ghost" size="sm" asChild>
+            <div className="flex items-center justify-between rounded-xl border border-slate-800/60 bg-slate-900/70 px-4 py-3">
+              <span className="truncate text-sm text-slate-200">{server.website_link}</span>
+              <Button variant="ghost" size="sm" asChild className="text-indigo-200 hover:text-indigo-100">
                 <a href={server.website_link} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-4 h-4" />
+                  <ExternalLink className="h-4 w-4" />
                 </a>
               </Button>
             </div>
           ) : (
-            <p className="text-muted-foreground text-sm">Website linki eklenmemiş</p>
+            <p className="text-sm text-slate-400">Website linki eklenmemiş</p>
           )}
         </div>
       </CardContent>

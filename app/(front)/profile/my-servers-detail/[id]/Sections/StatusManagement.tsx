@@ -25,31 +25,26 @@ export default function StatusManagement({
   statusText
 }: StatusManagementProps) {
   return (
-    <Card>
+    <Card className="border border-slate-800/60 bg-slate-900/60 shadow-lg shadow-black/30">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Activity className="w-5 h-5 text-primary" />
+        <CardTitle className="flex items-center gap-2 text-slate-100">
+          <Activity className="h-5 w-5 text-indigo-200" />
           Sunucu Durumu Yönetimi
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-muted/50 to-muted/30 rounded-xl border">
-          <div className="space-y-2">
-            <p className="font-semibold text-lg">Mevcut Durum</p>
-            <p className="text-sm text-muted-foreground">Sunucunuzun şu anki durumu</p>
+      <CardContent className="space-y-6 text-slate-200">
+        <div className="flex items-center justify-between rounded-2xl border border-slate-800/60 bg-slate-900/70 p-6">
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-slate-100">Mevcut Durum</p>
+            <p className="text-xs text-slate-400">Sunucunuzun şu anki durumu</p>
           </div>
-          <div className={`px-4 py-3 rounded-xl flex items-center gap-3 ${getStatusBgColor(server)}`}>
-            <div className="flex items-center gap-2">
+          <div className={`flex items-center gap-3 rounded-xl px-4 py-3 ${getStatusBgColor(server)}`}>
+            <div className="flex items-center gap-2 text-slate-100">
               {getStatusIcon(server)}
-              <span className={`font-semibold text-sm ${getStatusTextColor(server)}`}>
+              <span className={`text-sm font-semibold ${getStatusTextColor(server)}`}>
                 {statusText(server)}
               </span>
             </div>
-            <div className={`w-3 h-3 rounded-full ${
-              server?.status === "online" ? "bg-green-500" : 
-              server?.status === "offline" ? "bg-red-500" : 
-              server?.status === "maintenance" ? "bg-yellow-500" : "bg-gray-500"
-            }`}></div>
           </div>
         </div>
 
@@ -58,14 +53,14 @@ export default function StatusManagement({
             <Separator />
             <div className="space-y-6">
               <div>
-                <h4 className="font-semibold text-lg mb-4">Sunucu Durumu</h4>
+                <h4 className="mb-4 text-lg font-semibold text-slate-100">Sunucu Durumu</h4>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border">
+                  <div className="flex items-center justify-between rounded-xl border border-slate-800/60 bg-slate-900/60 p-4">
                     <div className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <CheckCircle className="h-5 w-5 text-emerald-200" />
                       <div>
-                        <p className="font-medium">Aktif (Online)</p>
-                        <p className="text-sm text-muted-foreground">Sunucu oyuncular tarafından erişilebilir</p>
+                        <p className="font-medium text-slate-100">Aktif (Online)</p>
+                        <p className="text-sm text-slate-400">Sunucu oyuncular tarafından erişilebilir</p>
                       </div>
                     </div>
                     <Switch
@@ -76,13 +71,13 @@ export default function StatusManagement({
                       disabled={updating}
                     />
                   </div>
-                  
-                  <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border">
+
+                  <div className="flex items-center justify-between rounded-xl border border-slate-800/60 bg-slate-900/60 p-4">
                     <div className="flex items-center gap-3">
-                      <AlertCircle className="w-5 h-5 text-yellow-600" />
+                      <AlertCircle className="h-5 w-5 text-indigo-200" />
                       <div>
-                        <p className="font-medium">Bakımda</p>
-                        <p className="text-sm text-muted-foreground">Geçici olarak erişim kısıtlı</p>
+                        <p className="font-medium text-slate-100">Bakımda</p>
+                        <p className="text-sm text-slate-400">Geçici olarak erişim kısıtlı</p>
                       </div>
                     </div>
                     <Switch
@@ -93,13 +88,13 @@ export default function StatusManagement({
                       disabled={updating}
                     />
                   </div>
-                  
-                  <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border">
+
+                  <div className="flex items-center justify-between rounded-xl border border-slate-800/60 bg-slate-900/60 p-4">
                     <div className="flex items-center gap-3">
-                      <XCircle className="w-5 h-5 text-red-600" />
+                      <XCircle className="h-5 w-5 text-rose-200" />
                       <div>
-                        <p className="font-medium">Çevrimdışı</p>
-                        <p className="text-sm text-muted-foreground">Sunucu erişilemez durumda</p>
+                        <p className="font-medium text-slate-100">Çevrimdışı</p>
+                        <p className="text-sm text-slate-400">Sunucu erişilemez durumda</p>
                       </div>
                     </div>
                     <Switch
@@ -115,14 +110,12 @@ export default function StatusManagement({
             </div>
           </div>
         ) : (
-          <div className="p-6 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-xl border border-yellow-200 dark:border-yellow-800">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
-                <AlertCircle className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
-              </div>
+          <div className="rounded-xl border border-amber-400/40 bg-amber-500/10 p-6 text-amber-100">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-6 w-6" />
               <div>
-                <p className="font-semibold text-lg text-yellow-800 dark:text-yellow-200">Onay Bekleniyor</p>
-                <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                <p className="text-sm font-semibold">Onay bekleniyor</p>
+                <p className="text-xs text-amber-200/80">
                   Durum güncelleme özellikleri admin onayı sonrası kullanılabilir olacaktır.
                 </p>
               </div>

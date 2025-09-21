@@ -42,32 +42,32 @@ const getStatusIcon = (status: string) => {
 const getStatusColor = (status: string) => {
   switch (status) {
     case "open":
-      return "bg-blue-500/20 text-blue-300 border-blue-500/30"
+      return "border-indigo-400/40 bg-indigo-500/10 text-indigo-200"
     case "pending":
-      return "bg-yellow-500/20 text-yellow-300 border-yellow-500/30"
+      return "border-amber-400/40 bg-amber-500/10 text-amber-200"
     case "in_progress":
-      return "bg-orange-500/20 text-orange-300 border-orange-500/30"
+      return "border-orange-400/40 bg-orange-500/10 text-orange-200"
     case "resolved":
-      return "bg-green-500/20 text-green-300 border-green-500/30"
+      return "border-emerald-400/40 bg-emerald-500/10 text-emerald-200"
     case "closed":
-      return "bg-gray-500/20 text-gray-300 border-gray-500/30"
+      return "border-slate-500/40 bg-slate-500/10 text-slate-200"
     default:
-      return "bg-gray-500/20 text-gray-300 border-gray-500/30"
+      return "border-slate-500/40 bg-slate-500/10 text-slate-200"
   }
 }
 
 const getPriorityColor = (priority: string) => {
   switch (priority) {
     case "low":
-      return "bg-green-500/20 text-green-300 border-green-500/30"
+      return "border-emerald-400/40 bg-emerald-500/10 text-emerald-200"
     case "normal":
-      return "bg-blue-500/20 text-blue-300 border-blue-500/30"
+      return "border-indigo-400/40 bg-indigo-500/10 text-indigo-200"
     case "high":
-      return "bg-orange-500/20 text-orange-300 border-orange-500/30"
+      return "border-orange-400/40 bg-orange-500/10 text-orange-200"
     case "urgent":
-      return "bg-red-500/20 text-red-300 border-red-500/30"
+      return "border-rose-400/40 bg-rose-500/10 text-rose-200"
     default:
-      return "bg-gray-500/20 text-gray-300 border-gray-500/30"
+      return "border-slate-500/40 bg-slate-500/10 text-slate-200"
   }
 }
 
@@ -116,15 +116,15 @@ export default function TicketList({
     .filter((t) => (priorityFilter === "all" ? true : t.priority === priorityFilter))
 
   return (
-    <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+    <Card className="border border-slate-800/60 bg-slate-900/60 shadow-lg shadow-black/30">
       <CardHeader className="pb-4">
-        <CardTitle className="text-white text-xl font-semibold">Taleplerim</CardTitle>
+        <CardTitle className="text-slate-100 text-xl font-semibold">Taleplerim</CardTitle>
         <div className="flex items-center gap-3 pt-2">
           <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-            <SelectTrigger className="bg-white/5 border-white/20 text-white w-[180px]">
+            <SelectTrigger className="w-[180px] rounded-xl border border-slate-700/60 bg-slate-900/70 text-slate-200">
               <SelectValue placeholder="Durum Filtresi" />
             </SelectTrigger>
-            <SelectContent className="bg-neutral-900 border-white/20">
+            <SelectContent className="border border-slate-700/60 bg-slate-900 text-slate-200">
               <SelectItem value="all">Tüm Durumlar</SelectItem>
               <SelectItem value="open">Açık</SelectItem>
               <SelectItem value="pending">Beklemede</SelectItem>
@@ -134,10 +134,10 @@ export default function TicketList({
             </SelectContent>
           </Select>
           <Select value={priorityFilter} onValueChange={onPriorityFilterChange}>
-            <SelectTrigger className="bg-white/5 border-white/20 text-white w-[180px]">
+            <SelectTrigger className="w-[180px] rounded-xl border border-slate-700/60 bg-slate-900/70 text-slate-200">
               <SelectValue placeholder="Öncelik Filtresi" />
             </SelectTrigger>
-            <SelectContent className="bg-neutral-900 border-white/20">
+            <SelectContent className="border border-slate-700/60 bg-slate-900 text-slate-200">
               <SelectItem value="all">Tüm Öncelikler</SelectItem>
               <SelectItem value="low">Düşük</SelectItem>
               <SelectItem value="normal">Normal</SelectItem>
@@ -152,32 +152,32 @@ export default function TicketList({
           {filteredTickets.map((ticket) => (
             <div
               key={ticket.ticket_id}
-              className="group p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-200"
+              className="group rounded-xl border border-slate-800/60 bg-slate-900/50 p-4 transition-all duration-200 hover:border-indigo-500/40 hover:bg-slate-900/70"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-white/60 text-sm font-mono">#{ticket.ticket_id}</span>
-                    <h3 className="text-white font-medium truncate">{ticket.title}</h3>
+                    <span className="text-xs font-mono uppercase tracking-[0.3em] text-slate-500">#{ticket.ticket_id}</span>
+                    <h3 className="truncate text-slate-100 font-medium">{ticket.title}</h3>
                   </div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Badge className={`${getStatusColor(ticket.status)} text-xs font-medium`}>
+                    <Badge className={`${getStatusColor(ticket.status)} text-xs font-medium rounded-full px-3 py-1`}> 
                       {getStatusIcon(ticket.status)}
                       <span className="ml-1">{getStatusText(ticket.status)}</span>
                     </Badge>
-                    <Badge className={`${getPriorityColor(ticket.priority)} text-xs font-medium`}>
+                    <Badge className={`${getPriorityColor(ticket.priority)} text-xs font-medium rounded-full px-3 py-1`}>
                       {getPriorityText(ticket.priority)}
                     </Badge>
                   </div>
                   {ticket.last_message_text && (
-                    <p className="text-white/70 text-sm line-clamp-2 leading-relaxed">{ticket.last_message_text}</p>
+                    <p className="text-sm leading-relaxed text-slate-400 line-clamp-2">{ticket.last_message_text}</p>
                   )}
                 </div>
                 <Button
                   size="sm"
-                  variant="secondary"
+                  variant="outline"
                   onClick={() => onOpenChat(ticket)}
-                  className="bg-white/10 hover:bg-white/20 text-white border-white/20 shrink-0"
+                  className="shrink-0 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-100 hover:border-indigo-400/50 hover:bg-indigo-500/20"
                 >
                   <MessageSquare className="w-4 h-4 mr-2" />
                   Yanıt
@@ -186,9 +186,9 @@ export default function TicketList({
             </div>
           ))}
           {filteredTickets.length === 0 && (
-            <div className="text-center py-12">
-              <div className="text-white/40 text-lg mb-2">{tickets.length === 0 ? "📝" : "🔍"}</div>
-              <p className="text-white/70 text-base">
+            <div className="py-12 text-center">
+              <div className="mb-2 text-lg text-slate-500">{tickets.length === 0 ? '📝' : '🔍'}</div>
+              <p className="text-sm text-slate-400">
                 {tickets.length === 0 ? "Henüz talebiniz yok." : "Filtreye uygun talep bulunamadı."}
               </p>
             </div>

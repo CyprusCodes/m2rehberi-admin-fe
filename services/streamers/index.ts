@@ -40,6 +40,83 @@ export interface StreamerPostReportStats {
   rejected: number;
 }
 
+export interface StreamerPostComment {
+  id: number;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  parent_comment_id?: number | null;
+  answer_user: {
+    user_id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+  };
+}
+
+export interface StreamerPostLike {
+  user_id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  liked_at: string;
+}
+
+export interface StreamerPost {
+  id: number;
+  streamer_id: number;
+  content: string;
+  published_at: string;
+  scheduled_at?: string | null;
+  reply_to_post_id?: number | null;
+  repost_of_post_id?: number | null;
+  visibility: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string | null;
+  // Streamer details
+  handle: string;
+  display_name: string;
+  avatar_url?: string | null;
+  is_verified: boolean;
+  is_active: boolean;
+  // Stats
+  like_count: number;
+  comment_count: number;
+  repost_count: number;
+  // Comments and likes
+  comments?: StreamerPostComment[] | null;
+  likes?: StreamerPostLike[] | null;
+  // Original post details (for reposts)
+  original_post_id?: number | null;
+  original_post_content?: string | null;
+  original_post_published_at?: string | null;
+  original_streamer_handle?: string | null;
+  original_streamer_display_name?: string | null;
+  original_streamer_avatar_url?: string | null;
+  original_streamer_is_verified?: boolean | null;
+  // Parent post details (for replies)
+  parent_post_id?: number | null;
+  parent_post_content?: string | null;
+  parent_post_published_at?: string | null;
+  parent_streamer_handle?: string | null;
+  parent_streamer_display_name?: string | null;
+  parent_streamer_avatar_url?: string | null;
+  parent_streamer_is_verified?: boolean | null;
+}
+
+export interface StreamerPostsResponse {
+  data: StreamerPost[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+}
+
 export interface CreateStreamerPayload {
   handle: string;
   display_name: string;
@@ -235,4 +312,45 @@ export const streamerPostReportService = {
     const response = await apiClient.get(streamerPostReportEndpoints.stats);
     return response.data;
   },
+};
+
+// Streamer Posts functions
+export const fetchAllStreamerPosts = async (params?: {
+  page?: number | string;
+  pageSize?: number;
+  sortBy?: string;
+  sortOrder?: "ASC" | "DESC";
+  filters?: any;
+  direction?: string;
+  cursor?: string;
+}): Promise<StreamerPostsResponse & { nextCursor?: string; prevCursor?: string }> => {
+  const res = await apiClient.get("/admin/streamers/posts", { params });
+  
+  // Debug için response'u logla
+  console.log("API Response:", res.data);
+  
+  const metadata = res.data.metadata || {};
+  const pageSize = metadata.pageSize || 20;
+  const total = metadata.total || 0;
+  
+  return {
+    data: res.data.data || [],
+    pagination: {
+      page: 1,
+      pageSize: pageSize,
+      total: total,
+      totalPages: Math.ceil(total / pageSize),
+      hasNextPage: metadata.hasNextPage || false,
+      hasPreviousPage: metadata.hasPreviousPage || false,
+    },
+    nextCursor: metadata.endCursor,
+    prevCursor: metadata.startCursor,
+  };
+};
+
+export const fetchStreamerPostById = async (
+  id: string | number
+): Promise<{ data: StreamerPost }> => {
+  const res = await apiClient.get(`/admin/streamers/posts/${id}`);
+  return res.data;
 };
