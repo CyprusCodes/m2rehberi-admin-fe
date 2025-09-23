@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Switch } from "@/components/ui/switch"
-import { Check, Server, Globe, MessageCircle, Calendar, Shield, Gamepad2, Settings, Star, Zap, Image, Upload, X } from "lucide-react"
+import { Check, Server, Globe, MessageCircle, Calendar, Shield, Gamepad2, Settings, Star, Zap, Image as ImageIcon, Upload, X, Plus, Trash2 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { createFrontendServer, type CreateServerPayload } from "@/services/servers"
 import { fetchActiveTags, type Tag } from "@/services/tags"
@@ -30,6 +30,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
   const [tags, setTags] = useState<Tag[]>([])
   const [loadingTags, setLoadingTags] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [galleryUploading, setGalleryUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -53,6 +54,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
     youtubeLinks: "",
     rules: "",
     serverCoverImageUrl: "",
+    images: [] as string[],
     showTimeStatus: false,
     showDateTime: "",
     systems: [] as string[],
@@ -99,6 +101,27 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
       alert('Dosya yüklenirken hata oluştu.')
     } finally {
       setUploading(false)
+    }
+  }
+
+  const handleGalleryUpload = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Lütfen sadece resim dosyası yükleyin.')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Dosya boyutu 5MB'dan büyük olamaz.")
+      return
+    }
+    try {
+      setGalleryUploading(true)
+      const response = await uploadAsset(file)
+      setForm({ ...form, images: [...form.images, response.data.url].slice(0, 6) })
+    } catch (e) {
+      console.error('Gallery upload failed:', e)
+      alert('Galeri resmi yüklenemedi.')
+    } finally {
+      setGalleryUploading(false)
     }
   }
 
@@ -158,6 +181,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
           : [],
         serverRules: form.rules || undefined,
         serverCoverImageUrl: form.serverCoverImageUrl || undefined,
+        images: form.images.length ? form.images : undefined,
         systems: form.systems.length > 0 ? form.systems : undefined,
         features: form.features.length > 0 ? form.features : undefined,
         events: form.events.length > 0 ? form.events : undefined,
@@ -179,6 +203,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
         youtubeLinks: "",
         rules: "",
         serverCoverImageUrl: "",
+        images: [],
         showTimeStatus: false,
         showDateTime: "",
         systems: [],
@@ -533,7 +558,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
 
                 <div className="space-y-2">
                   <Label className="text-sm font-medium flex items-center gap-2">
-                    <Image className="w-4 h-4" />
+                    <ImageIcon className="w-4 h-4" />
                     Sunucu Kapak Resmi
                   </Label>
                   
@@ -624,6 +649,45 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
                       />
                     </div>
                   )}
+                </div>
+
+                {/* Gallery Images (max 6) */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4" />
+                    Galeri Görselleri (maks 6)
+                  </Label>
+                  <div className="flex flex-wrap gap-3">
+                    {form.images.map((url, idx) => (
+                      <div key={url + idx} className="relative w-24 h-24 rounded-lg overflow-hidden border border-border/30">
+                        <img src={url} alt={`gallery-${idx}`} className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setForm({ ...form, images: form.images.filter((_, i) => i !== idx) })}
+                          className="absolute top-1 right-1 bg-red-600 text-white rounded p-1"
+                          title="Kaldır"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+
+                    {form.images.length < 6 && (
+                      <label className={`w-24 h-24 flex items-center justify-center rounded-lg border-2 border-dashed cursor-pointer ${galleryUploading ? 'opacity-60' : ''}`}>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => e.target.files && e.target.files[0] && handleGalleryUpload(e.target.files[0])}
+                          className="hidden"
+                        />
+                        {galleryUploading ? (
+                          <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                        ) : (
+                          <Plus className="w-5 h-5 text-muted-foreground" />
+                        )}
+                      </label>
+                    )}
+                  </div>
                 </div>
               </div>
 

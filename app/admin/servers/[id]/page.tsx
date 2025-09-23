@@ -422,6 +422,42 @@ export default function ServerDetailPage() {
         </div>
       )}
 
+      {/* Server Gallery Images */}
+      {Array.isArray(server.images) && server.images.length > 0 && (
+        <div>
+          <div className="mt-4 text-sm text-muted-foreground">Galeri</div>
+          <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {server.images.map((img: any) => (
+              <div
+                key={img.id}
+                className="relative rounded-lg overflow-hidden border border-border/30 bg-muted/20"
+                title={`Sıra: ${img.sort_order}`}
+              >
+                <img
+                  src={img.image_url}
+                  alt={`${server.server_name} görsel #${img.id}`}
+                  className="w-full h-32 object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = "none";
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML =
+                        '<div class="w-full h-32 flex items-center justify-center text-muted-foreground bg-muted/30">Görsel yüklenemedi</div>';
+                    }
+                  }}
+                />
+                {img.is_thumbnail ? (
+                  <div className="absolute top-1 left-1 px-2 py-0.5 text-xs rounded bg-blue-600 text-white">
+                    Kapak
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Segment Buttons */}
       <div className="inline-flex items-center rounded-lg border bg-muted p-1">
         <button

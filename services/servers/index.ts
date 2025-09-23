@@ -30,6 +30,7 @@ export interface CreateServerPayload {
   youtubeLinks?: string[] | null;
   serverRules?: string;
   serverCoverImageUrl?: string | null;
+  images?: string[] | null;
   systems?: any;
   features?: any;
   events?: any;
