@@ -22,6 +22,7 @@ import {
   Image,
   Video,
   Flag,
+  Trophy,
 } from "lucide-react"
 
 const navigation = [
@@ -82,6 +83,11 @@ const navigation = [
     name: "Ad Packages",
     href: "/admin/advertisement/packages",
     icon: Package,
+  },
+  {
+    name: "Çekilişler",
+    href: "/admin/lottery",
+    icon: Trophy,
   },
   {
     name: "Carousel",
