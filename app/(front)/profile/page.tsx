@@ -1,6 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+export const dynamic = 'force-dynamic'
+
+import React, { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { ProfileSidebar } from './components/ProfileSidebar'
 import { PersonalInfo } from './components/PersonalInfo'
@@ -13,49 +15,50 @@ import SupportTicketsSection from './components/Support/SupportTickets'
 import { useAuth } from '@/contexts/auth-context'
 import { User, Bell, Gamepad2, Heart, FileText, MessageCircle, Settings } from 'lucide-react'
 
-export default function ProfilePage() {
+const tabMeta: Record<string, { title: string; description: string; icon: React.ElementType }> = {
+  profile: {
+    title: 'Kişisel Bilgiler',
+    description: 'Profil detaylarını güncelle ve hesabını güçlendir.',
+    icon: User
+  },
+  notifications: {
+    title: 'Bildirimler',
+    description: 'Bildirim tercihlerini özelleştir, hiçbir güncellemeyi kaçırma.',
+    icon: Bell
+  },
+  servers: {
+    title: 'Sunucularım',
+    description: 'Yönettiğin sunucuları yönet ve performanslarını takip et.',
+    icon: Gamepad2
+  },
+  favorites: {
+    title: 'Favori Sunucular',
+    description: 'Takip ettiğin sunucuları tek ekranda görüntüle.',
+    icon: Heart
+  },
+  requests: {
+    title: 'Taleplerim',
+    description: 'Sunucu ve rol taleplerinin durumunu takip et.',
+    icon: FileText
+  },
+  support: {
+    title: 'Destek Taleplerim',
+    description: 'Destek kayıtlarını ve yanıtlarını buradan kontrol et.',
+    icon: MessageCircle
+  },
+  settings: {
+    title: 'Hesap Ayarları',
+    description: 'Hesap ayarlarını yapılandır ve deneyimini kişiselleştir.',
+    icon: Settings
+  }
+}
+
+function ProfileContent() {
   const [activeTab, setActiveTab] = useState('profile')
   const [openNewServer, setOpenNewServer] = useState(false)
   const searchParams = useSearchParams()
   const { user } = useAuth()
 
-  const tabMeta: Record<string, { title: string; description: string; icon: React.ElementType }> = {
-    profile: {
-      title: 'Kişisel Bilgiler',
-      description: 'Profil detaylarını güncelle ve hesabını güçlendir.',
-      icon: User
-    },
-    notifications: {
-      title: 'Bildirimler',
-      description: 'Bildirim tercihlerini özelleştir, hiçbir güncellemeyi kaçırma.',
-      icon: Bell
-    },
-    servers: {
-      title: 'Sunucularım',
-      description: 'Yönettiğin sunucuları yönet ve performanslarını takip et.',
-      icon: Gamepad2
-    },
-    favorites: {
-      title: 'Favori Sunucular',
-      description: 'Takip ettiğin sunucuları tek ekranda görüntüle.',
-      icon: Heart
-    },
-    requests: {
-      title: 'Taleplerim',
-      description: 'Sunucu ve rol taleplerinin durumunu takip et.',
-      icon: FileText
-    },
-    support: {
-      title: 'Destek Taleplerim',
-      description: 'Destek kayıtlarını ve yanıtlarını buradan kontrol et.',
-      icon: MessageCircle
-    },
-    settings: {
-      title: 'Hesap Ayarları',
-      description: 'Hesap ayarlarını yapılandır ve deneyimini kişiselleştir.',
-      icon: Settings
-    }
-  }
   const activeMeta = tabMeta[activeTab] ?? tabMeta.profile
 
   useEffect(() => {
@@ -140,5 +143,13 @@ export default function ProfilePage() {
         </main>
       </div>
     </div>
+  )
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={null}>
+      <ProfileContent />
+    </Suspense>
   )
 }
