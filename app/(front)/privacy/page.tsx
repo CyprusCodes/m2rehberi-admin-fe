@@ -221,13 +221,13 @@ export default function PrivacyPolicyPage() {
   const currentContent = content[language];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-950">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border-b">
+      <div className="bg-gradient-to-br from-indigo-500/10 via-slate-800/20 to-slate-950 border-b border-slate-800/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
           <div className="text-center space-y-6">
-            <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-2xl mb-4">
-              <Shield className="w-12 h-12 text-primary" />
+            <div className="inline-flex items-center justify-center p-3 bg-indigo-500/20 rounded-2xl mb-4">
+              <Shield className="w-12 h-12 text-indigo-200" />
             </div>
 
             {/* Language Toggle */}
@@ -252,13 +252,13 @@ export default function PrivacyPolicyPage() {
               </Button>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-100">
               {currentContent.hero.title}
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+            <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto">
               {currentContent.hero.description}
             </p>
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center justify-center gap-2 text-sm text-slate-400">
               <Clock className="w-4 h-4" />
               <span>{currentContent.hero.lastUpdated}</span>
             </div>
@@ -267,17 +267,15 @@ export default function PrivacyPolicyPage() {
       </div>
 
       {/* Table of Contents */}
-      <div className="bg-muted/30 border-b">
+      <div className="bg-slate-900/40 border-b border-slate-800/50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h2 className="text-lg font-semibold mb-4">
-            {currentContent.tableOfContents}
-          </h2>
+          <h2 className="text-lg font-semibold mb-4">{currentContent.tableOfContents}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
             {currentContent.sections.map((section, index) => (
               <a
                 key={section.id}
                 href={`#${section.id}`}
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors p-2 rounded-md hover:bg-primary/5"
+                className="flex items-center gap-2 text-sm text-slate-300 hover:text-indigo-200 transition-colors p-2 rounded-md hover:bg-indigo-500/10"
               >
                 <section.icon className="w-4 h-4" />
                 <span>
@@ -294,36 +292,34 @@ export default function PrivacyPolicyPage() {
         <div className="space-y-8">
           {currentContent.sections.map((section, sectionIndex) => (
             <section key={section.id} id={section.id} className="scroll-mt-24">
-              <Card className="border-2 hover:border-primary/50 transition-colors">
+              <Card className="border-2 border-slate-800/60 bg-slate-900/60 hover:border-indigo-400/40 transition-colors">
                 <CardContent className="p-6 md:p-8">
                   <div className="flex items-start gap-4 mb-6">
-                    <div className="p-3 bg-primary/10 rounded-xl">
-                      <section.icon className="w-6 h-6 text-primary" />
+                    <div className="p-3 bg-indigo-500/20 rounded-xl">
+                      <section.icon className="w-6 h-6 text-indigo-200" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-xs border-slate-700 text-slate-300">
                           {currentContent.sectionLabel} {sectionIndex + 1}
                         </Badge>
                       </div>
-                      <h2 className="text-2xl md:text-3xl font-bold">
-                        {section.title}
-                      </h2>
+                      <h2 className="text-2xl md:text-3xl font-bold">{section.title}</h2>
                     </div>
                   </div>
 
                   <div className="space-y-6">
                     {section.content.map((item, index) => (
                       <div key={index} className="space-y-2">
-                        <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                          <span className="w-2 h-2 bg-primary rounded-full" />
+                        <h3 className="text-lg font-semibold text-slate-200 flex items-center gap-2">
+                          <span className="w-2 h-2 bg-indigo-400 rounded-full" />
                           {item.subtitle}
                         </h3>
-                        <p className="text-muted-foreground leading-relaxed pl-4">
+                        <p className="text-slate-300 leading-relaxed pl-4">
                           {item.text}
                         </p>
                         {index < section.content.length - 1 && (
-                          <Separator className="!mt-4" />
+                          <Separator className="!mt-4 bg-slate-700/50" />
                         )}
                       </div>
                     ))}
@@ -335,25 +331,20 @@ export default function PrivacyPolicyPage() {
         </div>
 
         {/* Contact Section */}
-        <Card className="mt-12 border-2 border-primary/20 bg-primary/5">
+        <Card className="mt-12 border-2 border-indigo-500/30 bg-gradient-to-br from-indigo-500/10 to-slate-900/60">
           <CardContent className="p-6 md:p-8">
             <div className="text-center space-y-4">
-              <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-2xl">
-                <Mail className="w-8 h-8 text-primary" />
+              <div className="inline-flex items-center justify-center p-3 bg-indigo-500/20 rounded-2xl">
+                <Mail className="w-8 h-8 text-indigo-200" />
               </div>
-              <h2 className="text-2xl font-bold">
-                {currentContent.contactSection.title}
-              </h2>
+              <h2 className="text-2xl font-bold">{currentContent.contactSection.title}</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 {currentContent.contactSection.description}
               </p>
               <div className="flex justify-center items-center pt-4">
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="w-4 h-4 text-primary" />
-                  <a
-                    href={`mailto:${currentContent.contactSection.email}`}
-                    className="text-primary hover:underline"
-                  >
+                  <a href={`mailto:${currentContent.contactSection.email}`} className="text-primary hover:underline">
                     {currentContent.contactSection.email}
                   </a>
                 </div>
