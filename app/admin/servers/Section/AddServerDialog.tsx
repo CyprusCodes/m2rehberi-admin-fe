@@ -631,7 +631,7 @@ export function AddServerDialog({ children }: AddServerDialogProps) {
             Yeni Sunucu Ekle
           </DialogTitle>
           <DialogDescription className="text-center text-lg mt-2">
-            MetinPort sistemine yeni bir oyun sunucusu ekleyin
+            OynaGG sistemine yeni bir oyun sunucusu ekleyin
           </DialogDescription>
         </DialogHeader>
 

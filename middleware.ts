@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
   if (pathname.startsWith('/admin')) {
-    const userCookie = request.cookies.get('metinport_user')
+    const userCookie = request.cookies.get('OynaGG_user')
     
     if (!userCookie) {
       return NextResponse.redirect(new URL('/unauthorized', request.url))

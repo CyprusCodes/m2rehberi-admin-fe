@@ -4,8 +4,8 @@ import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 
 export const metadata: Metadata = {
-  title: "MetinPort - Admin Panel",
-  description: "MetinPort yönetim paneli",
+  title: "OynaGG - Admin Panel",
+  description: "OynaGG yönetim paneli",
 }
 
 export default function AdminLayout({

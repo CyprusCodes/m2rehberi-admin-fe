@@ -120,7 +120,7 @@ export function DashboardSidebar() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">MP</span>
             </div>
-            <span className="font-bold text-lg">MetinPort</span>
+            <span className="font-bold text-lg">OynaGG</span>
           </div>
         )}
         <Button variant="ghost" size="sm" onClick={() => setCollapsed(!collapsed)} className="h-8 w-8 p-0">

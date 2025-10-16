@@ -204,7 +204,7 @@ export function AddAdvertisementDialog({ isOpen, onClose, onSuccess }: AddAdvert
               <SheetTitle className="text-lg font-semibold text-slate-100 tracking-tight">
                 Yeni Reklam Ekle
               </SheetTitle>
-              <p className="mt-1 text-sm text-slate-400">MetinPort sistemine yeni bir reklam ekleyin</p>
+              <p className="mt-1 text-sm text-slate-400">OynaGG sistemine yeni bir reklam ekleyin</p>
             </div>
           </div>
         </SheetHeader>

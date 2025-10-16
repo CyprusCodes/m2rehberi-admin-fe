@@ -9,7 +9,7 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Sistem Ayarları</h1>
-        <p className="text-muted-foreground">MetinPort admin paneli ayarlarını yönetin</p>
+        <p className="text-muted-foreground">OynaGG admin paneli ayarlarını yönetin</p>
       </div>
 
       <Tabs defaultValue="database" className="space-y-4">

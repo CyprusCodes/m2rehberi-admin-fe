@@ -31,7 +31,7 @@ export const RemoveStorage = (key: string) => {
 };
 
 const AUTH_TOKEN_KEY = "authToken";
-const USER_KEY = "metinport_user";
+const USER_KEY = "OynaGG_user";
 
 export const setAuthToken = (token: string) => SetStorage(AUTH_TOKEN_KEY, token);
 export const getAuthToken = (): string | null => GetStorage<string>(AUTH_TOKEN_KEY);

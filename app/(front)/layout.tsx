@@ -4,7 +4,7 @@ import { LandingNavbar } from "@/components/landing/navbar"
 import { LandingFooter } from "@/components/landing/footer"
 
 export const metadata: Metadata = {
-  title: "MetinPort - Metin2 Server Management",
+  title: "OynaGG - Metin2 Server Management",
   description: "Metin2 sunucularını keşfedin ve yönetin",
 }
 
