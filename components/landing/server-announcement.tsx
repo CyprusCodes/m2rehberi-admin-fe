@@ -79,7 +79,7 @@ export function ServerAnnouncement() {
         <div className="text-center mb-16">
           <Badge variant="outline" className="mb-4 bg-gradient-to-r from-orange-500/15 to-purple-500/15 border-orange-500/30 text-orange-300">
             <Server className="w-4 h-4 mr-2" />
-            Metin2 Sunucu Vitrini
+            OynaGG Sunucu Vitrini
           </Badge>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
             <span className="bg-gradient-to-r from-orange-300 to-purple-300 bg-clip-text text-transparent">
@@ -88,7 +88,7 @@ export function ServerAnnouncement() {
             <span className="block mt-2 text-gray-200">Binlerce Oyuncuya Duyur</span>
           </h2>
           <p className="text-lg text-gray-400 max-w-3xl mx-auto">
-            Metin2 sunucunu Oyna.gg ana sayfa banner'larında, yayıncı vitrinlerinde ve topluluk akışında tanıt. 
+            OynaGG sunucunu Oyna.gg ana sayfa banner'larında, yayıncı vitrinlerinde ve topluluk akışında tanıt. 
             Tek form ile sunucunu kaydet, açılışını planla, "Yayındayım" rozetiyle canlı yayınını öne çıkar.
           </p>
         </div>

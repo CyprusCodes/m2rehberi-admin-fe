@@ -4,8 +4,8 @@ import { LandingNavbar } from "@/components/landing/navbar"
 import { LandingFooter } from "@/components/landing/footer"
 
 export const metadata: Metadata = {
-  title: "OynaGG - Metin2 Server Management",
-  description: "Metin2 sunucularını keşfedin ve yönetin",
+  title: "OynaGG - OynaGG Server Management",
+  description: "OynaGG sunucularını keşfedin ve yönetin",
 }
 
 export default function FrontendLayout({

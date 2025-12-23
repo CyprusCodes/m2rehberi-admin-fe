@@ -11,7 +11,7 @@ export default function NotFound() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-[url('/metin2-bg.png')] bg-cover bg-center opacity-5" />
+      <div className="absolute inset-0 bg-[url('/OynaGG-bg.png')] bg-cover bg-center opacity-5" />
       
       <Card className="w-full max-w-2xl glass border-2 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />

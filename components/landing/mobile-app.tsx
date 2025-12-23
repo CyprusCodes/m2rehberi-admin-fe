@@ -39,7 +39,7 @@ export function LandingMobileApp() {
     {
       icon: Megaphone,
       title: 'Sunucu Duyuruları',
-      description: 'Metin2 sunucularının açılış tarihlerini ve kampanyalarını kaçırma.',
+      description: 'OynaGG sunucularının açılış tarihlerini ve kampanyalarını kaçırma.',
       color: 'from-orange-500/20 to-yellow-500/20',
       iconColor: 'text-orange-400'
     },
@@ -92,7 +92,7 @@ export function LandingMobileApp() {
               
               <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
                 Oyna.gg mobil uygulamasıyla sosyal akış cebine gelir. "Yayındayım" bildirimlerini yakala, 
-                Metin2 sunucu duyurularını takip et, favori yayıncılarının paylaşımlarını kaçırma.
+                OynaGG sunucu duyurularını takip et, favori yayıncılarının paylaşımlarını kaçırma.
               </p>
             </div>
 
@@ -249,7 +249,7 @@ export function LandingMobileApp() {
                         <div className="w-10 h-10 bg-gradient-to-br from-orange-500/20 to-yellow-500/20 rounded-lg flex items-center justify-center">
                           <Megaphone className="w-5 h-5 text-orange-400" />
                         </div>
-                        <span className="text-sm font-medium">Metin2: Sunucu açılışına 2 gün kaldı</span>
+                        <span className="text-sm font-medium">OynaGG: Sunucu açılışına 2 gün kaldı</span>
                       </div>
                     </div>
                   </div>

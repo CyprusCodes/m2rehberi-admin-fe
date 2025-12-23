@@ -10,7 +10,7 @@ export function LandingFeatures() {
     {
       icon: MessageCircle,
       title: 'Sosyal Akış',
-      description: 'Paylaşımlar, klipler ve Metin2 haberleri tek akışta birleşir.',
+      description: 'Paylaşımlar, klipler ve OynaGG haberleri tek akışta birleşir.',
       features: ['Fotoğraf & video gönder', 'Topluluk yorumları', 'Destek mesajlarını topla', 'Favori paylaşımları sabitle']
     },
     {
@@ -27,7 +27,7 @@ export function LandingFeatures() {
     },
     {
       icon: Megaphone,
-      title: 'Metin2 Sunucu Vitrini',
+      title: 'OynaGG Sunucu Vitrini',
       description: 'Sunucu başvurusu yap, banner ve ana sayfa vitrinlerinde görün.',
       features: ['Sunucu başvuru formu', 'Banner alanı talebi', 'Ana sayfa spotlight kartları', 'Topluluğa özel kampanya paylaş']
     }
@@ -49,11 +49,11 @@ export function LandingFeatures() {
             🚀 Oyna.gg Özellikleri
           </Badge>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-            Metin2 Oyna.gg Topluluğunu
+            OynaGG Oyna.gg Topluluğunu
             <span className="block text-indigo-300">Tek Platformda Buluşturuyoruz</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Oyna.gg oyuncuların sosyal medyasıdır. Paylaş, canlı yayınını işaretle, Metin2 sunucunu duyur ve 
+            Oyna.gg oyuncuların sosyal medyasıdır. Paylaş, canlı yayınını işaretle, OynaGG sunucunu duyur ve 
             topluluğunu aynı çatı altında büyüt.
           </p>
         </div>

@@ -41,7 +41,7 @@ export default function ServerHeader({
               </h1>
               <p className="mt-1 flex items-center gap-2 text-sm text-slate-400">
                 <Server className="h-4 w-4" />
-                {server.game_type || 'Metin2'}
+                {server.game_type || 'OynaGG'}
               </p>
             </div>
           </div>

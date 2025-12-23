@@ -14,7 +14,7 @@ export const DIFFICULTY_LEVELS = ["Easy", "Medium", "Hard", "Other"];
 
 export const SERVER_TYPES = ["TR Type", "VS Type", "GM Type", "Other"];
 
-export const METIN2_SYSTEMS = [
+export const OynaGG_SYSTEMS = [
   "Çevrimdışı Pazar",
   "Rebirth",
   "Gaya",
@@ -25,7 +25,7 @@ export const METIN2_SYSTEMS = [
   "Savaş Bölgesi",
 ];
 
-export const METIN2_FEATURES = [
+export const OynaGG_FEATURES = [
   "Lycan",
   "Simya",
   "Kuşak",
@@ -36,7 +36,7 @@ export const METIN2_FEATURES = [
   "Meley",
 ];
 
-export const METIN2_EVENTS = [
+export const OynaGG_EVENTS = [
   "Futbol Topu",
   "Ox",
   "Balık Etkinliği",

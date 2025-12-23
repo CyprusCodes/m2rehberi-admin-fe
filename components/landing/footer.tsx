@@ -73,7 +73,7 @@ export function LandingFooter() {
             Ready to Launch Your Server?
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join thousands of server owners who trust Oyna.gg for their Metin2 server management needs.
+            Join thousands of server owners who trust Oyna.gg for their OynaGG server management needs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/login">
@@ -101,11 +101,11 @@ export function LandingFooter() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-foreground">Oyna.gg</h3>
-                  <p className="text-sm text-muted-foreground">Metin2 Server Management Platform</p>
+                  <p className="text-sm text-muted-foreground">OynaGG Server Management Platform</p>
                 </div>
               </div>
               <p className="text-muted-foreground max-w-md">
-                The most comprehensive platform for managing Metin2 servers, building communities, 
+                The most comprehensive platform for managing OynaGG servers, building communities, 
                 and growing your player base. Trusted by server owners worldwide.
               </p>
               <div className="flex items-center gap-4">

@@ -80,7 +80,7 @@ export function ServerApplicationForm() {
       <div className="relative">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-green-500/10 to-green-500/5 rounded-2xl" />
-        <div className="absolute inset-0 bg-[url('/metin2-bg.png')] bg-cover bg-center opacity-5 rounded-2xl" />
+        <div className="absolute inset-0 bg-[url('/OynaGG-bg.png')] bg-cover bg-center opacity-5 rounded-2xl" />
         
         {/* Floating Elements */}
         <div className="absolute top-4 left-4 w-3 h-3 bg-green-500/30 rounded-full animate-pulse" />
@@ -117,7 +117,7 @@ export function ServerApplicationForm() {
       <div className="relative">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 rounded-2xl" />
-        <div className="absolute inset-0 bg-[url('/metin2-bg.png')] bg-cover bg-center opacity-5 rounded-2xl" />
+        <div className="absolute inset-0 bg-[url('/OynaGG-bg.png')] bg-cover bg-center opacity-5 rounded-2xl" />
         
         {/* Floating Elements */}
         <div className="absolute top-4 left-4 w-3 h-3 bg-primary/30 rounded-full animate-pulse" />

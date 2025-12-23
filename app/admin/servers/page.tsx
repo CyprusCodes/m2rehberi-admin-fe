@@ -8,7 +8,7 @@ export default function ServersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Sunucu Yönetimi</h1>
-          <p className="text-muted-foreground">Metin2 sunucularını yönetin ve izleyin</p>
+          <p className="text-muted-foreground">OynaGG sunucularını yönetin ve izleyin</p>
         </div>
         <AddServerDialog>
           <Button>

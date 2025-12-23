@@ -13,7 +13,7 @@ import { Check, Server, Globe, MessageCircle, Calendar, Shield, Gamepad2, Settin
 import { useAuth } from "@/contexts/auth-context"
 import { createFrontendServer, type CreateServerPayload } from "@/services/servers"
 import { fetchActiveTags, type Tag } from "@/services/tags"
-import { LEVEL_RANGES, DIFFICULTY_LEVELS, SERVER_TYPES, METIN2_SYSTEMS, METIN2_FEATURES, METIN2_EVENTS } from "@/lib/helpersConstants"
+import { LEVEL_RANGES, DIFFICULTY_LEVELS, SERVER_TYPES, OynaGG_SYSTEMS, OynaGG_FEATURES, OynaGG_EVENTS } from "@/lib/helpersConstants"
 import { HtmlEditor } from "@/components/ui/html-editor"
 import { uploadAsset } from "@/services/uploads"
 
@@ -44,7 +44,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
   const [form, setForm] = useState({
     name: "",
     description: "",
-    gameType: "metin2",
+    gameType: "OynaGG",
     levelRange: "",
     difficulty: "",
     serverType: "",
@@ -165,7 +165,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
         userId: Number(user.id),
         serverName: form.name,
         description: form.description,
-        gameType: "metin2",
+        gameType: "OynaGG",
         serverLevelRange: form.levelRange,
         serverDifficulty: form.difficulty as any,
         serverType: form.serverType,
@@ -193,7 +193,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
       setForm({
         name: "",
         description: "",
-        gameType: "metin2",
+        gameType: "OynaGG",
         levelRange: "",
         difficulty: "",
         serverType: "",
@@ -269,7 +269,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
                         <SelectValue placeholder="Oyun seçin" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="metin2">Metin2</SelectItem>
+                        <SelectItem value="OynaGG">OynaGG</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -333,16 +333,16 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
                 </div>
               </div>
 
-              {/* Metin2 Systems */}
+              {/* OynaGG Systems */}
               <div className="space-y-4 p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm">
                 <div className="flex items-center gap-2 mb-4">
                   <Settings className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-lg">Metin2 Sistemleri</h3>
+                  <h3 className="font-semibold text-lg">OynaGG Sistemleri</h3>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Sistemler (Çoklu seçim)</Label>
                   <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border border-border/30 rounded-lg p-3">
-                    {METIN2_SYSTEMS.map((system) => (
+                    {OynaGG_SYSTEMS.map((system) => (
                       <label key={system} className="flex items-center space-x-2 cursor-pointer">
                         <input
                           type="checkbox"
@@ -363,16 +363,16 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
                 </div>
               </div>
 
-              {/* Metin2 Features */}
+              {/* OynaGG Features */}
               <div className="space-y-4 p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm">
                 <div className="flex items-center gap-2 mb-4">
                   <Star className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-lg">Metin2 Özellikleri</h3>
+                  <h3 className="font-semibold text-lg">OynaGG Özellikleri</h3>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Özellikler (Çoklu seçim)</Label>
                   <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border border-border/30 rounded-lg p-3">
-                    {METIN2_FEATURES.map((feature) => (
+                    {OynaGG_FEATURES.map((feature) => (
                       <label key={feature} className="flex items-center space-x-2 cursor-pointer">
                         <input
                           type="checkbox"
@@ -393,16 +393,16 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
                 </div>
               </div>
 
-              {/* Metin2 Events */}
+              {/* OynaGG Events */}
               <div className="space-y-4 p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm">
                 <div className="flex items-center gap-2 mb-4">
                   <Zap className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold text-lg">Metin2 Etkinlikleri</h3>
+                  <h3 className="font-semibold text-lg">OynaGG Etkinlikleri</h3>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Etkinlikler (Çoklu seçim)</Label>
                   <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border border-border/30 rounded-lg p-3">
-                    {METIN2_EVENTS.map((event) => (
+                    {OynaGG_EVENTS.map((event) => (
                       <label key={event} className="flex items-center space-x-2 cursor-pointer">
                         <input
                           type="checkbox"
