@@ -46,10 +46,12 @@ export function ReportedPostsTable() {
       setLoading(true)
       setError(null)
       const res = await fetchStreamerPostReports({ 
-        page: 1, 
-        pageSize: 50, 
-        sortBy: 'created_at',
-        sortOrder: 'DESC'
+        // page: 1, // Removed to fix "page parameter should be first or last or empty" error
+        // @ts-ignore - API expects snake_case
+        page_size: 50, 
+        // sort_by: 'created_at', // Changed to snake_case to be safe, though usage in index.ts takes params as is
+        // sortOrder: 'DESC' // Backend uses sort_by=-column for desc
+        sort_by: '-streamer_post_reports.created_at' // Matches backend default but explicit
       })
       setRows(res.data || [])
     } catch (e: any) {

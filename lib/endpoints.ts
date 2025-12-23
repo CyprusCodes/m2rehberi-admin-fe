@@ -67,6 +67,7 @@ export const adminUserEndpoints = {
   unban: (id: string) => `${API_BASE_URL}/admin/users/${id}/unban`,
   verifyEmail: (id: string) => `${API_BASE_URL}/admin/users/${id}/verify-email`,
   sendPasswordReset: `${API_BASE_URL}/admin/recovery-request`,
+  changePassword: (id: string | number) => `${API_BASE_URL}/admin/users/${id}/change-password`,
 };
 
 // Servers endpoints

@@ -33,8 +33,8 @@ export function LandingHero() {
     },
     {
       icon: Megaphone,
-      title: 'Metin2 Sunucu Duyuruları',
-      description: 'Yeni Metin2 sunucunu banner ve ana sayfa vitrinleriyle binlerce oyuncuya tanıt.'
+      title: 'OynaGG Sunucu Duyuruları',
+      description: 'Yeni OynaGG sunucunu banner ve ana sayfa vitrinleriyle binlerce oyuncuya tanıt.'
     }
   ]
 
@@ -130,7 +130,7 @@ export function LandingHero() {
           <div className="max-w-3xl mx-auto pt-12 border-t border-indigo-500/20">
             <p className="text-sm md:text-base text-gray-400">
               Oyna.gg oyuncuların sosyal medyasıdır: Yayından haberdar ol, sevdiğin yayıncıları takip et, 
-              Metin2 sunucu duyurularını tek merkezden yönet.
+              OynaGG sunucu duyurularını tek merkezden yönet.
             </p>
           </div>
         </div>

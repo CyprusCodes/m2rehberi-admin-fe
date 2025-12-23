@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Shield, Users, Calendar, Pencil } from "lucide-react"
-import { METIN2_SYSTEMS, METIN2_FEATURES, METIN2_EVENTS } from "@/lib/helpersConstants"
+import { OynaGG_SYSTEMS, OynaGG_FEATURES, OynaGG_EVENTS } from "@/lib/helpersConstants"
 
 interface SystemsFeaturesEventsProps {
   server: any
@@ -56,7 +56,7 @@ export default function SystemsFeaturesEvents({
           {editingField === "systems" ? (
             <div className="space-y-3">
               <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
-                {METIN2_SYSTEMS.map((system) => (
+                {OynaGG_SYSTEMS.map((system) => (
                   <label key={system} className="flex items-center gap-2 text-sm cursor-pointer">
                     <input
                       type="checkbox"
@@ -117,7 +117,7 @@ export default function SystemsFeaturesEvents({
           {editingField === "features" ? (
             <div className="space-y-3">
               <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
-                {METIN2_FEATURES.map((feature) => (
+                {OynaGG_FEATURES.map((feature) => (
                   <label key={feature} className="flex items-center gap-2 text-sm cursor-pointer">
                     <input
                       type="checkbox"
@@ -178,7 +178,7 @@ export default function SystemsFeaturesEvents({
           {editingField === "events" ? (
             <div className="space-y-3">
               <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
-                {METIN2_EVENTS.map((event) => (
+                {OynaGG_EVENTS.map((event) => (
                   <label key={event} className="flex items-center gap-2 text-sm cursor-pointer">
                     <input
                       type="checkbox"

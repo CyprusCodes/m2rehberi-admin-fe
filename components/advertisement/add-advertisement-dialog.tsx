@@ -220,7 +220,7 @@ export function AddAdvertisementDialog({ isOpen, onClose, onSuccess }: AddAdvert
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Örn: Premium Metin2 Items"
+                  placeholder="Örn: Premium OynaGG Items"
                   className="rounded-xl border border-slate-700/60 bg-slate-900/70 px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:border-indigo-400/60"
                   required
                 />

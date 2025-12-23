@@ -46,7 +46,7 @@ const DIFFICULTY_LEVELS = ["Easy", "Medium", "Hard"];
 
 const SERVER_TYPES = ["TR Type", "VS Type", "GM Type", "Other"];
 
-const METIN2_SYSTEMS = [
+const OynaGG_SYSTEMS = [
   "Çevrimdışı Pazar",
   "Rebirth",
   "Gaya",
@@ -57,7 +57,7 @@ const METIN2_SYSTEMS = [
   "Savaş Bölgesi",
 ];
 
-const METIN2_FEATURES = [
+const OynaGG_FEATURES = [
   "Lycan",
   "Simya",
   "Kuşak",
@@ -68,7 +68,7 @@ const METIN2_FEATURES = [
   "Meley",
 ];
 
-const METIN2_EVENTS = [
+const OynaGG_EVENTS = [
   "Futbol Topu",
   "Ox",
   "Balık Etkinliği",
@@ -93,7 +93,7 @@ export function AddServerDialog({ children }: AddServerDialogProps) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    gameType: "metin2",
+    gameType: "OynaGG",
     levelRange: "",
     difficulty: "",
     serverType: "",
@@ -163,7 +163,7 @@ export function AddServerDialog({ children }: AddServerDialogProps) {
         userId: Number(user.id),
         serverName: formData.name,
         description: formData.description || undefined,
-        gameType: formData.gameType as "metin2" | "other",
+        gameType: formData.gameType as "OynaGG" | "other",
         serverLevelRange: formData.levelRange || undefined,
         serverDifficulty: (formData.difficulty || undefined) as
           | "Easy"
@@ -198,7 +198,7 @@ export function AddServerDialog({ children }: AddServerDialogProps) {
       setFormData({
         name: "",
         description: "",
-        gameType: "metin2",
+        gameType: "OynaGG",
         levelRange: "",
         difficulty: "",
         serverType: "",
@@ -257,7 +257,7 @@ export function AddServerDialog({ children }: AddServerDialogProps) {
                       <SelectValue placeholder="Oyun seçin" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="metin2">Metin2</SelectItem>
+                      <SelectItem value="OynaGG">OynaGG</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -510,14 +510,14 @@ export function AddServerDialog({ children }: AddServerDialogProps) {
       case 4:
         return (
           <div className="space-y-8">
-            {formData.gameType === "metin2" && (
+            {formData.gameType === "OynaGG" && (
               <>
                 <div className="bg-muted/30 p-6 rounded-lg">
                   <h3 className="text-lg font-semibold mb-4 text-foreground">
                     Genel Sistemler
                   </h3>
                   <div className="grid grid-cols-3 gap-4">
-                    {METIN2_SYSTEMS.map((system) => (
+                    {OynaGG_SYSTEMS.map((system) => (
                       <div
                         key={system}
                         className="flex items-center space-x-3 p-3 bg-background rounded-md border"
@@ -546,7 +546,7 @@ export function AddServerDialog({ children }: AddServerDialogProps) {
                     Diğer Özellikler
                   </h3>
                   <div className="grid grid-cols-3 gap-4">
-                    {METIN2_FEATURES.map((feature) => (
+                    {OynaGG_FEATURES.map((feature) => (
                       <div
                         key={feature}
                         className="flex items-center space-x-3 p-3 bg-background rounded-md border"
@@ -575,7 +575,7 @@ export function AddServerDialog({ children }: AddServerDialogProps) {
                     Eventlar
                   </h3>
                   <div className="grid grid-cols-3 gap-4">
-                    {METIN2_EVENTS.map((event) => (
+                    {OynaGG_EVENTS.map((event) => (
                       <div
                         key={event}
                         className="flex items-center space-x-3 p-3 bg-background rounded-md border"
@@ -602,11 +602,11 @@ export function AddServerDialog({ children }: AddServerDialogProps) {
             )}
 
 
-            {formData.gameType !== "metin2" && (
+            {formData.gameType !== "OynaGG" && (
               <div className="bg-muted/30 p-12 rounded-lg">
                 <div className="text-center text-muted-foreground">
                   <h3 className="text-xl font-semibold mb-2">
-                    Metin2 Özellikleri
+                    OynaGG Özellikleri
                   </h3>
                   <p className="text-base">
                     Özellikleri görmek için önce temel bilgiler adımından oyun türünü seçin

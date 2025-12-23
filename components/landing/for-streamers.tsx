@@ -29,7 +29,7 @@ export function ForStreamers() {
     {
       icon: Megaphone,
       title: 'Sunucu & Banner Vitrini',
-      description: 'Metin2 sunucunu veya yayını ana sayfa banner\'ları ve vitrin kartlarıyla öne çıkar.',
+      description: 'OynaGG sunucunu veya yayını ana sayfa banner\'ları ve vitrin kartlarıyla öne çıkar.',
       highlights: ['Banner alanı talep et', 'Ana sayfa spotlight\'ı kullan', 'Sunucu duyurusu planla', 'Topluluğa özel kampanya başlat']
     }
   ]
@@ -38,7 +38,7 @@ export function ForStreamers() {
     { icon: Eye, title: 'Daha Fazla Görünürlük', desc: 'Canlı rozetin ve banner vitrinleriyle keşfedil.' },
     { icon: Share2, title: 'Tek Link Paneli', desc: 'Bütün yayın kanallarını tek yerden paylaş.' },
     { icon: Heart, title: 'Topluluğunla Bağ Kur', desc: 'Beğeni ve yorumlarla etkileşimi sıcak tut.' },
-    { icon: Megaphone, title: 'Sunucu Sponsorluğu', desc: 'Metin2 sunucu duyurularını takipçilerinle paylaş.' }
+    { icon: Megaphone, title: 'Sunucu Sponsorluğu', desc: 'OynaGG sunucu duyurularını takipçilerinle paylaş.' }
   ]
 
   return (
@@ -177,7 +177,7 @@ export function ForStreamers() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-indigo-300 rounded-full" />
-                  <span className="text-gray-300">Metin2 sunucu banner ve kampanyalarını vitrine taşı</span>
+                  <span className="text-gray-300">OynaGG sunucu banner ve kampanyalarını vitrine taşı</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-indigo-300 rounded-full" />
@@ -235,7 +235,7 @@ export function ForStreamers() {
                   </p>
                   <div className="flex gap-2 mt-3">
                     <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30">
-                      Metin2
+                      OynaGG
                     </Badge>
                     <Badge className="bg-slate-500/20 text-slate-200 border-slate-500/30">
                       PvP

@@ -81,6 +81,11 @@ export const sendPasswordResetEmail = async (email: string) => {
   return res.data as { requestId: number };
 };
 
+export const changeUserPassword = async (userId: number | string, password: string, sendEmail: boolean) => {
+  const res = await apiClient.post(adminUserEndpoints.changePassword(String(userId)), { password, sendEmail });
+  return res.data as { message: string };
+};
+
 // Server owner requests
 export type ServerOwnerRequestRow = {
   requestId: number;

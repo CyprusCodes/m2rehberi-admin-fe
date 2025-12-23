@@ -17,9 +17,11 @@ import { UserDetailsDialog } from "./user-details-dialog"
 import moment from "moment"
 import "moment/locale/tr"
 
-import { fetchUsers, type UsersPaginated, type UserRow, banUser as banUserSvc, unbanUser as unbanUserSvc, verifyUserEmail, sendPasswordResetEmail } from "@/services/users"
+import { fetchUsers, type UsersPaginated, type UserRow, banUser as banUserSvc, unbanUser as unbanUserSvc, verifyUserEmail, sendPasswordResetEmail, changeUserPassword } from "@/services/users"
 import toast from 'react-hot-toast'
-import { MoreHorizontal, Eye, UserCheck, UserX, Mail, KeyRound, Smartphone } from "lucide-react"
+import { MoreHorizontal, Eye, UserCheck, UserX, Mail, KeyRound, Smartphone, Lock } from "lucide-react"
+import { AdminChangePasswordForUser } from "./AdminChangePasswordForUser"
+
 
 type ApiUser = UserRow
 
@@ -30,6 +32,10 @@ export function UsersTable() {
   const [loading, setLoading] = useState(true)
   const [meta, setMeta] = useState<UsersPaginated["metadata"] | null>(null)
   const [query, setQuery] = useState<string>("?page_size=10&sort_by=-users.user_id")
+  
+  // Password Change State
+  const [isPasswordChangeOpen, setIsPasswordChangeOpen] = useState(false)
+  const [passwordChangeUserId, setPasswordChangeUserId] = useState<number | null>(null)
 
   const extractQueryFromLink = (link: string | null): string | null => {
     if (!link) return null
@@ -118,6 +124,11 @@ export function UsersTable() {
         error: 'Şifre sıfırlama emaili gönderilemedi.'
       }
     )
+  }
+
+  const openPasswordChangeDialog = (userId: number) => {
+    setPasswordChangeUserId(userId)
+    setIsPasswordChangeOpen(true)
   }
 
   return (
@@ -224,9 +235,13 @@ export function UsersTable() {
                           Şimdi Doğrula
                         </DropdownMenuItem>
                       )}
-                      <DropdownMenuItem onClick={() => handleSendPasswordResetEmail(user.email)}>
+                      {/* <DropdownMenuItem onClick={() => handleSendPasswordResetEmail(user.email)}>
                         <KeyRound className="mr-2 h-4 w-4" />
                         Şifre Sıfırlama Emaili
+                      </DropdownMenuItem> */}
+                      <DropdownMenuItem onClick={() => openPasswordChangeDialog(user.user_id)}>
+                        <Lock className="mr-2 h-4 w-4" />
+                        Şifreyi Değiştir
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -300,6 +315,12 @@ export function UsersTable() {
         } : null}
         open={isDetailsOpen}
         onOpenChange={setIsDetailsOpen}
+      />
+      
+      <AdminChangePasswordForUser
+        userId={passwordChangeUserId}
+        open={isPasswordChangeOpen}
+        onOpenChange={setIsPasswordChangeOpen}
       />
     </>
   )

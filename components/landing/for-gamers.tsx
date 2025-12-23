@@ -50,7 +50,7 @@ export function ForGamers() {
           </h2>
           <p className="text-lg text-gray-400 max-w-3xl mx-auto">
             Oyna.gg oyuncular için tasarlandı. Favori yayıncılarını takip et, canlı yayınlara tek dokunuşla bağlan, 
-            topluluğunla birlikte yeni Metin2 sunucularını keşfet.
+            topluluğunla birlikte yeni OynaGG sunucularını keşfet.
           </p>
         </div>
 
@@ -91,7 +91,7 @@ export function ForGamers() {
               </span>
             </h3>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Takip ettiğin yayıncıların canlı yayın bildirimleri, paylaşımları ve Metin2 sunucu duyuruları 
+              Takip ettiğin yayıncıların canlı yayın bildirimleri, paylaşımları ve OynaGG sunucu duyuruları 
               tek bir yerde birleşiyor.
             </p>
           </div>
@@ -102,7 +102,7 @@ export function ForGamers() {
               { icon: MessageCircle, title: 'Topluluk Akışı', desc: 'Yayıncı ve oyuncu paylaşımlarını zamanında yakala.' },
               { icon: Radio, title: 'Canlı Yayın Alarmı', desc: '"Yayındayım" rozetiyle o an canlı olan yayıncıyı gör.' },
               { icon: Heart, title: 'Destek Gönder', desc: 'Kalp bırak, yorum yaz, yayın öncesi motive et.' },
-              { icon: Megaphone, title: 'Sunucu Haberleri', desc: 'Yeni Metin2 sunucularını banner ve vitrinlerden keşfet.' }
+              { icon: Megaphone, title: 'Sunucu Haberleri', desc: 'Yeni OynaGG sunucularını banner ve vitrinlerden keşfet.' }
             ].map((feature, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-gray-900/60 to-gray-800/60 border-indigo-500/20 hover:border-indigo-400/30">
                 <CardContent className="p-6 space-y-3">

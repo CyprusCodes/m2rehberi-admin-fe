@@ -18,7 +18,7 @@ export interface CreateServerPayload {
   userId: number;
   serverName: string;
   description?: string;
-  gameType: "metin2" | "minecraft" | "other";
+  gameType: "OynaGG" | "minecraft" | "other";
   serverLevelRange?: string;
   serverDifficulty?: "Easy" | "Medium" | "Hard" | "Other";
   serverType?: string;
