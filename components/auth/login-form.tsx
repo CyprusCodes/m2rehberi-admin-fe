@@ -17,7 +17,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
-  const { login: doLogin } = useAuth()
+  const { adminLogin } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,7 +25,7 @@ export function LoginForm() {
     setError("")
 
     try {
-      const ok = await doLogin(email, password)
+      const ok = await adminLogin(email, password)
       if (ok) {
         router.push("/admin")
       } else {
@@ -37,6 +37,11 @@ export function LoginForm() {
       setIsLoading(false)
     }
   }
+  // 
+  // const handleLogin = async (email: string, password: string) => {
+  //   const ok = await doLogin(email, password)
+  //   if (ok) {
+  // }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
