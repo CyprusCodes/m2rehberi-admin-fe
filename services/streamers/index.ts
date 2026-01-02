@@ -21,8 +21,8 @@ export interface Streamer {
   x_url?: string | null;
   website_url?: string | null;
   socials_json?: any | null;
-  is_active: boolean;
-  is_verified: boolean;
+  is_active: number;
+  is_verified: number;
   approval_status: "pending" | "approved" | "rejected";
   approval_note?: string | null;
   rejected_note?: string | null;
@@ -137,7 +137,7 @@ export interface CreateStreamerPayload {
 
 export interface UpdateStreamerPayload extends Partial<CreateStreamerPayload> {}
 
-export const fetchStreamers = async (): Promise<{ data: Streamer[] }> => {
+export const fetchStreamers = async (): Promise<Streamer[]> => {
   const res = await apiClient.get(streamerEndpoints.getAll);
   return res.data;
 };
