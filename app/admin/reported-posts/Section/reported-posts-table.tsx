@@ -30,7 +30,7 @@ import {
   StreamerPostReportRow,
   StreamerPostReportStatus,
   updateStreamerPostReportStatus,
-} from "@/services/streamerPostReports"
+} from "@/services/streamer-post-reports"
 
 const statusVariant: Record<StreamerPostReportStatus, { label: string; variant: string }> = {
   pending: { label: "Beklemede", variant: "outline" },

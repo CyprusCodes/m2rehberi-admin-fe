@@ -1,9 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Flag, Clock, CheckCircle, XCircle } from "lucide-react"
-import { useEffect, useState } from "react"
-import { streamerPostReportService, StreamerPostReportStats } from "@/services/streamer-post-reports"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Flag, Clock, CheckCircle, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  streamerPostReportService,
+  StreamerPostReportStats,
+} from "@/services/streamer-post-reports";
 
 export function ReportedPostsStats() {
   const [stats, setStats] = useState<StreamerPostReportStats>({
@@ -32,25 +35,25 @@ export function ReportedPostsStats() {
   const statsConfig = [
     {
       title: "Toplam Rapor",
-      value: stats.total.toString(),
+      value: (stats?.total ?? 0).toString(),
       icon: Flag,
       color: "text-blue-500",
     },
     {
       title: "Bekleyen Raporlar",
-      value: stats.pending.toString(),
+      value: (stats?.pending ?? 0).toString(),
       icon: Clock,
       color: "text-yellow-500",
     },
     {
       title: "İncelenen Raporlar",
-      value: stats.reviewed.toString(),
+      value: (stats?.reviewed ?? 0).toString(),
       icon: CheckCircle,
       color: "text-green-500",
     },
     {
       title: "Reddedilen Raporlar",
-      value: stats.rejected.toString(),
+      value: (stats?.rejected ?? 0).toString(),
       icon: XCircle,
       color: "text-red-500",
     },
@@ -85,12 +88,10 @@ export function ReportedPostsStats() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stat.value}</div>
-            <p className="text-xs text-muted-foreground">
-              Gerçek zamanlı veri
-            </p>
+            <p className="text-xs text-muted-foreground">Gerçek zamanlı veri</p>
           </CardContent>
         </Card>
       ))}
     </div>
-  )
+  );
 }

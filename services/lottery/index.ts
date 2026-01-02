@@ -118,33 +118,117 @@ export const createLottery = async (payload: CreateLotteryPayload) => {
   return res.data as { lottery_id: number; message: string };
 };
 
+// Admin create lottery
+export interface AdminCreateLotteryPayload {
+  title: string;
+  description?: string;
+  prizeDescription: string;
+  prizeImageUrl?: string;
+  participationRules: {
+    streamer_id?: number;
+    follow_required?: boolean;
+  };
+  maxParticipants?: number;
+  startDate: string;
+  endDate: string;
+  winnerCount: number;
+  selectionMethod?: string;
+  status?: string;
+  serverId?: number;
+  creatorUserId?: number;
+}
+
+export const adminCreateLottery = async (
+  payload: AdminCreateLotteryPayload
+) => {
+  const res = await apiClient.post("/admin/lottery/create", payload);
+  return res.data as { insertedGeneralLotteryId: number; message: string };
+};
+
 // Join lottery
 export const joinLottery = async (lotteryId: string | number) => {
-  const res = await apiClient.post("/front/lottery/join", { lottery_id: lotteryId });
+  const res = await apiClient.post("/front/lottery/join", {
+    lottery_id: lotteryId,
+  });
   return res.data as { success: boolean; message: string };
 };
 
 // Admin actions
 export const endLottery = async (lotteryId: string | number) => {
-  const res = await apiClient.put(`/front/lottery/${lotteryId}/end`);
+  const res = await apiClient.put(`/admin/lottery/${lotteryId}/end`);
   return res.data as { success: boolean; message: string };
 };
 
-export const selectWinners = async (lotteryId: string | number) => {
-  const res = await apiClient.put(`/front/lottery/${lotteryId}/winners`);
+export const selectWinners = async (
+  lotteryId: string | number,
+  winnerUserIds?: number[]
+) => {
+  const res = await apiClient.put(`/admin/lottery/${lotteryId}/winners`, {
+    winnerUserIds,
+  });
   return res.data as { success: boolean; message: string; winners: any[] };
+};
+
+// End lottery and auto-select random winners
+export const endLotteryWithRandomWinners = async (
+  lotteryId: string | number
+) => {
+  const res = await apiClient.put(
+    `/admin/lottery/${lotteryId}/end-with-winners`
+  );
+  return res.data as { success: boolean; message: string; data: any };
+};
+
+// Fetch active users for participant selection
+export interface ActiveUser {
+  user_id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone_number?: string;
+  user_type: string;
+}
+
+export const fetchActiveUsers = async (
+  params: {
+    page_size?: number;
+    filters?: string;
+  } = {}
+) => {
+  const res = await apiClient.get("/admin/users/active", { params });
+  return res.data as { data: ActiveUser[]; pagination: any };
+};
+
+// Add participant to lottery
+export const addParticipantToLottery = async (
+  lotteryId: string | number,
+  userId: number
+) => {
+  const res = await apiClient.post(
+    `/admin/lottery/${lotteryId}/add-participant`,
+    { userId }
+  );
+  return res.data as {
+    success: boolean;
+    message: string;
+    insertedRecordId: number;
+  };
 };
 
 // Transform lottery data for admin table
 // Helper function to determine user role based on user_type_id
 const getUserRole = (userTypeId?: number) => {
   switch (userTypeId) {
-    case 1: return 'admin'
-    case 3: return 'serverOwner'
-    case 4: return 'streamer'
-    default: return 'user'
+    case 1:
+      return "admin";
+    case 3:
+      return "serverOwner";
+    case 4:
+      return "streamer";
+    default:
+      return "user";
   }
-}
+};
 
 export const transformLotteryData = (item: Lottery) => ({
   id: item.lottery_id,
@@ -152,8 +236,13 @@ export const transformLotteryData = (item: Lottery) => ({
   description: item.description,
   createdBy: {
     id: item.creator_user_id,
-    username: `${item.creator_first_name || ''} ${item.creator_last_name || ''}`.trim() || item.creator_email || `User ${item.creator_user_id}`,
-    role: getUserRole(item.creator_user_type_id)
+    username:
+      `${item.creator_first_name || ""} ${
+        item.creator_last_name || ""
+      }`.trim() ||
+      item.creator_email ||
+      `User ${item.creator_user_id}`,
+    role: getUserRole(item.creator_user_type_id),
   },
   createdAt: item.created_at,
   endDate: item.end_date,
@@ -161,23 +250,28 @@ export const transformLotteryData = (item: Lottery) => ({
   participantCount: parseInt(item.participant_count.toString()) || 0,
   maxParticipants: item.max_participants,
   winnerCount: item.winner_count,
-  hasWinners: parseInt(item.winner_selected_count.toString()) > 0
+  hasWinners: parseInt(item.winner_selected_count.toString()) > 0,
 });
 
 // Calculate statistics from lottery data
 export const calculateLotteryStats = (data: {
-  data: Lottery[]
-  pagination: { total_count: number }
+  data: Lottery[];
+  pagination: { total_count: number };
 }): LotteryStats => {
-  const lotteries = data.data
-  const activeLotteries = lotteries.filter(l => l.status === 'active').length
-  const completedLotteries = lotteries.filter(l => l.status === 'completed' || l.status === 'ended').length
-  const totalParticipants = lotteries.reduce((sum, lottery) => sum + parseInt(lottery.participant_count.toString()), 0)
-  
+  const lotteries = data.data;
+  const activeLotteries = lotteries.filter((l) => l.status === "active").length;
+  const completedLotteries = lotteries.filter(
+    (l) => l.status === "completed" || l.status === "ended"
+  ).length;
+  const totalParticipants = lotteries.reduce(
+    (sum, lottery) => sum + parseInt(lottery.participant_count.toString()),
+    0
+  );
+
   return {
     totalLotteries: data.pagination.total_count,
     activeLotteries,
     completedLotteries,
     totalParticipants,
-  }
-}
+  };
+};
