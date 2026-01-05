@@ -1,11 +1,18 @@
-"use client"
-import { useRouter } from "next/navigation"
-import { useEffect, useState, useCallback } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import moment from "moment"
-import "moment/locale/tr"
+"use client";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import moment from "moment";
+import "moment/locale/tr";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,96 +20,105 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { MoreHorizontal, Eye, CheckCircle, XCircle, Trash2, Clock } from "lucide-react"
-import { 
-  fetchStreamerPostReports, 
-  updateStreamerPostReportStatus, 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  MoreHorizontal,
+  Eye,
+  CheckCircle,
+  XCircle,
+  Trash2,
+  Clock,
+} from "lucide-react";
+import {
+  fetchStreamerPostReports,
+  updateStreamerPostReportStatus,
   deleteStreamerPost,
-  type StreamerPostReport 
-} from "@/services/streamers"
+  type StreamerPostReport,
+} from "@/services/streamers";
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800",
-  reviewed: "bg-green-100 text-green-800", 
-  dismissed: "bg-gray-100 text-gray-800"
-}
+  reviewed: "bg-green-100 text-green-800",
+  dismissed: "bg-gray-100 text-gray-800",
+};
 
 const statusLabels = {
   pending: "Bekliyor",
   reviewed: "İncelendi",
-  dismissed: "Reddedildi"
-}
+  dismissed: "Reddedildi",
+};
 
 export function ReportedPostsTable() {
-  const router = useRouter()
-  const [rows, setRows] = useState<StreamerPostReport[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
+  const [rows, setRows] = useState<StreamerPostReport[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
-      setLoading(true)
-      setError(null)
-      const res = await fetchStreamerPostReports({ 
-        // page: 1, // Removed to fix "page parameter should be first or last or empty" error
-        // @ts-ignore - API expects snake_case
-        page_size: 50, 
-        // sort_by: 'created_at', // Changed to snake_case to be safe, though usage in index.ts takes params as is
-        // sortOrder: 'DESC' // Backend uses sort_by=-column for desc
-        sort_by: '-streamer_post_reports.created_at' // Matches backend default but explicit
-      })
-      setRows(res.data || [])
+      setLoading(true);
+      setError(null);
+      const res = await fetchStreamerPostReports({
+        pageSize: 50,
+        sortBy: "streamer_post_reports.created_at",
+        sortOrder: "DESC",
+      });
+      setRows(res.data || []);
     } catch (e: any) {
-      setError(e?.message || "Raporlar yüklenemedi")
+      setError(e?.message || "Raporlar yüklenemedi");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    load()
-  }, [load])
+    load();
+  }, [load]);
 
   const handleViewDetails = (report: StreamerPostReport) => {
-    router.push(`/admin/reported-posts/${report.id}`)
-  }
+    router.push(`/admin/reported-posts/${report.id}`);
+  };
 
-  const handleStatusUpdate = async (reportId: number, status: 'pending' | 'reviewed' | 'dismissed') => {
+  const handleStatusUpdate = async (
+    reportId: number,
+    status: "pending" | "reviewed" | "dismissed"
+  ) => {
     try {
-      await updateStreamerPostReportStatus(reportId, status)
-      await load() // Refresh the table
+      await updateStreamerPostReportStatus(reportId, status);
+      await load(); // Refresh the table
     } catch (e: any) {
-      console.error("Status update failed:", e)
-      setError(e?.message || "Durum güncellenemedi")
+      console.error("Status update failed:", e);
+      setError(e?.message || "Durum güncellenemedi");
     }
-  }
+  };
 
   const handleDeletePost = async (postId: number) => {
-    if (!confirm("Bu postu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.")) {
-      return
+    if (
+      !confirm(
+        "Bu postu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+      )
+    ) {
+      return;
     }
-    
+
     try {
-      await deleteStreamerPost(postId)
-      await load() // Refresh the table
+      await deleteStreamerPost(postId);
+      await load(); // Refresh the table
     } catch (e: any) {
-      console.error("Post deletion failed:", e)
-      setError(e?.message || "Post silinemedi")
+      console.error("Post deletion failed:", e);
+      setError(e?.message || "Post silinemedi");
     }
-  }
+  };
 
   const truncateText = (text: string, maxLength: number = 100) => {
-    if (text.length <= maxLength) return text
-    return text.substring(0, maxLength) + "..."
-  }
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
 
   return (
     <div className="rounded-md border">
-      {error && (
-        <div className="p-4 text-sm text-red-600">{error}</div>
-      )}
+      {error && <div className="p-4 text-sm text-red-600">{error}</div>}
       <Table>
         <TableHeader>
           <TableRow>
@@ -125,7 +141,10 @@ export function ReportedPostsTable() {
             </TableRow>
           ) : rows.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+              <TableCell
+                colSpan={8}
+                className="text-center py-8 text-muted-foreground"
+              >
                 Henüz rapor bulunmuyor
               </TableCell>
             </TableRow>
@@ -151,26 +170,41 @@ export function ReportedPostsTable() {
                       {truncateText(report.post_content, 30)}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      {moment(report.post_published_at).locale('tr').format("lll")}
+                      {moment(report.post_published_at)
+                        .locale("tr")
+                        .format("lll")}
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={report.streamer_avatar_url || "/placeholder.svg"} alt={report.streamer_display_name} />
-                      <AvatarFallback>{report.streamer_display_name.charAt(0)}</AvatarFallback>
+                      <AvatarImage
+                        src={report.streamer_avatar_url || "/placeholder.svg"}
+                        alt={report.streamer_display_name}
+                      />
+                      <AvatarFallback>
+                        {report.streamer_display_name.charAt(0)}
+                      </AvatarFallback>
                     </Avatar>
                     <div>
-                      <div className="font-medium text-sm">{report.streamer_display_name}</div>
-                      <div className="text-xs text-muted-foreground">@{report.streamer_handle}</div>
+                      <div className="font-medium text-sm">
+                        {report.streamer_display_name}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        @{report.streamer_handle}
+                      </div>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="text-sm">
-                    <div className="font-medium">{report.reporter_username}</div>
-                    <div className="text-xs text-muted-foreground">{report.reporter_email}</div>
+                    <div className="font-medium">
+                      {report.reporter_username}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {report.reporter_email}
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -180,7 +214,7 @@ export function ReportedPostsTable() {
                 </TableCell>
                 <TableCell>
                   <div className="text-sm">
-                    {moment(report.created_at).locale('tr').format("lll")}
+                    {moment(report.created_at).locale("tr").format("lll")}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -199,24 +233,30 @@ export function ReportedPostsTable() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>İşlemler</DropdownMenuLabel>
-                      <DropdownMenuItem onClick={() => handleViewDetails(report)}>
+                      <DropdownMenuItem
+                        onClick={() => handleViewDetails(report)}
+                      >
                         <Eye className="mr-2 h-4 w-4" />
                         Detayları Görüntüle
                       </DropdownMenuItem>
-                      
+
                       <DropdownMenuSeparator />
-                      
-                      {report.status === 'pending' && (
+
+                      {report.status === "pending" && (
                         <>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(report.id, 'reviewed')}
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleStatusUpdate(report.id, "reviewed")
+                            }
                             className="text-green-600"
                           >
                             <CheckCircle className="mr-2 h-4 w-4" />
                             İncelendi Olarak İşaretle
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(report.id, 'dismissed')}
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleStatusUpdate(report.id, "dismissed")
+                            }
                             className="text-gray-600"
                           >
                             <XCircle className="mr-2 h-4 w-4" />
@@ -224,18 +264,22 @@ export function ReportedPostsTable() {
                           </DropdownMenuItem>
                         </>
                       )}
-                      
-                      {report.status === 'reviewed' && (
+
+                      {report.status === "reviewed" && (
                         <>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(report.id, 'pending')}
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleStatusUpdate(report.id, "pending")
+                            }
                             className="text-yellow-600"
                           >
                             <Clock className="mr-2 h-4 w-4" />
                             Bekliyor Olarak İşaretle
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(report.id, 'dismissed')}
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleStatusUpdate(report.id, "dismissed")
+                            }
                             className="text-gray-600"
                           >
                             <XCircle className="mr-2 h-4 w-4" />
@@ -243,18 +287,22 @@ export function ReportedPostsTable() {
                           </DropdownMenuItem>
                         </>
                       )}
-                      
-                      {report.status === 'dismissed' && (
+
+                      {report.status === "dismissed" && (
                         <>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(report.id, 'pending')}
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleStatusUpdate(report.id, "pending")
+                            }
                             className="text-yellow-600"
                           >
                             <Clock className="mr-2 h-4 w-4" />
                             Bekliyor Olarak İşaretle
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusUpdate(report.id, 'reviewed')}
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleStatusUpdate(report.id, "reviewed")
+                            }
                             className="text-green-600"
                           >
                             <CheckCircle className="mr-2 h-4 w-4" />
@@ -262,9 +310,9 @@ export function ReportedPostsTable() {
                           </DropdownMenuItem>
                         </>
                       )}
-                      
+
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => handleDeletePost(report.post_id)}
                         className="text-red-600"
                       >
@@ -280,5 +328,5 @@ export function ReportedPostsTable() {
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }
