@@ -29,6 +29,7 @@ import {
   Video,
   Flag,
   Trophy,
+  Bell,
 } from "lucide-react";
 
 const navigation = [
@@ -46,6 +47,11 @@ const navigation = [
     name: "Servers",
     href: "/admin/servers",
     icon: Server,
+  },
+  {
+    name: "Bildirimler",
+    href: "/admin/push-notifications",
+    icon: Bell,
   },
   {
     name: "Yayıncılar",

@@ -41,6 +41,7 @@ import {
 } from "@/services/lottery";
 import { fetchStreamers, Streamer } from "@/services/streamers";
 import { uploadAsset } from "@/services/uploads";
+import { apiClient } from "@/lib/apiClient";
 
 export default function CreateLotteryPage() {
   const router = useRouter();
@@ -63,6 +64,9 @@ export default function CreateLotteryPage() {
   const [winnerCount, setWinnerCount] = useState("1");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [prizeType, setPrizeType] = useState<"coupon_code" | "username">("username");
+  const [couponCodes, setCouponCodes] = useState<string[]>([]);
+  const [newCouponCode, setNewCouponCode] = useState("");
 
   // Fetch streamers on mount
   useEffect(() => {
@@ -97,14 +101,21 @@ export default function CreateLotteryPage() {
   }, []);
 
   const isFormValid = () => {
-    return (
+    const basicValid =
       title.trim() &&
       prizeDescription.trim() &&
       selectedStreamerId &&
       startDate &&
       endDate &&
-      new Date(startDate) < new Date(endDate)
-    );
+      new Date(startDate) < new Date(endDate);
+
+    // If coupon_code type, check if we have enough codes
+    if (prizeType === "coupon_code") {
+      const winnerCountNum = parseInt(winnerCount) || 1;
+      return basicValid && couponCodes.length >= winnerCountNum;
+    }
+
+    return basicValid;
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -186,6 +197,7 @@ export default function CreateLotteryPage() {
         description: description || undefined,
         prizeDescription,
         prizeImageUrl: prizeImageUrl || undefined,
+        prizeType,
         participationRules: {
           streamer_id: parseInt(selectedStreamerId),
           follow_required: requireFollow,
@@ -202,6 +214,25 @@ export default function CreateLotteryPage() {
       };
 
       const result = await adminCreateLottery(payload);
+
+      // If coupon_code type and codes provided, add them
+      if (prizeType === "coupon_code" && couponCodes.length > 0) {
+        try {
+          await apiClient.post(
+            `/admin/lottery/${result.insertedGeneralLotteryId}/add-coupon-codes`,
+            { couponCodes }
+          );
+        } catch (couponError: any) {
+          console.error("Coupon codes error:", couponError);
+          toast({
+            title: "Uyarı",
+            description:
+              "Çekiliş oluşturuldu ancak kupon kodları eklenirken hata oluştu: " +
+              (couponError?.response?.data?.message || "Bilinmeyen hata"),
+            variant: "destructive",
+          });
+        }
+      }
 
       toast({
         title: "Başarılı",
@@ -295,6 +326,109 @@ export default function CreateLotteryPage() {
                   required
                 />
               </div>
+
+              {/* Prize Type Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="prizeType">Ödül Tipi *</Label>
+                <Select
+                  value={prizeType}
+                  onValueChange={(value: "coupon_code" | "username") =>
+                    setPrizeType(value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Ödül tipi seçin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="username">Kullanıcı Adı</SelectItem>
+                    <SelectItem value="coupon_code">Kupon Kodu</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {prizeType === "username"
+                    ? "Kazananlar çekiliş sonlandıktan sonra oyun kullanıcı adlarını girecekler"
+                    : "Kazananlara otomatik olarak kupon kodları gönderilecek"}
+                </p>
+              </div>
+
+              {/* Coupon Codes Section */}
+              {prizeType === "coupon_code" && (
+                <div className="space-y-2 border rounded-lg p-4">
+                  <Label>Kupon Kodları</Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Kazanan sayısı kadar kupon kodu eklemelisiniz
+                  </p>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Kupon kodu girin"
+                      value={newCouponCode}
+                      onChange={(e) => setNewCouponCode(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          if (
+                            newCouponCode.trim() &&
+                            !couponCodes.includes(newCouponCode.trim())
+                          ) {
+                            setCouponCodes([
+                              ...couponCodes,
+                              newCouponCode.trim(),
+                            ]);
+                            setNewCouponCode("");
+                          }
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        if (
+                          newCouponCode.trim() &&
+                          !couponCodes.includes(newCouponCode.trim())
+                        ) {
+                          setCouponCodes([
+                            ...couponCodes,
+                            newCouponCode.trim(),
+                          ]);
+                          setNewCouponCode("");
+                        }
+                      }}
+                    >
+                      Ekle
+                    </Button>
+                  </div>
+                  {couponCodes.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      <p className="text-xs font-medium">
+                        Eklenen Kodlar ({couponCodes.length}):
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {couponCodes.map((code, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-sm"
+                          >
+                            <span>{code}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-4 w-4"
+                              onClick={() => {
+                                setCouponCodes(
+                                  couponCodes.filter((_, i) => i !== index)
+                                );
+                              }}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Image Upload Section */}
               <div className="space-y-2">

@@ -496,7 +496,7 @@ export default function LotteryDetailPage() {
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-72 p-0" align="start">
-                            <div className="bg-gradient-to-r from-primary/10 to-purple-500/10 p-4 rounded-t-lg border-b">
+                            <div className="bg-linear-to-r from-primary/10 to-purple-500/10 p-4 rounded-t-lg border-b">
                               <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
                                   <User className="h-6 w-6 text-primary" />

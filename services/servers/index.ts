@@ -191,7 +191,7 @@ export const deleteServerFeedback = async (
 
 export const fetchActiveServers = async (params: ServersListParams = {}) => {
   const { page, pageSize, sortBy, direction, filters, cursor } = params;
-  const res = await apiClient.get(serverEndpoints.getAll, {
+  const res = await apiClient.get(frontendServerEndpoints.getActiveServers, {
     params: {
       page,
       page_size: pageSize,
@@ -201,7 +201,6 @@ export const fetchActiveServers = async (params: ServersListParams = {}) => {
       cursor,
     },
   });
-  console.log("fetchActiveServers", JSON.stringify(res.data.data, null, 2));
   return res.data;
 };
 
