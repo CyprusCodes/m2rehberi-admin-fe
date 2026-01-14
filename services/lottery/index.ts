@@ -17,6 +17,7 @@ export interface Lottery {
   description: string;
   prize_description: string;
   prize_image_url?: string;
+  prize_type?: "coupon_code" | "username";
   participation_rules: any;
   max_participants?: number;
   start_date: string;
@@ -124,6 +125,7 @@ export interface AdminCreateLotteryPayload {
   description?: string;
   prizeDescription: string;
   prizeImageUrl?: string;
+  prizeType?: "coupon_code" | "username";
   participationRules: {
     streamer_id?: number;
     follow_required?: boolean;

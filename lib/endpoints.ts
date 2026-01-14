@@ -251,3 +251,12 @@ export const streamerPostReportEndpoints = {
   updateStatus: (id: string | number) => `${API_BASE_URL}/admin/streamer-post-reports/${id}/status`,
   deletePost: (id: string | number) => `${API_BASE_URL}/admin/streamer-post-reports/${id}/post`,
 };
+
+// Push Notifications endpoints
+export const pushNotificationEndpoints = {
+  getAll: `${API_BASE_URL}/admin/push-notifications/notifications`,
+  getById: (id: string | number) => `${API_BASE_URL}/admin/push-notifications/${id}`,
+  create: `${API_BASE_URL}/admin/push-notifications/notification`,
+  update: (id: string | number) => `${API_BASE_URL}/admin/push-notifications/notification/${id}`,
+  delete: (id: string | number) => `${API_BASE_URL}/admin/push-notifications/notification/${id}`,
+};
