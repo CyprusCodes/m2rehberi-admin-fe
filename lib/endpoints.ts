@@ -67,7 +67,8 @@ export const adminUserEndpoints = {
   unban: (id: string) => `${API_BASE_URL}/admin/users/${id}/unban`,
   verifyEmail: (id: string) => `${API_BASE_URL}/admin/users/${id}/verify-email`,
   sendPasswordReset: `${API_BASE_URL}/admin/recovery-request`,
-  changePassword: (id: string | number) => `${API_BASE_URL}/admin/users/${id}/change-password`,
+  changePassword: (id: string | number) =>
+    `${API_BASE_URL}/admin/users/${id}/change-password`,
 };
 
 // Servers endpoints
@@ -238,25 +239,47 @@ export const streamerEndpoints = {
   create: `${API_BASE_URL}/admin/streamers`,
   update: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}`,
   delete: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}`,
-  approve: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}/approve`,
-  reject: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}/reject`,
-  toggleStatus: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}/status`,
-  toggleVerification: (id: string | number) => `${API_BASE_URL}/admin/streamers/${id}/verification`,
+  approve: (id: string | number) =>
+    `${API_BASE_URL}/admin/streamers/${id}/approve`,
+  reject: (id: string | number) =>
+    `${API_BASE_URL}/admin/streamers/${id}/reject`,
+  toggleStatus: (id: string | number) =>
+    `${API_BASE_URL}/admin/streamers/${id}/status`,
+  toggleVerification: (id: string | number) =>
+    `${API_BASE_URL}/admin/streamers/${id}/verification`,
+  getNotificationCredits: (id: string | number) =>
+    `${API_BASE_URL}/admin/streamers/${id}/notification-credits`,
+  assignNotificationCredits: (id: string | number) =>
+    `${API_BASE_URL}/admin/streamers/${id}/notification-credits`,
+  getStreamHistory: (id: string | number) =>
+    `${API_BASE_URL}/admin/streamers/${id}/stream-history`,
 };
 
 export const streamerPostReportEndpoints = {
   list: `${API_BASE_URL}/admin/streamer-post-reports`,
   stats: `${API_BASE_URL}/admin/streamer-post-reports/stats`,
-  getById: (id: string | number) => `${API_BASE_URL}/admin/streamer-post-reports/${id}`,
-  updateStatus: (id: string | number) => `${API_BASE_URL}/admin/streamer-post-reports/${id}/status`,
-  deletePost: (id: string | number) => `${API_BASE_URL}/admin/streamer-post-reports/${id}/post`,
+  getById: (id: string | number) =>
+    `${API_BASE_URL}/admin/streamer-post-reports/${id}`,
+  updateStatus: (id: string | number) =>
+    `${API_BASE_URL}/admin/streamer-post-reports/${id}/status`,
+  deletePost: (id: string | number) =>
+    `${API_BASE_URL}/admin/streamer-post-reports/${id}/post`,
+};
+
+export const adminPendingNotificationEndpoints = {
+  getAll: `${API_BASE_URL}/admin/pending-notifications`,
+  approve: (id: string | number) => `${API_BASE_URL}/admin/pending-notifications/${id}/approve`,
+  reject: (id: string | number) => `${API_BASE_URL}/admin/pending-notifications/${id}/reject`,
 };
 
 // Push Notifications endpoints
 export const pushNotificationEndpoints = {
   getAll: `${API_BASE_URL}/admin/push-notifications/notifications`,
-  getById: (id: string | number) => `${API_BASE_URL}/admin/push-notifications/${id}`,
+  getById: (id: string | number) =>
+    `${API_BASE_URL}/admin/push-notifications/${id}`,
   create: `${API_BASE_URL}/admin/push-notifications/notification`,
-  update: (id: string | number) => `${API_BASE_URL}/admin/push-notifications/notification/${id}`,
-  delete: (id: string | number) => `${API_BASE_URL}/admin/push-notifications/notification/${id}`,
+  update: (id: string | number) =>
+    `${API_BASE_URL}/admin/push-notifications/notification/${id}`,
+  delete: (id: string | number) =>
+    `${API_BASE_URL}/admin/push-notifications/notification/${id}`,
 };

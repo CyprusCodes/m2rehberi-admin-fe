@@ -33,6 +33,9 @@ import {
   Upload,
   X,
   ImageIcon,
+  Dices,
+  Hand,
+  Info,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -64,9 +67,15 @@ export default function CreateLotteryPage() {
   const [winnerCount, setWinnerCount] = useState("1");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [prizeType, setPrizeType] = useState<"coupon_code" | "username">("username");
+  const [prizeType, setPrizeType] = useState<"coupon_code" | "username">(
+    "username",
+  );
+  const [selectionMethod, setSelectionMethod] = useState<"random" | "manual">(
+    "random",
+  );
   const [couponCodes, setCouponCodes] = useState<string[]>([]);
   const [newCouponCode, setNewCouponCode] = useState("");
+  const [bulkCouponCodes, setBulkCouponCodes] = useState("");
 
   // Fetch streamers on mount
   useEffect(() => {
@@ -189,7 +198,7 @@ export default function CreateLotteryPage() {
       };
 
       const selectedStreamer = streamers.find(
-        (s) => s.id.toString() === selectedStreamerId
+        (s) => s.id.toString() === selectedStreamerId,
       );
 
       const payload: AdminCreateLotteryPayload = {
@@ -208,7 +217,7 @@ export default function CreateLotteryPage() {
         startDate: formatDateForMySQL(startDate),
         endDate: formatDateForMySQL(endDate),
         winnerCount: parseInt(winnerCount) || 1,
-        selectionMethod: "random",
+        selectionMethod,
         status: "active",
         creatorUserId: selectedStreamer?.user_id || undefined,
       };
@@ -220,7 +229,7 @@ export default function CreateLotteryPage() {
         try {
           await apiClient.post(
             `/admin/lottery/${result.insertedGeneralLotteryId}/add-coupon-codes`,
-            { couponCodes }
+            { couponCodes },
           );
         } catch (couponError: any) {
           console.error("Coupon codes error:", couponError);
@@ -356,11 +365,81 @@ export default function CreateLotteryPage() {
                 <div className="space-y-2 border rounded-lg p-4">
                   <Label>Kupon Kodları</Label>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Kazanan sayısı kadar kupon kodu eklemelisiniz
+                    Kazanan sayısı kadar kupon kodu eklemelisiniz. Kodları her
+                    satıra bir kod gelecek şekilde yapıştırabilirsiniz.
                   </p>
+
+                  {/* Bulk Entry - Textarea */}
+                  <div className="space-y-2">
+                    <Label htmlFor="bulkCouponCodes" className="text-sm">
+                      Çoklu Kupon Kodu Ekle (Her satıra bir kod)
+                    </Label>
+                    <Textarea
+                      id="bulkCouponCodes"
+                      placeholder={`SDK-SDLDFMG-DLFGMD\nEPIC-2353-3522-3252\nSTEAM-DFKGD-DSEE-UOGL`}
+                      value={bulkCouponCodes}
+                      onChange={(e) => setBulkCouponCodes(e.target.value)}
+                      rows={6}
+                      className="font-mono text-sm"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        const lines = bulkCouponCodes
+                          .split("\n")
+                          .map((line) => line.trim())
+                          .filter((line) => line.length > 0);
+
+                        const newCodes: string[] = [];
+                        const duplicateCodes: string[] = [];
+
+                        lines.forEach((code) => {
+                          if (
+                            !couponCodes.includes(code) &&
+                            !newCodes.includes(code)
+                          ) {
+                            newCodes.push(code);
+                          } else if (
+                            couponCodes.includes(code) ||
+                            newCodes.includes(code)
+                          ) {
+                            duplicateCodes.push(code);
+                          }
+                        });
+
+                        if (newCodes.length > 0) {
+                          setCouponCodes([...couponCodes, ...newCodes]);
+                          setBulkCouponCodes("");
+                          toast({
+                            title: "Başarılı",
+                            description: `${newCodes.length} kod eklendi${duplicateCodes.length > 0 ? `, ${duplicateCodes.length} kod zaten mevcut` : ""}`,
+                          });
+                        } else if (duplicateCodes.length > 0) {
+                          toast({
+                            title: "Uyarı",
+                            description: "Tüm kodlar zaten eklenmiş",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      className="w-full"
+                    >
+                      Kodları Ekle
+                    </Button>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="flex items-center gap-2 my-4">
+                    <div className="flex-1 h-px bg-border"></div>
+                    <span className="text-xs text-muted-foreground">veya</span>
+                    <div className="flex-1 h-px bg-border"></div>
+                  </div>
+
+                  {/* Single Entry */}
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Kupon kodu girin"
+                      placeholder="Tek kod ekle"
                       value={newCouponCode}
                       onChange={(e) => setNewCouponCode(e.target.value)}
                       onKeyPress={(e) => {
@@ -375,6 +454,14 @@ export default function CreateLotteryPage() {
                               newCouponCode.trim(),
                             ]);
                             setNewCouponCode("");
+                          } else if (
+                            couponCodes.includes(newCouponCode.trim())
+                          ) {
+                            toast({
+                              title: "Uyarı",
+                              description: "Bu kod zaten eklenmiş",
+                              variant: "destructive",
+                            });
                           }
                         }
                       }}
@@ -391,32 +478,57 @@ export default function CreateLotteryPage() {
                             newCouponCode.trim(),
                           ]);
                           setNewCouponCode("");
+                        } else if (couponCodes.includes(newCouponCode.trim())) {
+                          toast({
+                            title: "Uyarı",
+                            description: "Bu kod zaten eklenmiş",
+                            variant: "destructive",
+                          });
                         }
                       }}
                     >
                       Ekle
                     </Button>
                   </div>
+
+                  {/* Display Added Codes */}
                   {couponCodes.length > 0 && (
-                    <div className="mt-2 space-y-1">
-                      <p className="text-xs font-medium">
-                        Eklenen Kodlar ({couponCodes.length}):
-                      </p>
-                      <div className="flex flex-wrap gap-2">
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-medium">
+                          Eklenen Kodlar ({couponCodes.length}):
+                        </p>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setCouponCodes([]);
+                            toast({
+                              title: "Temizlendi",
+                              description: "Tüm kodlar kaldırıldı",
+                            });
+                          }}
+                          className="h-6 text-xs"
+                        >
+                          Tümünü Temizle
+                        </Button>
+                      </div>
+                      <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border rounded-md bg-muted/30">
                         {couponCodes.map((code, index) => (
                           <div
                             key={index}
-                            className="flex items-center gap-1 bg-muted px-2 py-1 rounded text-sm"
+                            className="flex items-center gap-1 bg-background border px-2 py-1 rounded text-sm font-mono"
                           >
                             <span>{code}</span>
                             <Button
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="h-4 w-4"
+                              className="h-4 w-4 hover:bg-destructive hover:text-destructive-foreground"
                               onClick={() => {
                                 setCouponCodes(
-                                  couponCodes.filter((_, i) => i !== index)
+                                  couponCodes.filter((_, i) => i !== index),
                                 );
                               }}
                             >
@@ -609,6 +721,144 @@ export default function CreateLotteryPage() {
                     value={maxParticipants}
                     onChange={(e) => setMaxParticipants(e.target.value)}
                   />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Kazanan Seçim Yöntemi */}
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Dices className="h-5 w-5" />
+                Kazanan Seçim Yöntemi
+              </CardTitle>
+              <CardDescription>
+                Çekiliş bittiğinde kazananlar nasıl belirlensin?
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Random Option */}
+                <div
+                  onClick={() => setSelectionMethod("random")}
+                  className={`relative cursor-pointer rounded-lg border-2 p-4 transition-all hover:border-primary/50 ${
+                    selectionMethod === "random"
+                      ? "border-primary bg-primary/5"
+                      : "border-border"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`rounded-full p-2 ${
+                        selectionMethod === "random"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      <Dices className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold">Otomatik (Random)</h4>
+                        {selectionMethod === "random" && (
+                          <div className="h-4 w-4 rounded-full bg-primary flex items-center justify-center">
+                            <div className="h-2 w-2 rounded-full bg-white" />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Sistem otomatik olarak kazananları seçer
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Info Box for Random */}
+                  {selectionMethod === "random" && (
+                    <div className="mt-4 rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
+                      <div className="flex gap-2">
+                        <Info className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                        <div className="text-sm text-blue-700 dark:text-blue-300">
+                          <p className="font-medium mb-1">Nasıl Çalışır?</p>
+                          <ul className="list-disc list-inside space-y-1 text-xs">
+                            <li>
+                              Çekiliş bitiş tarihi geldiğinde sistem otomatik
+                              çalışır
+                            </li>
+                            <li>Kazananlar rastgele seçilir</li>
+                            <li>
+                              Kazananlara otomatik push bildirim gönderilir
+                            </li>
+                            <li>Herhangi bir manuel işlem gerektirmez</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Manual Option */}
+                <div
+                  onClick={() => setSelectionMethod("manual")}
+                  className={`relative cursor-pointer rounded-lg border-2 p-4 transition-all hover:border-primary/50 ${
+                    selectionMethod === "manual"
+                      ? "border-primary bg-primary/5"
+                      : "border-border"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`rounded-full p-2 ${
+                        selectionMethod === "manual"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      <Hand className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold">Manuel</h4>
+                        {selectionMethod === "manual" && (
+                          <div className="h-4 w-4 rounded-full bg-primary flex items-center justify-center">
+                            <div className="h-2 w-2 rounded-full bg-white" />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Kazananları kendiniz seçersiniz
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Info Box for Manual */}
+                  {selectionMethod === "manual" && (
+                    <div className="mt-4 rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
+                      <div className="flex gap-2">
+                        <Info className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                        <div className="text-sm text-amber-700 dark:text-amber-300">
+                          <p className="font-medium mb-1">Nasıl Çalışır?</p>
+                          <ul className="list-disc list-inside space-y-1 text-xs">
+                            <li>
+                              Bitiş tarihine 5 dk kala email hatırlatması
+                              alırsınız
+                            </li>
+                            <li>
+                              Çekiliş bittiğinde kazananları kendiniz seçersiniz
+                            </li>
+                            <li>
+                              5 dk içinde seçim yapılmazsa uyarı emaili
+                              gönderilir
+                            </li>
+                            <li>
+                              Canlı yayında çekiliş yapmak isteyenler için
+                              idealdir
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>

@@ -2,6 +2,7 @@ import { apiClient } from "@/lib/apiClient";
 import {
   streamerEndpoints,
   streamerPostReportEndpoints,
+  adminPendingNotificationEndpoints,
 } from "@/lib/endpoints";
 
 export interface Streamer {
@@ -123,6 +124,7 @@ export interface CreateStreamerPayload {
   bio?: string;
   avatar_url?: string;
   banner_url?: string;
+  badge_url?: string;
   main_link_url?: string;
   kick_url?: string;
   youtube_url?: string;
@@ -143,14 +145,14 @@ export const fetchStreamers = async (): Promise<Streamer[]> => {
 };
 
 export const fetchStreamerById = async (
-  id: string | number
+  id: string | number,
 ): Promise<{ data: Streamer }> => {
   const res = await apiClient.get(streamerEndpoints.getById(id));
   return res.data;
 };
 
 export const createStreamer = async (
-  payload: CreateStreamerPayload
+  payload: CreateStreamerPayload,
 ): Promise<{ data: Streamer; message: string }> => {
   const res = await apiClient.post(streamerEndpoints.create, payload);
   return res.data;
@@ -158,14 +160,14 @@ export const createStreamer = async (
 
 export const updateStreamer = async (
   id: string | number,
-  payload: UpdateStreamerPayload
+  payload: UpdateStreamerPayload,
 ): Promise<{ data: Streamer; message: string }> => {
   const res = await apiClient.put(streamerEndpoints.update(id), payload);
   return res.data;
 };
 
 export const deleteStreamer = async (
-  id: string | number
+  id: string | number,
 ): Promise<{ message: string }> => {
   const res = await apiClient.delete(streamerEndpoints.delete(id));
   return res.data;
@@ -173,7 +175,7 @@ export const deleteStreamer = async (
 
 export const approveStreamer = async (
   id: string | number,
-  approvalNote?: string
+  approvalNote?: string,
 ): Promise<{ data: Streamer; message: string }> => {
   const res = await apiClient.patch(streamerEndpoints.approve(id), {
     approval_note: approvalNote,
@@ -183,7 +185,7 @@ export const approveStreamer = async (
 
 export const rejectStreamer = async (
   id: string | number,
-  rejectedNote: string
+  rejectedNote: string,
 ): Promise<{ data: Streamer; message: string }> => {
   const res = await apiClient.patch(streamerEndpoints.reject(id), {
     rejected_note: rejectedNote,
@@ -193,7 +195,7 @@ export const rejectStreamer = async (
 
 export const toggleStreamerStatus = async (
   id: string | number,
-  status: "active" | "inactive"
+  status: "active" | "inactive",
 ): Promise<{ data: Streamer; message: string }> => {
   const res = await apiClient.patch(streamerEndpoints.toggleStatus(id), {
     status,
@@ -203,7 +205,7 @@ export const toggleStreamerStatus = async (
 
 export const toggleStreamerVerification = async (
   id: string | number,
-  isVerified: boolean
+  isVerified: boolean,
 ): Promise<{ data: Streamer; message: string }> => {
   const res = await apiClient.patch(streamerEndpoints.toggleVerification(id), {
     is_verified: isVerified,
@@ -281,7 +283,7 @@ export const fetchStreamerPostReports = async (params?: {
 };
 
 export const fetchStreamerPostReportById = async (
-  id: string | number
+  id: string | number,
 ): Promise<{ data: StreamerPostReportDetail }> => {
   const res = await apiClient.get(streamerPostReportEndpoints.getById(id));
   return res.data;
@@ -289,20 +291,20 @@ export const fetchStreamerPostReportById = async (
 
 export const updateStreamerPostReportStatus = async (
   id: string | number,
-  status: "pending" | "reviewed" | "dismissed"
+  status: "pending" | "reviewed" | "dismissed",
 ): Promise<{ reportId: number; status: string }> => {
   const res = await apiClient.patch(
     streamerPostReportEndpoints.updateStatus(id),
-    { status }
+    { status },
   );
   return res.data;
 };
 
 export const deleteStreamerPost = async (
-  id: string | number
+  id: string | number,
 ): Promise<{ postId: number; deleted: boolean }> => {
   const res = await apiClient.delete(
-    streamerPostReportEndpoints.deletePost(id)
+    streamerPostReportEndpoints.deletePost(id),
   );
   return res.data;
 };
@@ -323,16 +325,18 @@ export const fetchAllStreamerPosts = async (params?: {
   filters?: any;
   direction?: string;
   cursor?: string;
-}): Promise<StreamerPostsResponse & { nextCursor?: string; prevCursor?: string }> => {
+}): Promise<
+  StreamerPostsResponse & { nextCursor?: string; prevCursor?: string }
+> => {
   const res = await apiClient.get("/admin/streamers/posts", { params });
-  
+
   // Debug için response'u logla
   console.log("API Response:", res.data);
-  
+
   const metadata = res.data.metadata || {};
   const pageSize = metadata.pageSize || 20;
   const total = metadata.total || 0;
-  
+
   return {
     data: res.data.data || [],
     pagination: {
@@ -349,8 +353,177 @@ export const fetchAllStreamerPosts = async (params?: {
 };
 
 export const fetchStreamerPostById = async (
-  id: string | number
+  id: string | number,
 ): Promise<{ data: StreamerPost }> => {
   const res = await apiClient.get(`/admin/streamers/posts/${id}`);
   return res.data;
+};
+
+// Notification Credits interfaces and functions
+export interface NotificationCreditAssignment {
+  id: number;
+  streamer_id: number;
+  assigned_by_admin_id: number;
+  push_count: number;
+  is_payment_received: boolean;
+  payment_note?: string | null;
+  created_at: string;
+  admin_first_name?: string;
+  admin_last_name?: string;
+}
+
+export interface StreamerNotificationLog {
+  id: number;
+  streamer_id: number;
+  headline: string;
+  message: string;
+  audience: "followers" | "everyone";
+  recipients_count: number;
+  sent_at: string;
+  created_at: string;
+}
+
+export interface StreamerNotificationCreditsResponse {
+  totalCredits: number;
+  usedCredits: number;
+  remainingCredits: number;
+  history: NotificationCreditAssignment[];
+  notificationLogs?: StreamerNotificationLog[];
+}
+
+export const fetchStreamerNotificationCredits = async (
+  id: string | number,
+): Promise<StreamerNotificationCreditsResponse> => {
+  const res = await apiClient.get(streamerEndpoints.getNotificationCredits(id));
+  return res.data.data;
+};
+
+export const assignStreamerNotificationCredits = async (
+  id: string | number,
+  payload: {
+    pushCount: number;
+    isPaymentReceived: boolean;
+    paymentNote?: string;
+  },
+): Promise<{ success: boolean; insertedId: number; message: string }> => {
+  const res = await apiClient.post(
+    streamerEndpoints.assignNotificationCredits(id),
+    payload,
+  );
+  return res.data.data;
+};
+
+// Stream History interfaces
+export interface StreamHistoryRecord {
+  id: number;
+  streamer_id: number;
+  platform: 'kick' | 'youtube' | 'twitch' | 'instagram' | 'tiktok' | 'x' | 'main';
+  platform_url: string;
+  stream_title?: string | null;
+  started_at: string;
+  stopped_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StreamHistoryResponse {
+  streamerId: number;
+  history: StreamHistoryRecord[];
+}
+
+export const getStreamerStreamHistory = async (
+  streamerId: string | number,
+): Promise<StreamHistoryResponse> => {
+  const res = await apiClient.get(`/admin/streamers/${streamerId}/stream-history`);
+  return res.data.data;
+};
+
+// Pending Notifications
+export interface PendingNotification {
+  id: number;
+  streamer_id: number;
+  headline: string;
+  message: string;
+  audience: 'followers' | 'everyone';
+  status: 'pending' | 'approved' | 'rejected';
+  approval_note?: string | null;
+  reject_reason?: string | null;
+  approved_by?: number | null;
+  approved_at?: string | null;
+  rejected_by?: number | null;
+  rejected_at?: string | null;
+  sent_at?: string | null;
+  created_at: string;
+  updated_at: string;
+  streamer_handle: string;
+  streamer_display_name: string;
+  streamer_avatar_url?: string | null;
+  approved_by_first_name?: string | null;
+  approved_by_last_name?: string | null;
+  rejected_by_first_name?: string | null;
+  rejected_by_last_name?: string | null;
+}
+
+export interface PendingNotificationsResponse {
+  notifications: PendingNotification[];
+  pagination: {
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+  };
+}
+
+export const fetchPendingNotifications = async (
+  params?: {
+    status?: 'pending' | 'approved' | 'rejected';
+    streamerId?: number;
+    limit?: number;
+    offset?: number;
+  }
+): Promise<PendingNotificationsResponse> => {
+  try {
+    const queryParams = new URLSearchParams();
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.streamerId) queryParams.append('streamerId', params.streamerId.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.offset) queryParams.append('offset', params.offset.toString());
+
+    const url = `${adminPendingNotificationEndpoints.getAll}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    const res = await apiClient.get(url);
+    return res.data.data;
+  } catch (error: any) {
+    console.error('API Error in fetchPendingNotifications:', error);
+    throw new Error(error?.response?.data?.message || 'Bildirimler yüklenirken bir hata oluştu');
+  }
+};
+
+export const approvePendingNotification = async (
+  notificationId: number,
+  approvalNote?: string
+): Promise<{ success: boolean; message: string; recipientsCount: number }> => {
+  try {
+    const res = await apiClient.post(adminPendingNotificationEndpoints.approve(notificationId), {
+      approvalNote
+    });
+    return res.data.data;
+  } catch (error: any) {
+    console.error('API Error in approvePendingNotification:', error);
+    console.error('Error response:', error?.response);
+    throw new Error(error?.response?.data?.message || 'Bildirim onaylanırken bir hata oluştu');
+  }
+};
+
+export const rejectPendingNotification = async (
+  notificationId: number,
+  rejectReason: string
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const res = await apiClient.post(adminPendingNotificationEndpoints.reject(notificationId), {
+      rejectReason
+    });
+    return res.data.data;
+  } catch (error: any) {
+    console.error('API Error in rejectPendingNotification:', error);
+    throw new Error(error?.response?.data?.message || 'Bildirim reddedilirken bir hata oluştu');
+  }
 };
