@@ -68,6 +68,11 @@ const navigation = [
         href: "/admin/streamers/posts",
         icon: MessageSquare,
       },
+      {
+        name: "Bekleyen Bildirimler",
+        href: "/admin/pending-notifications",
+        icon: Bell,
+      },
     ],
   },
   {
