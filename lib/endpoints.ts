@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_BASE_URL } from "./apiClient";
 
 // Auth endpoints
 export const authEndpoints = {
@@ -128,6 +128,15 @@ export const tagEndpoints = {
   getActiveTags: `${API_BASE_URL}/front/tags?active=true`,
 };
 
+// Game Types endpoints
+export const gameTypeEndpoints = {
+  getAll: `${API_BASE_URL}/admin/game-types`,
+  getById: (id: string | number) => `${API_BASE_URL}/admin/game-types/${id}`,
+  create: `${API_BASE_URL}/admin/game-types`,
+  update: (id: string | number) => `${API_BASE_URL}/admin/game-types/${id}`,
+  getActive: `${API_BASE_URL}/front/game-types`,
+};
+
 // Advertisement endpoints
 export const advertisementEndpoints = {
   getAll: `${API_BASE_URL}/admin/advertisements`,
@@ -253,6 +262,8 @@ export const streamerEndpoints = {
     `${API_BASE_URL}/admin/streamers/${id}/notification-credits`,
   getStreamHistory: (id: string | number) =>
     `${API_BASE_URL}/admin/streamers/${id}/stream-history`,
+  stopLive: (id: string | number) =>
+    `${API_BASE_URL}/admin/streamers/${id}/stop-live`,
 };
 
 export const streamerPostReportEndpoints = {
@@ -282,4 +293,6 @@ export const pushNotificationEndpoints = {
     `${API_BASE_URL}/admin/push-notifications/notification/${id}`,
   delete: (id: string | number) =>
     `${API_BASE_URL}/admin/push-notifications/notification/${id}`,
+  getStats: `${API_BASE_URL}/admin/notification/stats`,
+  getUsersWithTokens: `${API_BASE_URL}/admin/notification/users-with-tokens`,
 };

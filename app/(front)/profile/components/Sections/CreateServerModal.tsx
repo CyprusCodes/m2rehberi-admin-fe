@@ -13,6 +13,7 @@ import { Check, Server, Globe, MessageCircle, Calendar, Shield, Gamepad2, Settin
 import { useAuth } from "@/contexts/auth-context"
 import { createFrontendServer, type CreateServerPayload } from "@/services/servers"
 import { fetchActiveTags, type Tag } from "@/services/tags"
+import { fetchActiveGameTypes, type GameType } from "@/services/gameTypes"
 import { LEVEL_RANGES, DIFFICULTY_LEVELS, SERVER_TYPES, OynaGG_SYSTEMS, OynaGG_FEATURES, OynaGG_EVENTS } from "@/lib/helpersConstants"
 import { HtmlEditor } from "@/components/ui/html-editor"
 import { uploadAsset } from "@/services/uploads"
@@ -29,6 +30,8 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
   const [submitting, setSubmitting] = useState(false)
   const [tags, setTags] = useState<Tag[]>([])
   const [loadingTags, setLoadingTags] = useState(false)
+  const [gameTypes, setGameTypes] = useState<GameType[]>([])
+  const [loadingGameTypes, setLoadingGameTypes] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [galleryUploading, setGalleryUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
@@ -44,7 +47,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
   const [form, setForm] = useState({
     name: "",
     description: "",
-    gameType: "OynaGG",
+    gameTypeId: "",
     levelRange: "",
     difficulty: "",
     serverType: "",
@@ -66,6 +69,17 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
     if (!open) return
     const load = async () => {
       try {
+        setLoadingGameTypes(true)
+        const gameTypesRes = await fetchActiveGameTypes()
+        const activeGameTypes = gameTypesRes.data || []
+        setGameTypes(activeGameTypes)
+        if (activeGameTypes.length > 0) {
+          setForm((prev) => (
+            prev.gameTypeId
+              ? prev
+              : { ...prev, gameTypeId: String(activeGameTypes[0].gameTypeId) }
+          ))
+        }
         setLoadingTags(true)
         const res = await fetchActiveTags()
         const active = (res.data || [])
@@ -73,6 +87,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
       } catch (e) {
         console.error('Error fetching tags:', e)
       } finally {
+        setLoadingGameTypes(false)
         setLoadingTags(false)
       }
     }
@@ -157,7 +172,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
 
   const handleSubmit = async () => {
     if (!user?.id) return
-    if (!form.name.trim() || !form.description.trim() || !form.levelRange || !form.difficulty || !form.serverType)
+    if (!form.name.trim() || !form.description.trim() || !form.gameTypeId || !form.levelRange || !form.difficulty || !form.serverType)
       return
     try {
       setSubmitting(true)
@@ -165,7 +180,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
         userId: Number(user.id),
         serverName: form.name,
         description: form.description,
-        gameType: "OynaGG",
+        gameTypeId: Number(form.gameTypeId),
         serverLevelRange: form.levelRange,
         serverDifficulty: form.difficulty as any,
         serverType: form.serverType,
@@ -193,7 +208,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
       setForm({
         name: "",
         description: "",
-        gameType: "OynaGG",
+        gameTypeId: "",
         levelRange: "",
         difficulty: "",
         serverType: "",
@@ -264,12 +279,25 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
 
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">Oyun Türü</Label>
-                    <Select value={form.gameType} onValueChange={(v) => setForm({ ...form, gameType: v })}>
+                    <Select value={form.gameTypeId} onValueChange={(v) => setForm({ ...form, gameTypeId: v })}>
                       <SelectTrigger className="h-11 border-border/50 focus:border-primary/50">
                         <SelectValue placeholder="Oyun seçin" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="OynaGG">OynaGG</SelectItem>
+                        {loadingGameTypes && (
+                          <SelectItem value="loading" disabled>
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                              Oyun türleri yükleniyor...
+                            </div>
+                          </SelectItem>
+                        )}
+                        {!loadingGameTypes &&
+                          gameTypes.map((gameType) => (
+                            <SelectItem key={gameType.gameTypeId} value={String(gameType.gameTypeId)}>
+                              {gameType.title}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -759,6 +787,7 @@ export function CreateServerModal({ open, onOpenChange, onCreated }: CreateServe
                 submitting ||
                 !form.name ||
                 !form.description ||
+                !form.gameTypeId ||
                 !form.levelRange ||
                 !form.difficulty ||
                 !form.serverType

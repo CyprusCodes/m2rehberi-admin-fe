@@ -31,13 +31,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
   createPushNotification,
-  sendTestPushNotification,
 } from "@/services/pushNotifications";
 import { toast } from "sonner";
 import { TestNotificationButtons } from "./testNotificationButtons";
@@ -46,6 +58,8 @@ import AndroidFrame from "./android-frame";
 import { fetchActiveServers } from "@/services/servers";
 import { fetchAllStreamerPosts, fetchStreamers } from "@/services/streamers";
 import { fetchActiveLotteries } from "@/services/lottery";
+import { apiClient } from "@/lib/apiClient";
+import { adminUserEndpoints, pushNotificationEndpoints } from "@/lib/endpoints";
 
 export const createPushNotificationSchema = z.object({
   headline: z.string().min(1, "Başlık gereklidir").max(100),
@@ -67,6 +81,13 @@ export const CreatePushNotificationDialog = ({
   children,
 }: CreatePushNotificationDialogProps) => {
   const [open, setOpen] = useState(false);
+
+  // Reset selected user when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setSelectedUserId("");
+    }
+  }, [open]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [countdown, setCountdown] = useState(5);
@@ -78,6 +99,10 @@ export const CreatePushNotificationDialog = ({
     Array<{ id: string; label: string; [key: string]: any }>
   >([]);
   const [loadingOptions, setLoadingOptions] = useState(false);
+  const [users, setUsers] = useState<Array<{ user_id: number; username: string; email: string }>>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [userSelectOpen, setUserSelectOpen] = useState(false);
 
   const form = useForm<z.infer<typeof createPushNotificationSchema>>({
     resolver: zodResolver(createPushNotificationSchema),
@@ -227,23 +252,46 @@ export const CreatePushNotificationDialog = ({
     }
   }, [showConfirmation]);
 
-  const handleTestNotification = async (
-    platform: "ios" | "android" | "all"
-  ) => {
+  // Fetch users with tokens when dialog opens
+  useEffect(() => {
+    if (open && users.length === 0) {
+      const fetchUsers = async () => {
+        setLoadingUsers(true);
+        try {
+          const response = await apiClient.get(pushNotificationEndpoints.getUsersWithTokens);
+          setUsers(response.data.users || []);
+        } catch (error) {
+          console.error("Failed to fetch users:", error);
+          toast.error("Kullanıcılar yüklenirken hata oluştu");
+        } finally {
+          setLoadingUsers(false);
+        }
+      };
+      fetchUsers();
+    }
+  }, [open, users.length]);
+
+  const handleTestNotification = async () => {
     const data = form.getValues();
     if (!data.headline || !data.message) {
       toast.error("Önce başlık ve mesaj alanlarını doldurun");
       return;
     }
 
+    if (!selectedUserId) {
+      toast.error("Lütfen test için bir kullanıcı seçin");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await sendTestPushNotification({
+      await apiClient.post(pushNotificationEndpoints.create, {
         headline: data.headline,
         message: data.message,
         linkTo: data.linkTo,
         linkToId: data.linkToId,
-        platform,
+        sendNow: true,
+        targets: [parseInt(selectedUserId)],
       });
       toast.success("Test bildirimi başarıyla gönderildi");
     } catch (error: unknown) {
@@ -883,10 +931,135 @@ export const CreatePushNotificationDialog = ({
                     Bildirimi göndermeden önce test edebilirsiniz
                   </p>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
+                  {/* User Selection */}
+                  <div className="space-y-4">
+                    <Label htmlFor="test-user-select" className="text-sm font-medium">
+                      Test İçin Kullanıcı Seçin
+                    </Label>
+
+                    {/* Selected User Card */}
+                    {selectedUserId && (
+                      <Card className="p-4 bg-blue-50 border-blue-200">
+                        {(() => {
+                          const selectedUser = users.find(u => String(u.user_id) === selectedUserId);
+                          if (!selectedUser) return null;
+
+                          return (
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                  <span className="text-blue-600 font-semibold text-sm">
+                                    {(selectedUser.first_name?.[0] || selectedUser.username?.[0] || selectedUser.email?.[0] || '?').toUpperCase()}
+                                  </span>
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-900">
+                                    {selectedUser.first_name && selectedUser.last_name
+                                      ? `${selectedUser.first_name} ${selectedUser.last_name}`
+                                      : selectedUser.username || selectedUser.email}
+                                  </p>
+                                  <p className="text-sm text-gray-600">
+                                    {selectedUser.username && selectedUser.username !== selectedUser.email ? `@${selectedUser.username} • ` : ""}
+                                    {selectedUser.email}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex gap-1">
+                                {selectedUser.platforms?.split(',').map((platform: string, platformIndex: number) => (
+                                  <span
+                                    key={`${selectedUser.user_id}-${platform}-${platformIndex}`}
+                                    className={`px-2 py-1 text-xs rounded-full font-medium ${
+                                      platform === 'IOS'
+                                        ? 'bg-purple-100 text-purple-700'
+                                        : 'bg-blue-100 text-blue-700'
+                                    }`}
+                                  >
+                                    {platform}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </Card>
+                    )}
+
+                    <Popover open={userSelectOpen} onOpenChange={setUserSelectOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={userSelectOpen}
+                          className="w-full justify-between"
+                          disabled={loadingUsers}
+                        >
+                          {selectedUserId ? (() => {
+                            const user = users.find(u => String(u.user_id) === selectedUserId);
+                            return user ? (
+                              user.first_name && user.last_name
+                                ? `${user.first_name} ${user.last_name}`
+                                : user.username || user.email
+                            ) : "Kullanıcı seçin";
+                          })() : loadingUsers ? "Kullanıcılar yükleniyor..." : "Test kullanıcısı seçin"}
+                          <span className="ml-2 opacity-50">▼</span>
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Kullanıcı ara..." />
+                          <CommandList>
+                            <CommandEmpty>Kullanıcı bulunamadı.</CommandEmpty>
+                            <CommandGroup>
+                              {users.map((user) => (
+                                <CommandItem
+                                  key={user.user_id}
+                                  value={`${user.first_name || ''} ${user.last_name || ''} ${user.username || ''} ${user.email || ''}`}
+                                  onSelect={(value) => {
+                                    setSelectedUserId(String(user.user_id));
+                                    setUserSelectOpen(false);
+                                  }}
+                                >
+                                  <div className="flex items-center justify-between w-full">
+                                    <div className="flex flex-col">
+                                      <span className="font-medium">
+                                        {user.first_name && user.last_name
+                                          ? `${user.first_name} ${user.last_name}`
+                                          : user.username || user.email}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground">
+                                        {user.username && user.username !== user.email ? `@${user.username} • ` : ""}
+                                        {user.email}
+                                      </span>
+                                    </div>
+                                    <div className="flex gap-1 ml-2">
+                                      {user.platforms?.split(',').map((platform: string, platformIndex: number) => (
+                                        <span
+                                          key={`${user.user_id}-${platform}-${platformIndex}`}
+                                          className={`px-1.5 py-0.5 text-xs rounded-full font-medium ${
+                                            platform === 'IOS'
+                                              ? 'bg-purple-100 text-purple-700'
+                                              : 'bg-blue-100 text-blue-700'
+                                          }`}
+                                        >
+                                          {platform}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
                   <TestNotificationButtons
                     onTest={handleTestNotification}
                     disabled={isSubmitting}
+                    selectedUser={selectedUserId}
                   />
                 </CardContent>
               </Card>

@@ -632,6 +632,8 @@ export default function LotteryDetailPage() {
         onOpenChange={setShowAddParticipantModal}
         lotteryId={lotteryId}
         existingParticipantIds={lottery.participants.map((p) => p.id)}
+        maxWinnerCount={lottery.winnerCount}
+        currentWinnerCount={lottery.winners.length}
         onParticipantAdded={handleParticipantAdded}
       />
 

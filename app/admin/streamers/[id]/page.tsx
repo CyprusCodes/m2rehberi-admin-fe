@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -58,6 +59,7 @@ import {
   StreamerNotificationCreditsResponse,
   StreamHistoryResponse,
   StreamHistoryRecord,
+  adminStopStreamerLive,
 } from "@/services/streamers";
 import { StreamerApprovalModal } from "../Section/StreamerApprovalModal";
 import { AssignNotificationCreditsModal } from "../Section/AssignNotificationCreditsModal";
@@ -94,12 +96,32 @@ export default function StreamerDetailPage() {
   const [badgeLoading, setBadgeLoading] = useState(false);
   const [streamHistory, setStreamHistory] = useState<StreamHistoryRecord[]>([]);
   const [streamHistoryLoading, setStreamHistoryLoading] = useState(false);
+  const DEFAULT_STOP_LIVE_TITLE = "OynaGG Moderasyon";
+  const DEFAULT_STOP_LIVE_MESSAGE =
+    "Yayının uzun süredir etkileşim almadan açık kaldığı tespit edildi. Moderasyon ekibimiz tarafından kapatılmıştır.";
+  const [stopLiveDialogOpen, setStopLiveDialogOpen] = useState(false);
+  const [sendStopNotification, setSendStopNotification] = useState(true);
+  const [stopLiveLoading, setStopLiveLoading] = useState(false);
+  const [stopNotificationTitle, setStopNotificationTitle] = useState(
+    DEFAULT_STOP_LIVE_TITLE,
+  );
+  const [stopNotificationMessage, setStopNotificationMessage] = useState(
+    DEFAULT_STOP_LIVE_MESSAGE,
+  );
 
   useEffect(() => {
     if (streamer) {
       setBadgeUrl(streamer.badge_url || "");
     }
   }, [streamer]);
+
+  useEffect(() => {
+    if (stopLiveDialogOpen) {
+      setSendStopNotification(true);
+      setStopNotificationTitle(DEFAULT_STOP_LIVE_TITLE);
+      setStopNotificationMessage(DEFAULT_STOP_LIVE_MESSAGE);
+    }
+  }, [stopLiveDialogOpen]);
 
   const handleBadgeUpdate = async () => {
     setBadgeLoading(true);
@@ -164,6 +186,29 @@ export default function StreamerDetailPage() {
       alert(e?.message || "Durum güncellenemedi");
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleAdminStopLive = async () => {
+    setStopLiveLoading(true);
+    try {
+      const payload: Record<string, any> = {
+        sendNotification: sendStopNotification,
+      };
+
+      if (sendStopNotification) {
+        payload.notificationTitle = stopNotificationTitle;
+        payload.notificationMessage = stopNotificationMessage;
+      }
+
+      await adminStopStreamerLive(streamerId, payload);
+      await Promise.all([refetch(), fetchStreamHistory()]);
+      setStopLiveDialogOpen(false);
+    } catch (e: any) {
+      console.error("Admin stop live failed:", e);
+      alert(e?.message || "Yayın sonlandırılamadı");
+    } finally {
+      setStopLiveLoading(false);
     }
   };
 
@@ -299,6 +344,11 @@ export default function StreamerDetailPage() {
   const updatedAtStr = streamer.updated_at
     ? moment(streamer.updated_at).locale("tr").format("LL")
     : "-";
+  const isLiveActive = Boolean(streamer.is_live_active);
+  const liveStartFormatted =
+    isLiveActive && streamer.started_at
+      ? moment(streamer.started_at).locale("tr").format("LLL")
+      : null;
 
   const socialLinks = [
     {
@@ -918,6 +968,76 @@ export default function StreamerDetailPage() {
                 </CardContent>
               </Card>
 
+              {/* Live Stream Control */}
+              <Card className="md:col-span-2 bg-white/5 border-white/10 backdrop-blur-sm text-white">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Power className="w-5 h-5 text-red-400" />
+                    Canlı Yayın Kontrolü
+                  </CardTitle>
+                  <CardDescription className="text-white/50">
+                    Yayıncı yayını kapatmayı unuttuysa buradan müdahale edin.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {isLiveActive ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
+                        <div className="text-sm text-emerald-200">
+                          Yayın Durumu
+                        </div>
+                        <div className="flex items-center gap-2 text-emerald-400 font-semibold text-lg mt-1">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                          Yayında
+                        </div>
+                      </div>
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                        <div className="text-sm text-white/50">Platform</div>
+                        <div className="text-white font-semibold capitalize">
+                          {streamer.platform || "Bilinmiyor"}
+                        </div>
+                        {streamer.platform_url && (
+                          <a
+                            href={streamer.platform_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-400 underline mt-1 inline-block"
+                          >
+                            Yayına Git
+                          </a>
+                        )}
+                      </div>
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                        <div className="text-sm text-white/50">Başlangıç</div>
+                        <div className="text-white font-semibold">
+                          {liveStartFormatted || "-"}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-white/60">
+                      Şu anda aktif bir canlı yayın bulunmuyor.
+                    </div>
+                  )}
+
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="text-sm text-white/60">
+                      Admin onayıyla yayını sonlandırabilir ve yayıncıya
+                      bilgilendirme push bildirimi gönderebilirsiniz.
+                    </div>
+                    <Button
+                      variant="destructive"
+                      className="bg-red-600 hover:bg-red-700"
+                      disabled={!isLiveActive || stopLiveLoading}
+                      onClick={() => setStopLiveDialogOpen(true)}
+                    >
+                      <Power className="w-4 h-4 mr-2" />
+                      Yayını Admin Yetkisiyle Kapat
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Admin Actions */}
               <Card className="md:col-span-2 bg-red-900/10 border-red-500/20 backdrop-blur-sm text-white">
                 <CardHeader>
@@ -1035,6 +1155,73 @@ export default function StreamerDetailPage() {
         action={approvalModal.action}
         onSubmit={handleApprovalSubmit}
       />
+
+      {/* Admin Stop Live Dialog */}
+      <Dialog open={stopLiveDialogOpen} onOpenChange={setStopLiveDialogOpen}>
+        <DialogContent className="sm:max-w-lg bg-zinc-950 border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle>Yayını Admin Yetkisiyle Kapat</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-white/70">
+              Bu işlem yayını anında sonlandırır. İsterseniz yayıncıya sebebi
+              açıklayan bir bildirim gönderebilirsiniz.
+            </p>
+            <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3">
+              <div>
+                <div className="font-medium text-white">Bildirim Gönder</div>
+                <p className="text-xs text-white/50">
+                  Yayının neden kapandığını yayıncıya ilet.
+                </p>
+              </div>
+              <Switch
+                checked={sendStopNotification}
+                onCheckedChange={setSendStopNotification}
+              />
+            </div>
+            {sendStopNotification && (
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label className="text-white/80">Bildirim Başlığı</Label>
+                  <Input
+                    value={stopNotificationTitle}
+                    onChange={(e) => setStopNotificationTitle(e.target.value)}
+                    className="bg-black/30 border-white/10 text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-white/80">Bildirim Mesajı</Label>
+                  <Textarea
+                    value={stopNotificationMessage}
+                    onChange={(e) => setStopNotificationMessage(e.target.value)}
+                    className="bg-black/30 border-white/10 text-white min-h-[100px]"
+                  />
+                </div>
+              </div>
+            )}
+            <div className="flex justify-end gap-3 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setStopLiveDialogOpen(false)}
+                className="bg-white/5 border-white/10 text-white hover:bg-white/10"
+                disabled={stopLiveLoading}
+              >
+                Vazgeç
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleAdminStopLive}
+                disabled={stopLiveLoading}
+                className="bg-red-600 hover:bg-red-700 min-w-[160px]"
+              >
+                {stopLiveLoading ? "İşleniyor..." : "Yayını Kapat"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Notification Credits Modal */}
       <AssignNotificationCreditsModal

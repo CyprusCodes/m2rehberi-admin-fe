@@ -30,6 +30,7 @@ import {
   Flag,
   Trophy,
   Bell,
+  Gamepad2,
 } from "lucide-react";
 
 const navigation = [
@@ -79,6 +80,11 @@ const navigation = [
     name: "Raporlanan Postlar",
     href: "/admin/reported-posts",
     icon: Flag,
+  },
+  {
+    name: "Game Types",
+    href: "/admin/game-type",
+    icon: Gamepad2,
   },
   {
     name: "Tags",

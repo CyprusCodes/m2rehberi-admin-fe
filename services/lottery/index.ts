@@ -204,16 +204,18 @@ export const fetchActiveUsers = async (
 // Add participant to lottery
 export const addParticipantToLottery = async (
   lotteryId: string | number,
-  userId: number
+  userId: number,
+  options: { isWinner?: boolean } = {}
 ) => {
   const res = await apiClient.post(
     `/admin/lottery/${lotteryId}/add-participant`,
-    { userId }
+    { userId, isWinner: options.isWinner }
   );
   return res.data as {
     success: boolean;
     message: string;
     insertedRecordId: number;
+    winner?: { winnerPosition: number };
   };
 };
 

@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Search, UserPlus, Check } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Loader2, Search, UserPlus, Check, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   fetchActiveUsers,
@@ -25,6 +26,8 @@ interface AddParticipantsModalProps {
   onOpenChange: (open: boolean) => void;
   lotteryId: string;
   existingParticipantIds: number[];
+  maxWinnerCount: number;
+  currentWinnerCount: number;
   onParticipantAdded: () => void;
 }
 
@@ -33,6 +36,8 @@ export function AddParticipantsModal({
   onOpenChange,
   lotteryId,
   existingParticipantIds,
+  maxWinnerCount,
+  currentWinnerCount,
   onParticipantAdded,
 }: AddParticipantsModalProps) {
   const { toast } = useToast();
@@ -41,12 +46,16 @@ export function AddParticipantsModal({
   const [searchTerm, setSearchTerm] = useState("");
   const [addingUserId, setAddingUserId] = useState<number | null>(null);
   const [addedUserIds, setAddedUserIds] = useState<number[]>([]);
+  const [addAsWinner, setAddAsWinner] = useState(false);
+  const [localWinnerAdds, setLocalWinnerAdds] = useState(0);
 
   // Load users when modal opens
   useEffect(() => {
     if (open) {
       loadUsers();
       setAddedUserIds([]);
+      setLocalWinnerAdds(0);
+      setAddAsWinner(false);
     }
   }, [open]);
 
@@ -67,14 +76,34 @@ export function AddParticipantsModal({
     }
   };
 
+  const winnersRemaining = Math.max(
+    maxWinnerCount - currentWinnerCount - localWinnerAdds,
+    0
+  );
+  const canSelectWinner = winnersRemaining > 0;
+
+  useEffect(() => {
+    if (!canSelectWinner && addAsWinner) {
+      setAddAsWinner(false);
+    }
+  }, [canSelectWinner, addAsWinner]);
+
   const handleAddParticipant = async (userId: number) => {
     setAddingUserId(userId);
     try {
-      await addParticipantToLottery(lotteryId, userId);
+      const willAddAsWinner = addAsWinner && canSelectWinner;
+      await addParticipantToLottery(lotteryId, userId, {
+        isWinner: willAddAsWinner,
+      });
+      if (willAddAsWinner) {
+        setLocalWinnerAdds((prev) => prev + 1);
+      }
       setAddedUserIds((prev) => [...prev, userId]);
       toast({
         title: "Başarılı",
-        description: "Katılımcı eklendi",
+        description: willAddAsWinner
+          ? "Katılımcı kazanan olarak eklendi"
+          : "Katılımcı eklendi",
       });
       onParticipantAdded();
     } catch (error: any) {
@@ -120,6 +149,37 @@ export function AddParticipantsModal({
         </DialogHeader>
 
         <div className="space-y-4">
+          <div className="rounded-lg border border-muted p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Crown className="h-4 w-4 text-amber-500" />
+                <div>
+                  <div className="font-semibold">
+                    Kazanan olarak ekle
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Eklenen kullanıcıyı anında kazanan listesine taşı
+                  </div>
+                </div>
+              </div>
+              <Switch
+                checked={addAsWinner}
+                onCheckedChange={setAddAsWinner}
+                disabled={!canSelectWinner}
+              />
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Kalan kazanan slotu:{" "}
+              <span
+                className={
+                  winnersRemaining > 0 ? "text-emerald-600" : "text-red-500"
+                }
+              >
+                {winnersRemaining}
+              </span>{" "}
+              / {maxWinnerCount}
+            </div>
+          </div>
           {/* Search Input */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
