@@ -139,6 +139,12 @@ export interface CreateStreamerPayload {
 
 export interface UpdateStreamerPayload extends Partial<CreateStreamerPayload> {}
 
+export interface AdminStopLivePayload {
+  sendNotification?: boolean;
+  notificationTitle?: string;
+  notificationMessage?: string;
+}
+
 export const fetchStreamers = async (): Promise<Streamer[]> => {
   const res = await apiClient.get(streamerEndpoints.getAll);
   return res.data;
@@ -210,6 +216,14 @@ export const toggleStreamerVerification = async (
   const res = await apiClient.patch(streamerEndpoints.toggleVerification(id), {
     is_verified: isVerified,
   });
+  return res.data;
+};
+
+export const adminStopStreamerLive = async (
+  id: string | number,
+  payload: AdminStopLivePayload,
+): Promise<{ status: string; data: any }> => {
+  const res = await apiClient.post(streamerEndpoints.stopLive(id), payload);
   return res.data;
 };
 

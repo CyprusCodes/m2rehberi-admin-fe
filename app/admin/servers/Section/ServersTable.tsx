@@ -2,8 +2,8 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useMemo, useState, useCallback } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
 import moment from "moment"
 import "moment/locale/tr"
 import {
@@ -34,6 +34,7 @@ type ApiServer = {
   tag_id?: number | null
   reject_note?: string | null
   server_cover_image_url?: string | null
+  game_type_title?: string | null
   owner_first_name?: string | null
   owner_last_name?: string | null
   approver_first_name?: string | null
@@ -54,6 +55,7 @@ type TableServer = {
   uptime: string
   location: string
   tagId?: number | null
+  gameTypeTitle?: string
   banner?: string
   rules?: string[]
   description?: string
@@ -77,6 +79,7 @@ const mapToTable = (s: ApiServer): TableServer => ({
   uptime: "-",
   location: s.location || "-",
   tagId: s.tag_id ?? null,
+  gameTypeTitle: s.game_type_title || undefined,
   banner: s.server_cover_image_url || undefined,
   rules: undefined,
   description: undefined,
@@ -176,7 +179,7 @@ export function ServersTable() {
             <TableHead>Durum</TableHead>
             <TableHead>Onay Durumu</TableHead>
             <TableHead>Gönderen</TableHead>
-            <TableHead>Oyuncular</TableHead>
+            <TableHead>Oyun Türü</TableHead>
             <TableHead>Konum</TableHead>
             <TableHead>Bağlantılar</TableHead>
             <TableHead>Uptime</TableHead>
@@ -210,12 +213,9 @@ export function ServersTable() {
                 </div>
               </TableCell>
               <TableCell>
-                <div className="space-y-1">
-                  <div className="text-sm font-medium">
-                    {server.players}/{server.maxPlayers}
-                  </div>
-                  <Progress value={(server.maxPlayers ? (server.players / server.maxPlayers) * 100 : 0)} className="h-1 w-16" />
-                </div>
+                <Badge className="bg-green-500 hover:bg-green-600">
+                  {server.gameTypeTitle || "-"}
+                </Badge>
               </TableCell>
               <TableCell>{server.location}</TableCell>
               <TableCell>
