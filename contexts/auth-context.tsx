@@ -12,7 +12,7 @@ interface User {
   id: string
   email: string
   name: string
-  role: "super_admin" | "user" | "server_owner"
+  role: "super_admin" | "user" | "server_owner" | "streamer"
   avatar?: string
   userType?: string
   userTypeLabel?: string
