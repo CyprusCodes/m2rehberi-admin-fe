@@ -3,7 +3,7 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/auth-context'
-import { User, Bell, Gamepad2, Heart, FileText, MessageCircle, Settings, Crown } from 'lucide-react'
+import { User, Bell, Gamepad2, Heart, FileText, MessageCircle, Settings, Crown, Gift, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface ProfileSidebarProps {
@@ -66,10 +66,17 @@ export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) 
   const { user } = useAuth()
   const router = useRouter()
 
-  const canSeeMyServersTab = user?.role === 'super_admin' || user?.role === 'server_owner'
-  const visibleMenuItems = canSeeMyServersTab
-    ? menuItems
-    : menuItems.filter((item) => item.id !== 'servers')
+  const canSeeServersArea =
+    user?.role === 'super_admin' || user?.role === 'server_owner' || user?.role === 'streamer'
+
+  const visibleMenuItems = canSeeServersArea ? menuItems : menuItems.filter((item) => item.id !== 'servers')
+
+  const isGiveawaysTabActive = activeTab === 'cekilis-create' || activeTab === 'cekilis-history'
+  const [isGiveawaysOpen, setIsGiveawaysOpen] = React.useState(isGiveawaysTabActive)
+
+  React.useEffect(() => {
+    if (isGiveawaysTabActive) setIsGiveawaysOpen(true)
+  }, [isGiveawaysTabActive])
 
   const handleTabChange = (tab: string) => {
     onTabChange(tab)
@@ -135,34 +142,99 @@ export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) 
           const isActive = activeTab === item.id
           
           return (
-            <button
-              key={item.id}
-              onClick={() => handleTabChange(item.id)}
-              className={cn(
-                'group w-full rounded-xl border border-transparent p-3 text-left transition-all duration-200',
-                isActive
-                  ? 'border-indigo-500/60 bg-gradient-to-r from-indigo-600/90 to-slate-700/90 text-white shadow-lg shadow-indigo-900/40'
-                  : 'text-slate-400 hover:border-slate-700/80 hover:bg-slate-900/60 hover:text-slate-100'
-              )}
-            >
-              <div className="flex items-center space-x-3">
-                <Icon 
-                  className={cn(
-                    'h-5 w-5 transition-colors duration-200',
-                    isActive ? 'text-white' : 'text-indigo-300 group-hover:text-indigo-100'
-                  )} 
-                />
-                <div className="flex-1 text-left">
-                  <div className="font-medium tracking-wide">{item.label}</div>
-                  <div className={cn(
-                    'text-xs transition-colors duration-200',
-                    isActive ? 'text-indigo-100/70' : 'text-slate-500 group-hover:text-slate-300'
-                  )}>
-                    {item.description}
+            <React.Fragment key={item.id}>
+              <button
+                onClick={() => handleTabChange(item.id)}
+                className={cn(
+                  'group w-full rounded-xl border border-transparent p-3 text-left transition-all duration-200',
+                  isActive
+                    ? 'border-indigo-500/60 bg-gradient-to-r from-indigo-600/90 to-slate-700/90 text-white shadow-lg shadow-indigo-900/40'
+                    : 'text-slate-400 hover:border-slate-700/80 hover:bg-slate-900/60 hover:text-slate-100'
+                )}
+              >
+                <div className="flex items-center space-x-3">
+                  <Icon
+                    className={cn(
+                      'h-5 w-5 transition-colors duration-200',
+                      isActive ? 'text-white' : 'text-indigo-300 group-hover:text-indigo-100'
+                    )}
+                  />
+                  <div className="flex-1 text-left">
+                    <div className="font-medium tracking-wide">{item.label}</div>
+                    <div
+                      className={cn(
+                        'text-xs transition-colors duration-200',
+                        isActive
+                          ? 'text-indigo-100/70'
+                          : 'text-slate-500 group-hover:text-slate-300'
+                      )}
+                    >
+                      {item.description}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </button>
+              </button>
+
+              {/* Giveaways accordion lives under "Sunucularım" */}
+              {item.id === 'servers' && canSeeServersArea && (
+                <div className="space-y-1">
+                  <button
+                    onClick={() => setIsGiveawaysOpen((v) => !v)}
+                    className={cn(
+                      'group w-full rounded-xl border border-transparent p-3 text-left transition-all duration-200',
+                      isGiveawaysTabActive
+                        ? 'border-indigo-500/30 bg-slate-900/60 text-slate-100'
+                        : 'text-slate-400 hover:border-slate-700/80 hover:bg-slate-900/60 hover:text-slate-100'
+                    )}
+                    aria-expanded={isGiveawaysOpen}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Gift className={cn('h-5 w-5', isGiveawaysTabActive ? 'text-indigo-100' : 'text-indigo-300 group-hover:text-indigo-100')} />
+                      <div className="flex-1 text-left">
+                        <div className="font-medium tracking-wide">Çekilişler</div>
+                        <div className={cn('text-xs transition-colors duration-200', isGiveawaysTabActive ? 'text-indigo-100/70' : 'text-slate-500 group-hover:text-slate-300')}>
+                          Çekilişlerinizi yönetin
+                        </div>
+                      </div>
+                      <ChevronDown
+                        className={cn(
+                          'h-4 w-4 transition-transform duration-200',
+                          isGiveawaysOpen ? 'rotate-180' : 'rotate-0',
+                          isGiveawaysTabActive ? 'text-indigo-100' : 'text-slate-500 group-hover:text-slate-300'
+                        )}
+                      />
+                    </div>
+                  </button>
+
+                  {isGiveawaysOpen && (
+                    <div className="space-y-1 pl-6">
+                      <button
+                        onClick={() => handleTabChange('cekilis-create')}
+                        className={cn(
+                          'group w-full rounded-xl border border-transparent px-3 py-2 text-left text-sm transition-all duration-200',
+                          activeTab === 'cekilis-create'
+                            ? 'border-indigo-500/40 bg-indigo-500/10 text-slate-100'
+                            : 'text-slate-400 hover:border-slate-700/80 hover:bg-slate-900/60 hover:text-slate-100'
+                        )}
+                      >
+                        Çekiliş Yarat
+                      </button>
+                      <button
+                        onClick={() => handleTabChange('cekilis-history')}
+                        className={cn(
+                          'group w-full rounded-xl border border-transparent px-3 py-2 text-left text-sm transition-all duration-200',
+                          activeTab === 'cekilis-history'
+                            ? 'border-indigo-500/40 bg-indigo-500/10 text-slate-100'
+                            : 'text-slate-400 hover:border-slate-700/80 hover:bg-slate-900/60 hover:text-slate-100'
+                        )}
+                      >
+                        Geçmiş Çekilişler
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </React.Fragment>
           )
         })}
       </nav>

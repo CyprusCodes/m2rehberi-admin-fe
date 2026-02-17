@@ -8,12 +8,13 @@ import { ProfileSidebar } from './components/ProfileSidebar'
 import { PersonalInfo } from './components/PersonalInfo'
 import { Notifications } from './components/Notifications'
 import { MyServers } from './components/MyServers'
+import { GiveawayCreate, GiveawayHistory } from './components/Giveaways'
 import { FavoriteServers } from './components/FavoriteServer/FavoriteServers'
 import { MyRequests } from './components/MyRequests'
 import { ModeToggle } from '@/components/mode-toggle'
 import SupportTicketsSection from './components/Support/SupportTickets'
 import { useAuth } from '@/contexts/auth-context'
-import { User, Bell, Gamepad2, Heart, FileText, MessageCircle, Settings } from 'lucide-react'
+import { User, Bell, Gamepad2, Heart, FileText, MessageCircle, Settings, Gift } from 'lucide-react'
 
 const tabMeta: Record<string, { title: string; description: string; icon: React.ElementType }> = {
   profile: {
@@ -30,6 +31,16 @@ const tabMeta: Record<string, { title: string; description: string; icon: React.
     title: 'Sunucularım',
     description: 'Yönettiğin sunucuları yönet ve performanslarını takip et.',
     icon: Gamepad2
+  },
+  'cekilis-create': {
+    title: 'Çekiliş Yarat',
+    description: 'Yeni çekiliş oluşturun ve yönetin.',
+    icon: Gift
+  },
+  'cekilis-history': {
+    title: 'Geçmiş Çekilişller',
+    description: 'Geçmiş çekilişlerinizi görüntüleyin.',
+    icon: Gift
   },
   favorites: {
     title: 'Favori Sunucular',
@@ -63,11 +74,14 @@ function ProfileContent() {
 
   useEffect(() => {
     const tab = searchParams.get('tab')
-    const canSeeMyServersTab = user?.role === 'super_admin' || user?.role === 'server_owner'
+    const canSeeServersArea =
+      user?.role === 'super_admin' || user?.role === 'server_owner' || user?.role === 'streamer'
     const allowedTabs = [
       'profile',
       'notifications',
-      ...(canSeeMyServersTab ? (['servers'] as const) : []),
+      ...(canSeeServersArea
+        ? (['servers', 'cekilis-create', 'cekilis-history', 'cekilisler'] as const)
+        : []),
       'favorites',
       'requests',
       'support',
@@ -78,12 +92,23 @@ function ProfileContent() {
       tab &&
       allowedTabs.some(allowed => allowed === tab)
     ) {
+      // Backwards compatibility: old "cekilisler" tab now opens the first submenu.
+      if (tab === 'cekilisler') {
+        setActiveTab('cekilis-create')
+        return
+      }
       setActiveTab(tab)
       return
     }
 
     // If user is not allowed to access servers tab, ensure we don't get stuck there
-    if (!canSeeMyServersTab && activeTab === 'servers') {
+    if (
+      !canSeeServersArea &&
+      (activeTab === 'servers' ||
+        activeTab === 'cekilis-create' ||
+        activeTab === 'cekilis-history' ||
+        activeTab === 'cekilisler')
+    ) {
       setActiveTab('profile')
     }
   }, [searchParams, user?.role, activeTab])
@@ -96,6 +121,10 @@ function ProfileContent() {
         return <Notifications />
       case 'servers':
         return <MyServers openNewServer={openNewServer} setOpenNewServer={setOpenNewServer} />
+      case 'cekilis-create':
+        return <GiveawayCreate />
+      case 'cekilis-history':
+        return <GiveawayHistory />
       case 'favorites':
         return <FavoriteServers />
       case 'requests':
