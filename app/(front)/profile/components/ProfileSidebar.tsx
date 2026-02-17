@@ -66,6 +66,11 @@ export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) 
   const { user } = useAuth()
   const router = useRouter()
 
+  const canSeeMyServersTab = user?.role === 'super_admin' || user?.role === 'server_owner'
+  const visibleMenuItems = canSeeMyServersTab
+    ? menuItems
+    : menuItems.filter((item) => item.id !== 'servers')
+
   const handleTabChange = (tab: string) => {
     onTabChange(tab)
     // Update URL with tab parameter
@@ -125,7 +130,7 @@ export function ProfileSidebar({ activeTab, onTabChange }: ProfileSidebarProps) 
 
       {/* Navigation Menu */}
       <nav className="space-y-2">
-        {menuItems.map((item) => {
+        {visibleMenuItems.map((item) => {
           const Icon = item.icon
           const isActive = activeTab === item.id
           

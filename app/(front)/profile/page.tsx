@@ -63,10 +63,30 @@ function ProfileContent() {
 
   useEffect(() => {
     const tab = searchParams.get('tab')
-    if (tab && ['profile', 'notifications', 'servers', 'favorites', 'requests', 'support', 'settings'].includes(tab)) {
+    const canSeeMyServersTab = user?.role === 'super_admin' || user?.role === 'server_owner'
+    const allowedTabs = [
+      'profile',
+      'notifications',
+      ...(canSeeMyServersTab ? (['servers'] as const) : []),
+      'favorites',
+      'requests',
+      'support',
+      'settings',
+    ] as const
+
+    if (
+      tab &&
+      allowedTabs.some(allowed => allowed === tab)
+    ) {
       setActiveTab(tab)
+      return
     }
-  }, [searchParams])
+
+    // If user is not allowed to access servers tab, ensure we don't get stuck there
+    if (!canSeeMyServersTab && activeTab === 'servers') {
+      setActiveTab('profile')
+    }
+  }, [searchParams, user?.role, activeTab])
 
   const renderContent = () => {
     switch (activeTab) {
